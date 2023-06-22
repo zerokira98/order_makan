@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_bloc.dart';
 import 'package:order_makan/component/toptab.dart';
+import 'package:order_makan/repo/strukrepo.dart';
 
 class CheckoutPage extends StatefulWidget {
   // StrukState theData;
@@ -117,7 +118,12 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ],
                     ),
                     ElevatedButton(
-                        onPressed: () {}, child: const Text('Chekout!'))
+                        onPressed: () async {
+                          var a = await RepositoryProvider.of<StrukRepository>(
+                                  context)
+                              .sendtoDatabase(state);
+                        },
+                        child: const Text('Chekout!'))
                     // Text(widget.theData.toString()),
                   ],
                 ),

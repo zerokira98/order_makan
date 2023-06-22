@@ -1,4 +1,5 @@
 // import 'package:order_makan/model/menuitems_model.dart';
+import 'package:order_makan/bloc/struk/struk_bloc.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:sembast/sembast.dart';
 
@@ -7,7 +8,7 @@ abstract class StrukRepo {
 
   StrukRepo(this.db);
 
-  Future sendtoDatabase(List<StrukItem> items);
+  Future sendtoDatabase(StrukState state);
   Future readAllStruk();
   Future readStrukwithFilter(StrukFilter filter);
 }
@@ -22,13 +23,14 @@ class StrukRepository extends StrukRepo {
   }
 
   @override
-  Future sendtoDatabase(List<StrukItem> items) {
+  Future sendtoDatabase(StrukState state) {
     var store = intMapStoreFactory.store('struk');
-    return db.transaction((trx) async {
-      for (var e in items) {
-        await store.add(trx, e.toJson());
-      }
-    });
+    return Future(() => null);
+    // return db.transaction((trx) async {
+    //   for (var e in items) {
+    //     await store.add(trx, e.toJson());
+    //   }
+    // });
   }
 
   @override
