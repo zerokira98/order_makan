@@ -10,12 +10,19 @@ class AddMenu extends MenuEvent {
   AddMenu(this.menu);
 }
 
+class EditMenu extends MenuEvent {
+  final MenuItems prevmenu;
+  final MenuItems editedmenu;
+
+  EditMenu(this.prevmenu, this.editedmenu);
+}
+
 class DelMenu extends MenuEvent {
   final MenuItems menu;
   DelMenu({required this.menu});
 }
 
-class ChangeCat extends MenuEvent {
+class ChangeTopbarCat extends MenuEvent {
   final String catName;
-  ChangeCat({required this.catName});
+  ChangeTopbarCat({required this.catName});
 }

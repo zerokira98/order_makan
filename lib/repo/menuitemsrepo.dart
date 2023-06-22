@@ -1,4 +1,4 @@
-import 'package:order_makan/use_app/bloc/menuitem/menuitems_model.dart';
+import 'package:order_makan/model/menuitems_model.dart';
 import 'package:sembast/sembast.dart';
 
 abstract class MenuItemRepo {
@@ -12,7 +12,7 @@ abstract class MenuItemRepo {
   Future addCategorytoMenu(MenuItems menu);
   Future addMenu(MenuItems menu);
   Future deleteMenu(MenuItems menu);
-  Future editMenu(MenuItems menu);
+  Future editMenu(String title, MenuItems menu);
 }
 
 class MenuItemRepository implements MenuItemRepo {
@@ -21,9 +21,10 @@ class MenuItemRepository implements MenuItemRepo {
 
   MenuItemRepository(this.db);
   @override
-  Future editMenu(MenuItems menu) {
-    // TODO: implement editMenu
-    throw UnimplementedError();
+  Future editMenu(String title, MenuItems menu) {
+    var store = intMapStoreFactory.store('menus');
+    return store.update(db, menu.toJson(),
+        finder: Finder(filter: Filter.equals('title', title)));
   }
 
   @override

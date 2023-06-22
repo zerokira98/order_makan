@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
-import 'package:order_makan/edit_app/edit_main.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
+import 'package:order_makan/pages/admin_loginpage.dart';
+import 'package:order_makan/pages/firstrun_setup.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
+import 'package:order_makan/repo/strukrepo.dart';
 import 'package:order_makan/sembastdb.dart';
-import 'package:order_makan/use_app/use_main.dart';
-
-import 'use_app/bloc/struk/struk_bloc.dart';
+import 'package:order_makan/pages/use_app/use_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var db = await SembastDB.init();
-  runApp(RepositoryProvider(
-    create: (context) => MenuItemRepository(db),
+  var db2 = await SembastDB.init2();
+  runApp(MultiRepositoryProvider(
+    providers: [
+      RepositoryProvider(
+        create: (context) => MenuItemRepository(db),
+      ),
+      RepositoryProvider(
+        create: (context) => StrukRepository(db2),
+      ),
+    ],
     child: MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -37,15 +47,32 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      themeMode: ThemeMode.system,
-      darkTheme: ThemeData.dark(useMaterial3: true),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return BlocListener<TopbarBloc, TopbarState>(
+      listenWhen: (p, c) => p.selected != c.selected,
+      listener: (context, state) {
+        BlocProvider.of<m.MenuBloc>(context)
+            .add(m.ChangeTopbarCat(catName: state.selected ?? '[ALL]'));
+      },
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        themeMode: ThemeMode.system,
+        darkTheme: ThemeData.dark(useMaterial3: true),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: FutureBuilder(
+          future: SharedPreferences.getInstance()
+              .then((value) => value.getBool('firstStart')),
+          builder: (context, snap) {
+            if ((snap.data == null) | (snap.data == true)) {
+              return const SetupPage();
+            } else {
+              return const MyHome(title: 'Flutter Home Page');
+            }
+          },
+        ),
       ),
-      home: const MyHome(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -56,24 +83,16 @@ class MyHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
+        overlays: SystemUiOverlay.values);
     return Scaffold(
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Text('Login App'),
+        const Text('Login Karyawan'),
         const Card(
             child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text('login app form'),
+          padding: EdgeInsets.all(28.0),
+          child: Text('login Form'),
         )),
-        ElevatedButton(
-            onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BlocProvider(
-                    create: (context) => StrukBloc(),
-                    child: const EditMain(),
-                  ),
-                )),
-            child: const Text('Login Pengusaha')),
         ElevatedButton(
             onPressed: () => Navigator.push(
                 context,
@@ -83,12 +102,13 @@ class MyHome extends StatelessWidget {
             child: const Text('Login Karyawan')),
         ElevatedButton(
             onPressed: () async {
-              // var menurepo = RepositoryProvider.of<MenuItemRepository>(context);
-              // await menurepo
-              //     .deleteMenu(MenuItems(title: 'Kentang', imgDir: ''));
-              // var printable = await menurepo.getAllMenus();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminLoginPage(),
+                  ));
             },
-            child: const Text('Button debug')),
+            child: const Text('Admin Panel')),
       ]),
     );
   }

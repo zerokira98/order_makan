@@ -32,7 +32,7 @@ class _TopTabState extends State<TopTab> {
               //     .getCategories(),
               builder: (context, state) {
             if (state.categories.isEmpty) {
-              return AddCategoryButton();
+              return widget.edit ? AddCategoryButton() : const Text('EMPTY');
             }
             return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -42,7 +42,7 @@ class _TopTabState extends State<TopTab> {
                     state.categories.length + 2,
                     (index) => index < state.categories.length + 1
                         ? index == 0
-                            ? TopBarMenuItem(nama: '[ALL]')
+                            ? const TopBarMenuItem(nama: '[ALL]')
                             : TopBarMenuItem(nama: state.categories[index - 1])
                         : widget.edit
                             ? AddCategoryButton()
@@ -74,18 +74,24 @@ class AddCategoryButton extends StatelessWidget {
           showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                    title: const Text('Add Category'),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () async {
-                            if (catControl.text.length > 2) {
-                              BlocProvider.of<TopbarBloc>(context)
-                                  .add(AddCat(name: catControl.text));
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: const Text('Submit'))
-                    ],
+                    title: Row(
+                      children: [
+                        const Text('Add Category'),
+                        Expanded(
+                            child: Container(
+                          padding: const EdgeInsets.all(4),
+                        )),
+                        ElevatedButton(
+                            onPressed: () async {
+                              if (catControl.text.length > 2) {
+                                BlocProvider.of<TopbarBloc>(context)
+                                    .add(AddCat(name: catControl.text));
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: const Text('Submit'))
+                      ],
+                    ),
                     content: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
@@ -101,7 +107,7 @@ class AddCategoryButton extends StatelessWidget {
   }
 }
 
-NumberFormat numfor = NumberFormat("###,###");
+NumberFormat numfor = NumberFormat("###,###", 'ID_id');
 
 extension Uppercasing on String {
   String firstUpcase() {

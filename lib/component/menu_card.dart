@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
+import 'package:order_makan/bloc/struk/struk_bloc.dart';
+import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart' as t;
+import 'package:order_makan/model/menuitems_model.dart';
+import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
-import 'package:order_makan/use_app/bloc/struk/struk_bloc.dart';
-import 'package:order_makan/use_app/component/toptab.dart';
-
-import '../bloc/menuitem/menuitems_model.dart';
+import 'package:order_makan/component/toptab.dart';
 
 class MenuCard extends StatelessWidget {
   final Function() onTap;
@@ -24,48 +25,46 @@ class MenuCard extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onLongPress: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      const Text('Delete this menu?'),
-                      SizedBox(
-                        height: 170,
-                        child: Stack(
-                          children: [
-                            MenuCard(
-                              onTap: () {},
-                              menudata: menudata,
-                            ),
-                            Positioned.fill(
-                              child: Container(
-                                color: Colors.green.withOpacity(0.1),
+          if (editmode) {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return Dialog(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Text('Delete this menu?'),
+                        SizedBox(
+                          height: 170,
+                          child: Stack(
+                            children: [
+                              MenuCard(
+                                onTap: () {},
+                                menudata: menudata,
                               ),
-                            )
-                          ],
+                              Positioned.fill(
+                                child: Container(
+                                  color: Colors.green.withOpacity(0.1),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                      ElevatedButton(
-                          onPressed: () {
-                            BlocProvider.of<MenuBloc>(context)
-                                .add(DelMenu(menu: menudata));
-                          },
-                          child: const Text('Confirm'))
-                    ],
+                        ElevatedButton(
+                            onPressed: () {
+                              BlocProvider.of<MenuBloc>(context)
+                                  .add(DelMenu(menu: menudata));
+                            },
+                            child: const Text('Confirm'))
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          );
-          editmode
-              ? () => BlocProvider.of<MenuBloc>(context)
-                  .add(DelMenu(menu: menudata))
-              : null;
+                );
+              },
+            );
+          } else {}
         },
         onTap: editmode
             ? () {
@@ -75,20 +74,10 @@ class MenuCard extends StatelessWidget {
                         TambahmenuDialog(editmode: true, menudata: menudata));
               }
             : () => BlocProvider.of<StrukBloc>(context)
-                .add(AddOrderitems(item: menudata)),
+                .add(AddOrderitems(item: StrukItem.fromMenuItems(menudata))),
         child: Container(
-          width: 115,
-          // margin: EdgeInsets.all(4),
-          padding: const EdgeInsets.all(4),
-          // decoration: BoxDecoration(
-          //   borderRadius: BorderRadius.circular(8),
-          //   color: Color.fromARGB(255, 151, 163, 168),
-          //   boxShadow: [
-          //     BoxShadow(
-          //       color: Colors.black,
-          //     )
-          //   ],
-          // ),
+          width: 120,
+          padding: const EdgeInsets.all(6),
           child: Column(
             children: [
               Row(
@@ -122,7 +111,7 @@ class MenuCard extends StatelessWidget {
                   // child: Center(child: Text('menu image')),
                 ),
               ),
-              Text('Rp.${menudata.price}')
+              Text('Rp  ${menudata.price.toString().numberFormat()}')
             ],
           ),
         ),
@@ -296,7 +285,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
             ],
           )),
           ElevatedButton(
-              onPressed: () async {
+              onPressed: () {
                 int? hargaInt = int.tryParse(hargaC.text);
                 if (namaMenuC.text.length > 3 && hargaInt != null) {
                   var menuitem = MenuItems(
@@ -306,8 +295,13 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                     categories: category,
                   );
                   if (widget.editmode) {
+                    BlocProvider.of<MenuBloc>(context)
+                        .add(EditMenu(widget.menudata!, menuitem));
+                    BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
+                    Navigator.pop(context);
                   } else {
                     BlocProvider.of<MenuBloc>(context).add(AddMenu(menuitem));
+                    Navigator.pop(context);
                   }
                 }
               },

@@ -47,12 +47,10 @@ class MenuItems {
   factory MenuItems.fromJson(Map<String, dynamic> json) =>
       _$MenuItemsFromJson(json);
 
-  /// Connect the generated [_$PersonToJson] function to the `toJson` method.
   Map<String, dynamic> toJson() => _$MenuItemsToJson(this);
 
   @override
   String toString() {
-    // TODO: implement toString
     return title;
   }
 }

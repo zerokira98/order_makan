@@ -46,6 +46,8 @@ dependencies:
   image_picker: ^0.8.8
   json_annotation: ^4.8.1
   intl: ^0.18.1
+  shared_preferences: ^2.1.2
+  crypt: ^4.3.0
 
 dev_dependencies:
   flutter_test:
