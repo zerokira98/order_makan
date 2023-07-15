@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:order_makan/main.dart';
 import 'package:order_makan/pages/admin_panel/karyawan_manage/karyawanmanage_main.dart';
 import 'package:order_makan/pages/edit_app/edit_main.dart';
 
@@ -15,7 +16,22 @@ class _AdminPanelState extends State<AdminPanel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Admin Panel [${a[selectedIndex]}]')),
+      appBar: AppBar(
+        title: Text('Admin Panel [${a[selectedIndex]}]'),
+        actions: [
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyApp(),
+                  ),
+                  (route) => false,
+                );
+              },
+              child: const Text('Close AdminPanel'))
+        ],
+      ),
       drawer: Drawer(
         child: Center(
           child: ListView(

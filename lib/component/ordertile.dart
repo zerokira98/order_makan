@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_bloc.dart';
+import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/component/toptab.dart';
 import 'dart:math' as math;
 

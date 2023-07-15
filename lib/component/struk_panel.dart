@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_bloc.dart';
+import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/component/ordertile.dart';
 import 'package:order_makan/component/toptab.dart';
-import 'package:order_makan/pages/checkout.dart';
+import 'package:order_makan/pages/use_app/checkout.dart';
 
 class StrukPanel extends StatelessWidget {
   const StrukPanel({
@@ -72,15 +73,23 @@ class StrukPanel extends StatelessWidget {
                             Text('Total: Rp.${getTotal().numberFormat()} '),
                             ElevatedButton(
                                 onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (c) => BlocProvider.value(
-                                          value: BlocProvider.of<StrukBloc>(
-                                              context),
-                                          child: const CheckoutPage(),
-                                        ),
-                                      ));
+                                  showDialog(
+                                    context: context,
+                                    builder: (c) => BlocProvider.value(
+                                      value:
+                                          BlocProvider.of<StrukBloc>(context),
+                                      child: const CheckoutPage(),
+                                    ),
+                                  );
+                                  // Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //       builder: (c) => BlocProvider.value(
+                                  //         value: BlocProvider.of<StrukBloc>(
+                                  //             context),
+                                  //         child: const CheckoutPage(),
+                                  //       ),
+                                  //     ));
                                 },
                                 child: const Text('CheckOut'))
                           ],

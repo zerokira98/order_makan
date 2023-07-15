@@ -48,6 +48,7 @@ dependencies:
   intl: ^0.18.1
   shared_preferences: ^2.1.2
   crypt: ^4.3.0
+  equatable: ^2.0.5
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/sate.jpg
+    - assets/kentang.jpg
+    - assets/nasi.jpg
+    - assets/es_teh.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

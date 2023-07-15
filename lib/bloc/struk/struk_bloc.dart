@@ -1,19 +1,25 @@
 import 'package:bloc/bloc.dart';
+
 import 'package:meta/meta.dart';
+import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 
 part 'struk_event.dart';
-part 'struk_state.dart';
 
 class StrukBloc extends Bloc<StrukEvent, StrukState> {
-  Future errorHandle = Future(() => null);
   StrukBloc() : super(StrukState.initial()) {
+    on<InitiateStruk>((event, emit) {
+      ///get karyawan id...
+
+      emit(state.copywith(karyawanId: event.karyawanId));
+    });
     on<IncreaseCount>((event, emit) async {
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
           .map((e) =>
               e.title == event.item.title ? e.copywith(count: e.count + 1) : e)
           .toList();
-      emit(StrukState(orderItems: newlist));
+      // emit(StrukState(orderItems: newlist));
+      emit(state.copywith(orderItems: newlist));
     });
     on<DecreaseCount>((event, emit) async {
       if (state.orderItems
@@ -25,14 +31,14 @@ class StrukBloc extends Bloc<StrukEvent, StrukState> {
         newlist.removeWhere((element) =>
             element.title ==
             event.item.title); //Plz change to id after db created///maybe not
-        emit(StrukState(orderItems: newlist));
+        emit(state.copywith(orderItems: newlist));
       } else {
         List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
             .map((e) => e.title == event.item.title
                 ? e.copywith(count: e.count - 1)
                 : e)
             .toList();
-        emit(StrukState(orderItems: newlist));
+        emit(state.copywith(orderItems: newlist));
       }
     });
     on<AddOrderitems>((event, emit) async {
@@ -43,7 +49,7 @@ class StrukBloc extends Bloc<StrukEvent, StrukState> {
       !(newlist.every((element) => element.title != event.item.title))
           ? error = StrukError.existed(event.item)
           : newlist.add(event.item.copywith(count: 1));
-      emit(StrukState(orderItems: newlist, error: error));
+      emit(state.copywith(orderItems: newlist, error: error));
 
       ///Use Color animation on highlight!
     });

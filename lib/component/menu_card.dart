@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,10 +7,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart' as t;
+import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/component/toptab.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MenuCard extends StatelessWidget {
   final Function() onTap;
@@ -104,10 +107,19 @@ class MenuCard extends StatelessWidget {
                     color: Colors.black12,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Image.asset(
-                    'assets/sate.jpg',
-                    fit: BoxFit.cover,
-                  ),
+                  child: menudata.imgDir.contains('assets')
+                      ? Image.asset(
+                          menudata.imgDir.isEmpty
+                              ? 'assets/sate.jpg'
+                              : menudata.imgDir,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.file(
+                          File(
+                            menudata.imgDir,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
                   // child: Center(child: Text('menu image')),
                 ),
               ),
@@ -139,8 +151,18 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
       elevation: 2,
       child: InkWell(
         onTap: () {
+          var ao = BlocProvider.of<TopbarBloc>(context).state.selected;
+          // if (ao != null) {
+          //   if (ao == '[ALL]') {
+          //     ao = null;
+          //   }
+          // }
           showDialog(
-              context: context, builder: (context) => const TambahmenuDialog());
+              context: context,
+              builder: (context) => TambahmenuDialog(
+                    menudata:
+                        MenuItems(title: '', imgDir: '', categories: [ao]),
+                  ));
         },
         // onTap: () => BlocProvider.of<StrukBloc>(context)
         //     .add(AddOrderitems(item: menudata)),
@@ -213,12 +235,17 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
   List<String> category = [];
   @override
   void initState() {
-    widget.editmode ? category.addAll(widget.menudata!.categories) : null;
+    if (widget.editmode) {
+      category.addAll(widget.menudata!.categories);
+    } else if (widget.menudata!.categories.isNotEmpty) {
+      category = widget.menudata!.categories;
+    }
 
     namaMenuC = TextEditingController(
         text: widget.editmode ? widget.menudata!.title : '');
     hargaC = TextEditingController(
         text: widget.editmode ? widget.menudata!.price.toString() : '');
+    imgdir = widget.editmode ? widget.menudata!.imgDir : '';
     super.initState();
   }
 
@@ -288,6 +315,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
               onPressed: () {
                 int? hargaInt = int.tryParse(hargaC.text);
                 if (namaMenuC.text.length > 3 && hargaInt != null) {
+                  print(imgdir);
                   var menuitem = MenuItems(
                     title: namaMenuC.text,
                     imgDir: imgdir,
@@ -295,12 +323,22 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                     categories: category,
                   );
                   if (widget.editmode) {
+                    var pickedfile = File(imgdir);
+                    getApplicationDocumentsDirectory().then((value) {
+                      var copytodir = File(
+                          p.join(value.path, 'imgres/${p.basename(imgdir)}'));
+                      print(copytodir.path);
+                      copytodir.create(recursive: true).then((value) {
+                        value.writeAsBytesSync(pickedfile.readAsBytesSync());
+                      });
+                    });
                     BlocProvider.of<MenuBloc>(context)
                         .add(EditMenu(widget.menudata!, menuitem));
-                    BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
                     Navigator.pop(context);
+                    BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
                   } else {
                     BlocProvider.of<MenuBloc>(context).add(AddMenu(menuitem));
+                    BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
                     Navigator.pop(context);
                   }
                 }
@@ -326,6 +364,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                 controller: hargaC,
                 decoration: const InputDecoration(label: Text('Harga')),
               )),
+          const Padding(padding: EdgeInsets.all(4)),
           (imgdir.isEmpty)
               ? ElevatedButton.icon(
                   onPressed: () async {
@@ -340,18 +379,21 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                   icon: const Icon(Icons.camera_alt_outlined),
                   label: const Text('Gambar'))
               : SizedBox(
-                  height: 120,
+                  height: 110,
                   child: InkWell(
-                      onTap: () async {
-                        var a = await ImagePicker()
-                            .pickImage(source: ImageSource.gallery);
-                        if (a != null) {
-                          setState(() {
-                            imgdir = a.path;
-                          });
-                        }
-                      },
-                      child: Image.file(File(imgdir))),
+                    onTap: () async {
+                      var a = await ImagePicker()
+                          .pickImage(source: ImageSource.gallery);
+                      if (a != null) {
+                        setState(() {
+                          imgdir = a.path;
+                        });
+                      }
+                    },
+                    child: imgdir.contains('assets')
+                        ? Image.asset(imgdir)
+                        : Image.file(File(imgdir)),
+                  ),
                 ),
 
           // Text('imgField: img'),

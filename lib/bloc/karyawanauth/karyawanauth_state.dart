@@ -1,7 +1,10 @@
 part of 'karyawanauth_bloc.dart';
 
 @immutable
-abstract class KaryawanauthState {}
+abstract class KaryawanauthState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
 class KaryawanauthInitial extends KaryawanauthState {}
 
@@ -10,7 +13,12 @@ class KaryawanAuthenticated extends KaryawanauthState {
   KaryawanAuthenticated(this.user);
 }
 
-class KaryawanUnAuth extends KaryawanauthState {}
+class KaryawanUnAuth extends KaryawanauthState {
+  final String? errorMsg;
+  KaryawanUnAuth({this.errorMsg});
+  @override
+  List<Object?> get props => [errorMsg];
+}
 
 class KaryawanLoading extends KaryawanauthState {}
 

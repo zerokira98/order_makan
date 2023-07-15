@@ -3,6 +3,11 @@ part of 'struk_bloc.dart';
 @immutable
 abstract class StrukEvent {}
 
+class InitiateStruk extends StrukEvent {
+  final String? karyawanId;
+  InitiateStruk({this.karyawanId});
+}
+
 class AddOrderitems extends StrukEvent {
   final StrukItem item;
   AddOrderitems({required this.item});
@@ -19,3 +24,8 @@ class DecreaseCount extends StrukEvent {
 }
 
 class SendtoDb extends StrukEvent {}
+
+// final class _KaryawanUserChanged extends StrukEvent {
+//   final User user;
+//   const _KaryawanUserChanged(this.user);
+// }
