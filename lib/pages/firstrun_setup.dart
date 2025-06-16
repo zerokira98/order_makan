@@ -53,7 +53,8 @@ class _SetupPageState extends State<SetupPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Sign Up Admin for App'),
-            Text('First time setup. Don\'t forget', textScaleFactor: 0.5),
+            Text('First time setup. Don\'t forget',
+                textScaler: TextScaler.linear(0.5)),
           ],
         ),
       ),

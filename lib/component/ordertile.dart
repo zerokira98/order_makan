@@ -19,7 +19,7 @@ class OrderTile extends StatefulWidget {
 class _OrderTileState extends State<OrderTile>
     with SingleTickerProviderStateMixin {
   late AnimationController ac;
-  Tween ani = Tween(begin: 0.0, end: 1.0);
+  Tween<double> ani = Tween(begin: 0.0, end: 1.0);
   late Animation ca;
   @override
   void initState() {
@@ -44,10 +44,11 @@ class _OrderTileState extends State<OrderTile>
           child: AnimatedBuilder(
             animation: ac,
             builder: (context, child) => Transform.translate(
-              offset: Offset(math.sin((ac.value * math.pi)) * 2, 0),
+              offset: Offset(math.sin((ac.value * math.pi)) * 2.0, 0.0),
               child: Container(
-                color: Colors.red.withOpacity(ca.value),
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                color: Colors.red.withValues(alpha: ca.value),
+                margin:
+                    const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4.0),
                 child: Column(
                   children: [
                     Row(
@@ -86,7 +87,7 @@ class _OrderTileState extends State<OrderTile>
                             flex: 2,
                             child: SizedBox(
                               // color: Colors.green,
-                              height: 20,
+                              height: 20.0,
                               child: Text(
                                 (state.orderItems[widget.index].price *
                                         state.orderItems[widget.index].count)

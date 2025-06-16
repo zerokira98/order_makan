@@ -17,13 +17,13 @@ class StrukPanel extends StatelessWidget {
         flex: 3,
         child: Card(
           elevation: 4,
-          margin: const EdgeInsets.all(6),
+          margin: const EdgeInsets.all(6.0),
           child: Column(children: [
             const Padding(
               padding: EdgeInsets.all(8.0),
               child: Text(
                 'Struck',
-                textScaleFactor: 1.2,
+                textScaler: TextScaler.linear(1.2),
               ),
             ),
             Expanded(
@@ -64,9 +64,9 @@ class StrukPanel extends StatelessWidget {
 
                       return Container(
                         color: Colors.red,
-                        margin: const EdgeInsets.only(bottom: 10),
+                        margin: const EdgeInsets.only(bottom: 10.0),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                            horizontal: 8.0, vertical: 4.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

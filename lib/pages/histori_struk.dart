@@ -43,7 +43,7 @@ class HistoriStruk extends StatelessWidget {
                                 children: [
                                   Text(
                                     'Nomor Struk#${e.key}',
-                                    textScaleFactor: 1.2,
+                                    textScaler: TextScaler.linear(1.2),
                                     textAlign: TextAlign.left,
                                   ),
                                   Expanded(child: Container()),

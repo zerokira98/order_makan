@@ -33,6 +33,9 @@ void main() async {
     child: MultiBlocProvider(
       providers: [
         BlocProvider(
+          create: (context) => StrukBloc(),
+        ),
+        BlocProvider(
           create: (context) =>
               AntrianBloc(RepositoryProvider.of<StrukRepository>(context))
                 ..add(InitiateAntrian()),

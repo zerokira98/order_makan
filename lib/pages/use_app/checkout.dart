@@ -49,7 +49,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       padding: EdgeInsets.all(8.0),
                       child: Text('Nama Resto'),
                     ),
-                    const Padding(padding: EdgeInsets.all(24)),
+                    const Padding(padding: EdgeInsets.all(24.0)),
                     const Row(
                       children: [
                         Text(
@@ -168,7 +168,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       children: [
                         Text(
                           'Total : Rp${(total(state) - diskon).toString().numberFormat()}',
-                          textScaleFactor: 1.25,
+                          textScaler: TextScaler.linear(1.25),
                           style: const TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ],

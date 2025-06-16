@@ -1,4 +1,3 @@
-
 import 'package:crypt/crypt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,7 +25,8 @@ class _KaryawanSignupPageState extends State<KaryawanSignupPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Karyawan Signup Page'),
-            Text('Buat akun karyawan pertama', textScaleFactor: 0.5),
+            Text('Buat akun karyawan pertama',
+                textScaler: TextScaler.linear(0.5)),
           ],
         ),
       ),

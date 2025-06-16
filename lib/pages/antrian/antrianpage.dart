@@ -32,7 +32,7 @@ class AntrianPage extends StatelessWidget {
                       children: [
                         Text(
                           'Nomor Struk#$e',
-                          textScaleFactor: 1.2,
+                          textScaler: TextScaler.linear(1.2),
                           textAlign: TextAlign.left,
                         ),
                         Expanded(child: Container()),

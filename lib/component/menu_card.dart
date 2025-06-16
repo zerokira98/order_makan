@@ -49,7 +49,7 @@ class MenuCard extends StatelessWidget {
                               ),
                               Positioned.fill(
                                 child: Container(
-                                  color: Colors.green.withOpacity(0.1),
+                                  color: Colors.green.withValues(alpha: 0.1),
                                 ),
                               )
                             ],
@@ -79,8 +79,8 @@ class MenuCard extends StatelessWidget {
             : () => BlocProvider.of<StrukBloc>(context)
                 .add(AddOrderitems(item: StrukItem.fromMenuItems(menudata))),
         child: Container(
-          width: 120,
-          padding: const EdgeInsets.all(6),
+          // width: 12,
+          padding: const EdgeInsets.all(6.0),
           child: Column(
             children: [
               Row(
@@ -90,7 +90,7 @@ class MenuCard extends StatelessWidget {
                       height: 32,
                       child: Text(
                         menudata.title.firstUpcase(),
-                        // textScaleFactor: 1.2,
+                        // textScaler: TextScaler.linear( 1.2,
                         style: const TextStyle(fontSize: 14, height: 1.0),
                         textAlign: TextAlign.left,
                       ),
@@ -101,7 +101,7 @@ class MenuCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: Container(
-                  height: 95,
+                  // height: 94,
                   // width: 95,
                   decoration: BoxDecoration(
                     color: Colors.black12,
@@ -112,17 +112,20 @@ class MenuCard extends StatelessWidget {
                           menudata.imgDir.isEmpty
                               ? 'assets/sate.jpg'
                               : menudata.imgDir,
+                          height: 80,
                           fit: BoxFit.cover,
                         )
                       : Image.file(
                           File(
                             menudata.imgDir,
                           ),
+                          height: 80,
                           fit: BoxFit.cover,
                         ),
                   // child: Center(child: Text('menu image')),
                 ),
               ),
+              // Padding(padding: EdgeInsetsGeometry.all(2)),
               Text('Rp  ${menudata.price.toString().numberFormat()}')
             ],
           ),
@@ -169,7 +172,7 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
         child: Container(
           width: 115,
           // margin: EdgeInsets.all(4),
-          padding: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(4.0),
           child: Column(
             children: [
               const Row(
@@ -179,7 +182,7 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
                       height: 32,
                       child: Text(
                         'Tambah menu',
-                        // textScaleFactor: 1.2,
+                        // textScaler: TextScaler.linear( 1.2,
                         style: TextStyle(fontSize: 14, height: 1.0),
                         textAlign: TextAlign.left,
                       ),
