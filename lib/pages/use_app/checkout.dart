@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/component/toptab.dart';
@@ -26,6 +27,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return total;
   }
 
+// TextStyle biggerTxt = TextStyle()
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -50,10 +52,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       child: Text('Nama Resto'),
                     ),
                     const Padding(padding: EdgeInsets.all(24.0)),
-                    const Row(
+                    Row(
                       children: [
                         Text(
-                          'KaryawanName',
+                          ((BlocProvider.of<KaryawanauthBloc>(context).state
+                                  as KaryawanAuthenticated)
+                              .user
+                              .namaKaryawan),
                           textAlign: TextAlign.left,
                         ),
                       ],
@@ -93,12 +98,23 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           Flexible(
                               fit: FlexFit.tight,
                               flex: 8,
-                              child: Text(a.title.toString())),
-                          Flexible(flex: 0, child: Text(a.count.toString())),
+                              child: Text(
+                                a.title.toString(),
+                                textScaler: TextScaler.linear(1.2),
+                              )),
+                          Flexible(
+                              flex: 0,
+                              child: Text(
+                                a.count.toString(),
+                                textScaler: TextScaler.linear(1.2),
+                              )),
                           Flexible(
                               // fit: FlexFit.tight,
                               flex: 10,
-                              child: Text(a.price.toString().numberFormat())),
+                              child: Text(
+                                a.price.toString().numberFormat(),
+                                textScaler: TextScaler.linear(1.2),
+                              )),
                         ],
                       ),
                     // Text(

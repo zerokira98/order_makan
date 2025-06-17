@@ -23,6 +23,11 @@ class DecreaseCount extends StrukEvent {
   DecreaseCount({required this.item});
 }
 
+class ClearErrMsg extends StrukEvent {
+  // final StrukItem item;
+  ClearErrMsg();
+}
+
 class SendtoDb extends StrukEvent {}
 
 // final class _KaryawanUserChanged extends StrukEvent {

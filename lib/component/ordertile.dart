@@ -31,6 +31,12 @@ class _OrderTileState extends State<OrderTile>
   }
 
   @override
+  void dispose() {
+    ac.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<StrukBloc, StrukState>(
       builder: (context, state) {
@@ -39,6 +45,7 @@ class _OrderTileState extends State<OrderTile>
           listener: (context, state) {
             if (state.error.msg == widget.data.title) {
               ac.forward().then((value) => ac.reverse());
+              BlocProvider.of<StrukBloc>(context).add(ClearErrMsg());
             }
           },
           child: AnimatedBuilder(

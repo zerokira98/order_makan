@@ -3,25 +3,29 @@
 
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypt/crypt.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
+import 'package:order_makan/helper.dart' show usernameValidator, validateEmail;
 import 'package:order_makan/model/menuitems_model.dart';
-import 'package:order_makan/pages/karyawan_signup.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SetupPage extends StatefulWidget {
-  const SetupPage({super.key});
+  final void Function() click;
+  const SetupPage(this.click, {super.key});
 
   @override
   State<SetupPage> createState() => _SetupPageState();
 }
 
 class _SetupPageState extends State<SetupPage> {
-  final TextEditingController usernamea = TextEditingController(text: '');
+  final TextEditingController username = TextEditingController(text: '');
+  final TextEditingController email = TextEditingController(text: '');
   final TextEditingController passworda = TextEditingController(text: '');
   final TextEditingController passworda2 = TextEditingController(text: '');
 
@@ -67,18 +71,20 @@ class _SetupPageState extends State<SetupPage> {
             child: Column(
               children: [
                 TextFormField(
-                  controller: usernamea,
+                  controller: username,
                   onEditingComplete: () {
                     FocusScope.of(context).nextFocus();
                   },
-                  validator: (value) {
-                    if (value!.length < 3) {
-                      return 'need more character';
-                    }
-                    return null;
-                    //
-                  },
+                  validator: usernameValidator,
                   decoration: const InputDecoration(label: Text('Username')),
+                ),
+                TextFormField(
+                  controller: email,
+                  onEditingComplete: () {
+                    FocusScope.of(context).nextFocus();
+                  },
+                  validator: validateEmail,
+                  decoration: const InputDecoration(label: Text('Email')),
                 ),
                 TextFormField(
                   validator: (value) {
@@ -153,55 +159,85 @@ class _SetupPageState extends State<SetupPage> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      if (a.currentState!.validate()) {
-                        var b = await SharedPreferences.getInstance();
-                        var cryptedpassa =
-                            Crypt.sha512(passworda.text, salt: 'garam');
-                        Map c = {
-                          'username': usernamea.text,
-                          'password': cryptedpassa.hash,
-                        };
-                        Map d = {
-                          'namaresto': namaResto.text,
-                        };
-                        await b.setString('adminCred', jsonEncode(c));
-                        await b.setString('globalSetting', jsonEncode(d));
-                        // b.setStringList('adminCred', []);
-                        await b.setBool('firstStart', false);
+                      try {
+                        if (a.currentState?.validate() ?? false) {
+                          var sharedpref =
+                              await SharedPreferences.getInstance();
+                          var cryptedpass =
+                              Crypt.sha512(passworda.text, salt: 'garam').hash;
+                          // Map c = {
+                          //   'email': email.text,
+                          //   'password': cryptedpass,
+                          // };
+                          Map d = {
+                            'namaresto': namaResto.text,
+                          };
+                          var auth =
+                              RepositoryProvider.of<FirebaseAuth>(context);
+                          var store =
+                              RepositoryProvider.of<FirebaseFirestore>(context);
+                          await auth
+                              .createUserWithEmailAndPassword(
+                                  email: email.text, password: cryptedpass)
+                              .then(
+                            (value) async {
+                              await value.user!
+                                  .updateDisplayName(username.text);
+                              await store
+                                  .collection('users')
+                                  .doc(value.user?.uid)
+                                  .set({
+                                "name": username.text,
+                                "role": "admin"
+                              }).then(
+                                (value) => auth.signOut(),
+                              );
+                            },
+                          );
+                          // BlocProvider.of<KaryawanauthBloc>(context).add(SignUpAdmin());
+                          // await sharedpref.setString('adminCred', jsonEncode(c));
+                          await sharedpref.setString(
+                              'globalSetting', jsonEncode(d));
+                          // b.setStringList('adminCred', []);
 
-                        ///set default menu
-                        List firstcat = ['meals', 'snacks', 'drinks'];
-                        for (var e in firstcat) {
-                          BlocProvider.of<TopbarBloc>(context)
-                              .add(AddCat(name: e));
+                          ///set default menu
+                          List firstcat = ['meals', 'snacks', 'drinks'];
+                          for (var e in firstcat) {
+                            BlocProvider.of<TopbarBloc>(context)
+                                .add(AddCat(name: e));
+                          }
+                          // List firstmenus = [
+                          //   MenuItems(
+                          //       title: 'Nasi',
+                          //       imgDir: 'assets/nasi.jpg',
+                          //       categories: ['meals'],
+                          //       price: 3500),
+                          //   MenuItems(
+                          //       title: 'Kentang',
+                          //       imgDir: 'assets/kentang.jpg',
+                          //       categories: ['snacks'],
+                          //       price: 5500),
+                          //   MenuItems(
+                          //       title: 'Es Teh',
+                          //       imgDir: 'assets/es_teh.jpg',
+                          //       categories: ['drinks'],
+                          //       price: 3000),
+                          // ];
+                          for (var e in firstmenus) {
+                            BlocProvider.of<MenuBloc>(context).add(AddMenu(e));
+                          }
+                          await sharedpref.setInt('firstStart', 1);
+                          widget.click();
+                          // Navigator.pushReplacement(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) => const KaryawanSignupPage(
+                          //         firstTime: true,
+                          //       ),
+                          //     ));
                         }
-                        List firstmenus = [
-                          MenuItems(
-                              title: 'Nasi',
-                              imgDir: 'assets/nasi.jpg',
-                              categories: ['meals'],
-                              price: 3500),
-                          MenuItems(
-                              title: 'Kentang',
-                              imgDir: 'assets/kentang.jpg',
-                              categories: ['snacks'],
-                              price: 5500),
-                          MenuItems(
-                              title: 'Es Teh',
-                              imgDir: 'assets/es_teh.jpg',
-                              categories: ['drinks'],
-                              price: 3000),
-                        ];
-                        for (var e in firstmenus) {
-                          BlocProvider.of<MenuBloc>(context).add(AddMenu(e));
-                        }
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const KaryawanSignupPage(
-                                firstTime: true,
-                              ),
-                            ));
+                      } catch (e) {
+                        print(e);
                       }
                     },
                     child: const Text('Next'))

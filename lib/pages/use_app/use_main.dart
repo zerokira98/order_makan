@@ -7,7 +7,7 @@ import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/component/menu_card.dart';
 import 'package:order_makan/component/struk_panel.dart';
 import 'package:order_makan/component/toptab.dart';
-import 'package:order_makan/pages/admin_loginpage.dart';
+import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
 import 'package:order_makan/pages/antrian/antrianpage.dart';
 import 'package:order_makan/pages/histori_struk.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -96,7 +96,7 @@ class _UseMainState extends State<UseMain> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const AdminLoginPage(),
+                      builder: (context) => const AdminPanel(),
                     ));
               },
               child: const Text('Admin Panel'))

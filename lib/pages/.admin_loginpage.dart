@@ -13,7 +13,7 @@ class AdminLoginPage extends StatefulWidget {
 }
 
 class _AdminLoginPageState extends State<AdminLoginPage> {
-  final TextEditingController usernamec = TextEditingController(text: '');
+  final TextEditingController email = TextEditingController(text: '');
 
   final TextEditingController password = TextEditingController(text: '');
 
@@ -34,8 +34,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextField(
-                controller: usernamec,
-                decoration: const InputDecoration(label: Text('Username')),
+                controller: email,
+                decoration: const InputDecoration(label: Text('Email')),
               ),
               TextField(
                 controller: password,
@@ -57,21 +57,21 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               const Padding(padding: EdgeInsets.all(8)),
               ElevatedButton(
                   onPressed: () async {
-                    var a = await SharedPreferences.getInstance();
-                    var b = a.getString('adminCred');
-                    if (b != null) {
-                      var c = jsonDecode(b);
-                      var crypted =
-                          Crypt.sha512(password.text, salt: 'garam').hash;
-                      if (c['username'] == usernamec.text &&
-                          c['password'] == crypted) {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminPanel(),
-                            ));
-                      }
-                    }
+                    var crypted =
+                        Crypt.sha512(password.text, salt: 'garam').hash;
+                    // var a = await SharedPreferences.getInstance();
+                    // var b = a.getString('adminCred');
+                    // if (b != null) {
+                    //   var c = jsonDecode(b);
+                    //   if (c['email'] == email.text &&
+                    //       c['password'] == crypted) {
+                    //     Navigator.pushReplacement(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //           builder: (context) => const AdminPanel(),
+                    //         ));
+                    //   }
+                    // }
                   },
                   child: const Text('Login'))
             ],

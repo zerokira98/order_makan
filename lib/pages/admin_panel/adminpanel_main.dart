@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:order_makan/main.dart';
-import 'package:order_makan/pages/admin_panel/karyawan_manage/karyawanmanage_main.dart';
+// import 'package:order_makan/pages/admin_panel/karyawan_manage/karyawanmanage_main.dart';
 import 'package:order_makan/pages/edit_app/edit_main.dart';
 
 class AdminPanel extends StatefulWidget {
@@ -51,7 +51,7 @@ class _AdminPanelState extends State<AdminPanel> {
       ),
       body: switch (selectedIndex) {
         0 => const EditMain(),
-        1 => const KaryawanManageMain(),
+        // 1 => const KaryawanManageMain(),
         int() => const EditMain(),
       },
     );

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "55819968623",
+    "project_id": "get-order-a0bd7",
+    "storage_bucket": "get-order-a0bd7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55819968623:android:1db722870fd2803d2e2d9a",
+        "android_client_info": {
+          "package_name": "com.example.order_makan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLHxtWoG8wMZH7WWizmeOOm2tyF5XsLTw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,6 +13,9 @@ class StrukBloc extends Bloc<StrukEvent, StrukState> {
 
       emit(state.copywith(karyawanId: event.karyawanId));
     });
+    on<ClearErrMsg>((event, emit) {
+      emit(state.copywith(error: StrukError.empty()));
+    });
     on<IncreaseCount>((event, emit) async {
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
           .map((e) =>

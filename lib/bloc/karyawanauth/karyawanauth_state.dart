@@ -9,7 +9,7 @@ abstract class KaryawanauthState extends Equatable {
 class KaryawanauthInitial extends KaryawanauthState {}
 
 class KaryawanAuthenticated extends KaryawanauthState {
-  final Karyawan user;
+  final User user;
   KaryawanAuthenticated(this.user);
 }
 
@@ -22,9 +22,9 @@ class KaryawanUnAuth extends KaryawanauthState {
 
 class KaryawanLoading extends KaryawanauthState {}
 
-class Karyawan {
-  String username;
-  String namaLengkap;
-  String? gambar;
-  Karyawan({required this.username, required this.namaLengkap});
-}
+// class Karyawan {
+//   String username;
+//   String namaLengkap;
+//   String? gambar;
+//   Karyawan({required this.username, required this.namaLengkap});
+// }

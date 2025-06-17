@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
@@ -5,8 +8,10 @@ import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
+import 'package:order_makan/firebase_options.dart';
 import 'package:order_makan/pages/firstrun_setup.dart';
 import 'package:order_makan/pages/karyawan_loginpage.dart';
+import 'package:order_makan/pages/karyawan_signup.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
@@ -16,12 +21,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  var fireApp = await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   var db = await SembastDB.init();
   var db2 = await SembastDB.init2();
+  var firebase = FirebaseAuth.instanceFor(app: fireApp);
+  var firestore = FirebaseFirestore.instanceFor(app: fireApp);
   runApp(MultiRepositoryProvider(
     providers: [
       RepositoryProvider(
-        create: (context) => KaryawanAuthRepo(db),
+        create: (context) => firebase,
+      ),
+      RepositoryProvider(
+        create: (context) => firestore,
+      ),
+      RepositoryProvider(
+        create: (context) => KaryawanAuthRepo(firebase, firestore),
       ),
       RepositoryProvider(
         create: (context) => MenuItemRepository(db),
@@ -67,16 +83,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        BlocListener<AntrianBloc, AntrianState>(
-          listener: (context, state) {
-            // TODO: implement listener
-          },
-        ),
         BlocListener<KaryawanauthBloc, KaryawanauthState>(
           listener: (context, state) {
             if (state is KaryawanAuthenticated) {
               BlocProvider.of<StrukBloc>(context)
-                  .add(InitiateStruk(karyawanId: state.user.username));
+                  .add(InitiateStruk(karyawanId: state.user.namaKaryawan));
             }
           },
         ),
@@ -97,28 +108,38 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: FutureBuilder(
-          future: SharedPreferences.getInstance()
-              .then((value) => value.getBool('firstStart')),
-          builder: (context, snap) {
-            if (snap.connectionState == ConnectionState.done) {
-              if ((snap.data == null) | (snap.data == true)) {
-                return const SetupPage();
-              } else {
-                return BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
-                  builder: (context, state) {
-                    if (state is! KaryawanAuthenticated) {
-                      return const KaryawanLoginPage();
-                    } else {
-                      return const UseMain();
-                    }
-                  },
-                );
+        home: StatefulBuilder(builder: (context, setstate) {
+          var future = SharedPreferences.getInstance()
+              .then((value) => value.getInt('firstStart'));
+          click() => setstate(() {
+                future = future;
+              });
+          return FutureBuilder(
+            future: future,
+            builder: (context, snap) {
+              if (snap.connectionState == ConnectionState.done) {
+                if ((snap.data == null) | (snap.data == 0)) {
+                  return SetupPage(click);
+                } else if (snap.data == 1) {
+                  return KaryawanSignupPage(
+                    firstTime: true,
+                  );
+                } else {
+                  return BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
+                    builder: (context, state) {
+                      if (state is! KaryawanAuthenticated) {
+                        return const KaryawanLoginPage();
+                      } else {
+                        return const UseMain();
+                      }
+                    },
+                  );
+                }
               }
-            }
-            return const CircularProgressIndicator();
-          },
-        ),
+              return const CircularProgressIndicator();
+            },
+          );
+        }),
       ),
     );
   }
