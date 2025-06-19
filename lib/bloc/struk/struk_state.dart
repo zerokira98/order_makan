@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 
@@ -6,27 +7,25 @@ part 'struk_state.g.dart';
 @JsonSerializable()
 class StrukState {
   final String karyawanId;
-  final int strukId;
+  final String? strukId;
   final DateTime ordertime;
   final List<StrukItem> orderItems;
   final StrukError error;
-  final bool isFinished;
 
   StrukState({
     required this.karyawanId,
-    required this.strukId,
+    this.strukId,
     required this.ordertime,
     required this.orderItems,
     StrukError? error,
-    bool? isFinished,
     // required this.karyawanId,
-  })  : error = error ?? StrukError.empty(),
-        // karyawanId = karyawanId ?? '',
-        isFinished = isFinished ?? false;
+  }) : error = error ?? StrukError.empty();
+  // karyawanId = karyawanId ?? '',
+
   static StrukState initial({String? karyawanId}) => StrukState(
         karyawanId: karyawanId ?? '',
         ordertime: DateTime.now(),
-        strukId: 0,
+
         orderItems: [],
         // karyawanId: karyawanId,
       );
@@ -34,7 +33,7 @@ class StrukState {
           {List<StrukItem>? orderItems,
           bool? isFinished,
           String? karyawanId,
-          int? strukId,
+          String? strukId,
           StrukError? error,
           DateTime? ordertime}) =>
       StrukState(
@@ -43,13 +42,18 @@ class StrukState {
         error: error ?? this.error,
         ordertime: ordertime ?? this.ordertime,
         orderItems: orderItems ?? this.orderItems,
-        isFinished: isFinished ?? this.isFinished,
       );
 
   factory StrukState.fromJson(Map<String, dynamic> json) =>
       _$StrukStateFromJson(json);
 
   Map<String, dynamic> toJson() => _$StrukStateToJson(this);
+
+  factory StrukState.fromFirestore(
+          DocumentSnapshot<Map<String, dynamic>> data) =>
+      _$StrukStateFromFirestore(data);
+
+  Map<String, dynamic> toFirestore() => _$StrukStateToFirestore(this);
 }
 
 class Diskon {
@@ -73,3 +77,29 @@ class StrukError {
 
   Map<String, dynamic> toJson() => _$StrukErrorToJson(this);
 }
+
+StrukState _$StrukStateFromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc) {
+  Map<String, dynamic>? data = doc.data();
+  if (data == null) throw Exception();
+  return StrukState(
+    karyawanId: data['karyawanId'] as String,
+    strukId: doc.id,
+    ordertime: (data['ordertime'] as Timestamp).toDate(),
+    orderItems: (data['orderItems'] as List<dynamic>)
+        .map((e) => StrukItem.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    error: data['error'] == null
+        ? null
+        : StrukError.fromJson(data['error'] as Map<String, dynamic>),
+  );
+}
+
+Map<String, dynamic> _$StrukStateToFirestore(StrukState instance) =>
+    <String, dynamic>{
+      'karyawanId': instance.karyawanId,
+      // 'strukId': instance.strukId,
+      'ordertime': Timestamp.fromDate(instance.ordertime),
+      'orderItems': instance.orderItems,
+      'error': instance.error,
+    };

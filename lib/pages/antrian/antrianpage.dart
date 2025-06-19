@@ -67,8 +67,9 @@ class AntrianPage extends StatelessWidget {
                               ///
                               // print(e.key);
                               // print('a');
+                              if (e.strukId == null) throw Exception();
                               RepositoryProvider.of<StrukRepository>(context)
-                                  .antrianFinish(e.strukId);
+                                  .finishAntrian(e.strukId!);
                             },
                             child: const Text('Complete order')),
                       ],

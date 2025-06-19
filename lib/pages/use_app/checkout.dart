@@ -196,15 +196,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             var before =
                                 await RepositoryProvider.of<StrukRepository>(
                                         context)
-                                    .getCount();
+                                    .getAntrianCount();
                             var a =
                                 await RepositoryProvider.of<StrukRepository>(
                                         context)
-                                    .sendtoDatabase(state);
+                                    .sendtoAntrian(state);
                             var after =
                                 await RepositoryProvider.of<StrukRepository>(
                                         context)
-                                    .getCount();
+                                    .getAntrianCount();
                             // print(a);
                             if (before < after) {
                               print('inserted');

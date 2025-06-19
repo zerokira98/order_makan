@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 
 class HistoriStruk extends StatelessWidget {
@@ -28,7 +29,7 @@ class HistoriStruk extends StatelessWidget {
                       childAspectRatio: 5,
                       crossAxisCount: 2,
                       children: snapshot.data!.map((e) {
-                        List ewe = e['orderItems'] as List;
+                        List<StrukItem> ewe = e.orderItems;
                         return InkWell(
                           onTap: () {
                             showDialog(
@@ -42,12 +43,12 @@ class HistoriStruk extends StatelessWidget {
                               Row(
                                 children: [
                                   Text(
-                                    'Nomor Struk#${e.key}',
+                                    'Nomor Struk#${e.strukId}',
                                     textScaler: TextScaler.linear(1.2),
                                     textAlign: TextAlign.left,
                                   ),
                                   Expanded(child: Container()),
-                                  Text(e['timestamp'].toString())
+                                  Text(e.ordertime.toString())
                                 ],
                               ),
                               Expanded(
@@ -56,12 +57,12 @@ class HistoriStruk extends StatelessWidget {
                                   Wrap(
                                     alignment: WrapAlignment.start,
                                     children: [
-                                      for (dynamic ew in ewe)
+                                      for (StrukItem ew in ewe)
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Text(ew['title'] +
+                                          child: Text(ew.title +
                                               ' x' +
-                                              ew['count'].toString()),
+                                              ew.count.toString()),
                                         ),
                                     ],
                                   ),

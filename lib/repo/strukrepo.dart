@@ -1,84 +1,112 @@
 // import 'package:order_makan/model/menuitems_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:order_makan/bloc/struk/struk_state.dart';
-import 'package:sembast/sembast.dart';
-import 'package:sembast/utils/value_utils.dart';
 
 abstract class StrukRepo {
-  Database db;
+  FirebaseFirestore db;
 
   StrukRepo(this.db);
 
-  Future sendtoDatabase(StrukState state);
+  Future sendtoAntrian(StrukState state);
+  Future getAntrian();
+  Future<int> getAntrianCount();
+  Future deleteAntrian(String docId, String reason);
+  Future finishAntrian(String strukId) async {}
+  // Future sendtoDatabase(StrukState state);
   Future<List> readAllStruk();
-  Future<int> getCount();
-  Future antrianFinish(int key) async {}
+  Future<int> getStrukCount();
   Future readStrukwithFilter(StrukFilter filter);
 }
 
 class StrukRepository extends StrukRepo {
-  StrukRepository(super.db);
+  StrukRepository(super.db)
+      : antrianRef = db.collection('antrian').withConverter(
+              fromFirestore: (snapshot, options) =>
+                  StrukState.fromFirestore(snapshot),
+              toFirestore: (value, options) => value.toFirestore(),
+            ),
+        strukRef = db.collection('struk').withConverter(
+              fromFirestore: (snapshot, options) =>
+                  StrukState.fromFirestore(snapshot),
+              toFirestore: (value, options) => value.toFirestore(),
+            );
+  CollectionReference<StrukState> antrianRef;
+  CollectionReference<StrukState> strukRef;
   @override
-  Future<int> getCount() {
-    var store = intMapStoreFactory.store('struk');
-    return store.count(db);
+  Future<int> getStrukCount() {
+    return strukRef.count().get().then(
+          (value) => value.count ?? 0,
+        );
   }
 
   @override
-  Future<List<RecordSnapshot>> readAllStruk(
-      {bool? descending, bool? finished}) {
-    var store = intMapStoreFactory.store('struk');
-    Filter? filter1;
-    SortOrder sortOrder = SortOrder(Field.key, true);
-    if (finished != null) {
-      filter1 = Filter.equals('isFinished', finished);
-    }
-    if (descending != null) {
-      sortOrder = SortOrder(Field.key, descending);
-    }
-    return store
-        .query(finder: Finder(filter: filter1, sortOrders: [sortOrder]))
-        .getSnapshots(db);
+  Future<int> getAntrianCount() {
+    return antrianRef.count().get().then(
+          (value) => value.count ?? 0,
+        );
   }
 
   @override
-  Future sendtoDatabase(StrukState state) {
-    var store = intMapStoreFactory.store('struk');
-    var jsonState = state.toJson();
-    var now = DateTime.now();
-    jsonState.addAll({'timestamp': now.toString()});
-    // return Future(() => null);
-    return db.transaction((trx) async {
-      await store.add(trx, jsonState);
-    });
+  Future<List<StrukState>> readAllStruk({bool? descending, bool? finished}) {
+    return strukRef.get().then(
+          (value) => value.docs
+              .map(
+                (e) => e.data(),
+              )
+              .toList(),
+        );
   }
 
   @override
-  Future antrianFinish(int key) async {
-    var store = intMapStoreFactory.store('struk');
-    store.findFirst(db);
-    var a = await store.record(key).get(db);
-    var map = cloneMap(a!);
-    // var b = a!.cast();
-    map['isFinished'] = true;
-    return store.record(key).update(db, map);
-    // return db.transaction((trx) async {
-
-    // await store.add(trx, jsonState);
-    // });
+  Future finishAntrian(String strukId) async {
+    var a = antrianRef.doc(strukId);
+    return db.runTransaction(
+      (transaction) async {
+        var b = await transaction.get(a);
+        transaction.set(strukRef.doc(strukId), b.data());
+        transaction.delete(a);
+      },
+    );
   }
 
   @override
-  Future readStrukwithFilter(StrukFilter filter) {
-    // TODO: implement readStrukwithFilter
-    var store = intMapStoreFactory.store('struk');
+  Future<List<StrukState>> readStrukwithFilter(StrukFilter filter) {
+    var newfilter = Filter.and(
+      Filter('start', isGreaterThanOrEqualTo: filter.start),
+      Filter('end', isLessThanOrEqualTo: filter.end),
+      Filter('pegawaiId', isGreaterThanOrEqualTo: filter.pegawaiId),
+      Filter('strukId', isGreaterThanOrEqualTo: filter.strukId),
+    );
+    return strukRef.where(newfilter).get().then(
+          (value) => value.docs
+              .map(
+                (e) => e.data(),
+              )
+              .toList(),
+        );
+  }
 
-    var newfilter = Filter.and([
-      Filter.greaterThanOrEquals('start', filter.start),
-      Filter.lessThanOrEquals('end', filter.end),
-      Filter.greaterThanOrEquals('pegawaiId', filter.pegawaiId),
-      Filter.greaterThanOrEquals('strukId', filter.strukId),
-    ]);
-    return store.query(finder: Finder(filter: newfilter)).getSnapshots(db);
+  @override
+  Future deleteAntrian(String docId, String reason) {
+    var deletedRef = db.collection('deleted_struk').doc(docId);
+    return db.runTransaction(
+      (transaction) async {
+        var data = await transaction.get(antrianRef.doc(docId));
+        transaction.set(deletedRef, data.data());
+        transaction.set(
+            deletedRef, {"reason": reason}, SetOptions(merge: true));
+      },
+    );
+  }
+
+  @override
+  Future getAntrian() {
+    return antrianRef.get();
+  }
+
+  @override
+  Future<DocumentReference> sendtoAntrian(StrukState state) {
+    return antrianRef.add(state);
   }
 }
 

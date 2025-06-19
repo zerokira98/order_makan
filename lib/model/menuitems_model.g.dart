@@ -7,9 +7,9 @@ part of 'menuitems_model.dart';
 // **************************************************************************
 
 MenuItems _$MenuItemsFromJson(Map<String, dynamic> json) => MenuItems(
-      count: json['count'] as int?,
+      count: (json['count'] as num?)?.toInt(),
       id: json['id'] as String?,
-      price: json['price'] as int?,
+      price: (json['price'] as num?)?.toInt(),
       title: json['title'] as String,
       imgDir: json['imgDir'] as String,
       categories: (json['categories'] as List<dynamic>?)

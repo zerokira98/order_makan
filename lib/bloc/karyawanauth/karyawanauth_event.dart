@@ -8,7 +8,8 @@ class Authenticate extends KaryawanauthEvent {}
 class SignUp extends KaryawanauthEvent {
   final String email;
   final String password;
-  SignUp(this.email, this.password);
+  final String username;
+  SignUp(this.email, this.password, this.username);
 }
 
 class SignIn extends KaryawanauthEvent {

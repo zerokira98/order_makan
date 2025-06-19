@@ -8,7 +8,7 @@ part of 'struk_state.dart';
 
 StrukState _$StrukStateFromJson(Map<String, dynamic> json) => StrukState(
       karyawanId: json['karyawanId'] as String,
-      strukId: json['strukId'] as int,
+      strukId: json['strukId'] as String?,
       ordertime: DateTime.parse(json['ordertime'] as String),
       orderItems: (json['orderItems'] as List<dynamic>)
           .map((e) => StrukItem.fromJson(e as Map<String, dynamic>))
@@ -16,7 +16,6 @@ StrukState _$StrukStateFromJson(Map<String, dynamic> json) => StrukState(
       error: json['error'] == null
           ? null
           : StrukError.fromJson(json['error'] as Map<String, dynamic>),
-      isFinished: json['isFinished'] as bool?,
     );
 
 Map<String, dynamic> _$StrukStateToJson(StrukState instance) =>
@@ -26,11 +25,10 @@ Map<String, dynamic> _$StrukStateToJson(StrukState instance) =>
       'ordertime': instance.ordertime.toIso8601String(),
       'orderItems': instance.orderItems,
       'error': instance.error,
-      'isFinished': instance.isFinished,
     };
 
 StrukError _$StrukErrorFromJson(Map<String, dynamic> json) => StrukError(
-      json['code'] as int,
+      (json['code'] as num).toInt(),
       json['msg'] as String,
     );
 

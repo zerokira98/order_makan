@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'menuitems_model.g.dart';
@@ -46,6 +47,8 @@ class MenuItems {
       );
   factory MenuItems.fromJson(Map<String, dynamic> json) =>
       _$MenuItemsFromJson(json);
+  factory MenuItems.fromFirestore(DocumentSnapshot<Map> data) =>
+      _$MenuItemsFromFirestore(data);
 
   Map<String, dynamic> toJson() => _$MenuItemsToJson(this);
 
@@ -53,4 +56,29 @@ class MenuItems {
   String toString() {
     return title;
   }
+
+  Map<String, dynamic> toFirestore() => _$MenuItemsToFirestore(this);
 }
+
+MenuItems _$MenuItemsFromFirestore(DocumentSnapshot<Map> data) {
+  var menudata = data.data();
+  return MenuItems(
+    id: data.id,
+    price: menudata?['price'],
+    title: menudata?['title'],
+    imgDir: menudata?['imgDir'],
+    categories: (menudata?['categories'] as List<dynamic>)
+        .map<String>(
+          (e) => e.toString(),
+        )
+        .toList(),
+  );
+}
+
+Map<String, dynamic> _$MenuItemsToFirestore(MenuItems instance) =>
+    <String, dynamic>{
+      'title': instance.title,
+      'imgDir': instance.imgDir,
+      'price': instance.price,
+      'categories': instance.categories,
+    };

@@ -11,18 +11,20 @@ part 'karyawanauth_state.dart';
 
 class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
   final KaryawanAuthRepo auth;
-
+// final FirebaseFirestore firestore;
   late final StreamSubscription<User> _userSubscription;
-  KaryawanauthBloc(this.auth)
-      : super(auth.currentUser.isEmpty
+  KaryawanauthBloc(
+    this.auth,
+  ) : super(auth.currentUser.isEmpty
             ? KaryawanauthInitial()
             : KaryawanauthInitial()) {
     on<InitiateKaryawan>((event, emit) {});
-    on<UserChanged>((event, emit) {
+    on<UserChanged>((event, emit) async {
       if (event.user.isEmpty) {
         emit(KaryawanUnAuth());
       } else {
-        emit(KaryawanAuthenticated(event.user));
+        emit(KaryawanAuthenticated(
+            user: event.user, isAdmin: await auth.isAdmin()));
       }
     });
     on<SignIn>((event, emit) async {
@@ -36,7 +38,10 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
       }
     });
     on<SignUp>((event, emit) async {
-      await auth.signUp(email: event.email, password: event.password);
+      await auth.signUp(
+          email: event.email,
+          password: event.password,
+          displayName: event.username);
     });
     on<SignOut>((event, emit) async {
       await auth.logOut();

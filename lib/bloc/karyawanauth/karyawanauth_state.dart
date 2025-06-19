@@ -10,7 +10,8 @@ class KaryawanauthInitial extends KaryawanauthState {}
 
 class KaryawanAuthenticated extends KaryawanauthState {
   final User user;
-  KaryawanAuthenticated(this.user);
+  final bool isAdmin;
+  KaryawanAuthenticated({required this.user, this.isAdmin = false});
 }
 
 class KaryawanUnAuth extends KaryawanauthState {

@@ -83,8 +83,8 @@ class _KaryawanSignupPageState extends State<KaryawanSignupPage> {
                             //   var c = jsonDecode(b);
                             var crypted =
                                 Crypt.sha512(password.text, salt: 'garam').hash;
-                            BlocProvider.of<KaryawanauthBloc>(context)
-                                .add(SignUp(email.text, crypted));
+                            BlocProvider.of<KaryawanauthBloc>(context).add(
+                                SignUp(email.text, crypted, username.text));
 
                             if (widget.firstTime) {
                               await sharedpref.setInt('firstStart', 2);

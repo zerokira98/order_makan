@@ -12,7 +12,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/helper.dart' show usernameValidator, validateEmail;
+import 'package:order_makan/main.dart';
 import 'package:order_makan/model/menuitems_model.dart';
+import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SetupPage extends StatefulWidget {
@@ -165,10 +167,6 @@ class _SetupPageState extends State<SetupPage> {
                               await SharedPreferences.getInstance();
                           var cryptedpass =
                               Crypt.sha512(passworda.text, salt: 'garam').hash;
-                          // Map c = {
-                          //   'email': email.text,
-                          //   'password': cryptedpass,
-                          // };
                           Map d = {
                             'namaresto': namaResto.text,
                           };
@@ -186,12 +184,36 @@ class _SetupPageState extends State<SetupPage> {
                               await store
                                   .collection('users')
                                   .doc(value.user?.uid)
-                                  .set({
-                                "name": username.text,
-                                "role": "admin"
-                              }).then(
-                                (value) => auth.signOut(),
-                              );
+                                  .set(
+                                      {"name": username.text, "role": "admin"});
+                              List firstcat = ['meals', 'snacks', 'drinks'];
+                              for (var e in firstcat) {
+                                await RepositoryProvider.of<MenuItemRepository>(
+                                        context)
+                                    .addCategory(e);
+                              }
+                              List firstmenus = [
+                                MenuItems(
+                                    title: 'Nasi',
+                                    imgDir: 'assets/nasi.jpg',
+                                    categories: ['meals'],
+                                    price: 3500),
+                                MenuItems(
+                                    title: 'Kentang',
+                                    imgDir: 'assets/kentang.jpg',
+                                    categories: ['snacks'],
+                                    price: 5500),
+                                MenuItems(
+                                    title: 'Es Teh',
+                                    imgDir: 'assets/es_teh.jpg',
+                                    categories: ['drinks'],
+                                    price: 3000),
+                              ];
+                              for (var e in firstmenus) {
+                                await RepositoryProvider.of<MenuItemRepository>(
+                                        context)
+                                    .addMenu(e);
+                              }
                             },
                           );
                           // BlocProvider.of<KaryawanauthBloc>(context).add(SignUpAdmin());
@@ -201,32 +223,10 @@ class _SetupPageState extends State<SetupPage> {
                           // b.setStringList('adminCred', []);
 
                           ///set default menu
-                          List firstcat = ['meals', 'snacks', 'drinks'];
-                          for (var e in firstcat) {
-                            BlocProvider.of<TopbarBloc>(context)
-                                .add(AddCat(name: e));
-                          }
-                          // List firstmenus = [
-                          //   MenuItems(
-                          //       title: 'Nasi',
-                          //       imgDir: 'assets/nasi.jpg',
-                          //       categories: ['meals'],
-                          //       price: 3500),
-                          //   MenuItems(
-                          //       title: 'Kentang',
-                          //       imgDir: 'assets/kentang.jpg',
-                          //       categories: ['snacks'],
-                          //       price: 5500),
-                          //   MenuItems(
-                          //       title: 'Es Teh',
-                          //       imgDir: 'assets/es_teh.jpg',
-                          //       categories: ['drinks'],
-                          //       price: 3000),
-                          // ];
-                          for (var e in firstmenus) {
-                            BlocProvider.of<MenuBloc>(context).add(AddMenu(e));
-                          }
+
                           await sharedpref.setInt('firstStart', 1);
+
+                          await auth.signOut();
                           widget.click();
                           // Navigator.pushReplacement(
                           //     context,
@@ -240,7 +240,18 @@ class _SetupPageState extends State<SetupPage> {
                         print(e);
                       }
                     },
-                    child: const Text('Next'))
+                    child: const Text('Next')),
+                Padding(padding: EdgeInsetsGeometry.all(64.0)),
+                ElevatedButton(
+                    onPressed: () {
+                      SharedPreferences.getInstance().then(
+                        (value) {
+                          value.setInt('firstStart', 2);
+                          widget.click();
+                        },
+                      );
+                    },
+                    child: Text('Skip'))
               ],
             ),
           ),

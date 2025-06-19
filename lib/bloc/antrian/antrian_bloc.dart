@@ -13,12 +13,10 @@ class AntrianBloc extends Bloc<AntrianEvent, AntrianState> {
         super(const AntrianState(antrianStruks: [])) {
     on<InitiateAntrian>((event, emit) async {
       var a = await _repo.readAllStruk(descending: true, finished: false);
-      var b = a
-          .map((e) =>
-              StrukState.fromJson(e['orderItems'] as Map<String, dynamic>))
-          .toList();
+
       // List ewe = a['orderItems'] as List;
-      print(b);
+      // print(b);
+      emit(state.copywith(antrianStruks: a));
       // emit(AntrianState(antrianStruks: ));
     });
     on<AddtoAntrian>((event, emit) {});

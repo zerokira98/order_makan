@@ -22,8 +22,17 @@ class KaryawanAuthRepo {
     );
   }
 
+  Future<bool> isAdmin() {
+    return firestore.collection('users').doc(currentUser.id).get().then(
+          (value) => value.data()?['role'] == 'admin',
+        );
+  }
+
   Future<void> signUp(
-      {required String email, required String password, String? role}) async {
+      {required String email,
+      required String password,
+      String? role,
+      String? displayName}) async {
     try {
       await instance
           .createUserWithEmailAndPassword(
@@ -32,10 +41,10 @@ class KaryawanAuthRepo {
       )
           .then(
         (value) {
-          return firestore.collection('users').doc(value.user?.uid).set({
-            "name": value.user?.displayName ?? "",
-            "role": role ?? "karyawan"
-          });
+          return firestore
+              .collection('users')
+              .doc(value.user?.uid)
+              .set({"name": displayName ?? '', "role": role ?? "karyawan"});
         },
       );
     } on auth.FirebaseAuthException catch (e) {

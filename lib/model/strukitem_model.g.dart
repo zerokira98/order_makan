@@ -7,9 +7,9 @@ part of 'strukitem_model.dart';
 // **************************************************************************
 
 StrukItem _$StrukItemFromJson(Map<String, dynamic> json) => StrukItem(
-      count: json['count'] as int?,
+      count: (json['count'] as num?)?.toInt(),
       id: json['id'] as String?,
-      price: json['price'] as int?,
+      price: (json['price'] as num?)?.toInt(),
       title: json['title'] as String,
     );
 

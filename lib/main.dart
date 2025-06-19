@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
@@ -15,17 +16,17 @@ import 'package:order_makan/pages/karyawan_signup.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
-import 'package:order_makan/sembastdb.dart';
 import 'package:order_makan/pages/use_app/use_main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   var fireApp = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  var db = await SembastDB.init();
-  var db2 = await SembastDB.init2();
+  // var db = await SembastDB.init();
+  // var db2 = await SembastDB.init2();
   var firebase = FirebaseAuth.instanceFor(app: fireApp);
   var firestore = FirebaseFirestore.instanceFor(app: fireApp);
   runApp(MultiRepositoryProvider(
@@ -40,10 +41,10 @@ void main() async {
         create: (context) => KaryawanAuthRepo(firebase, firestore),
       ),
       RepositoryProvider(
-        create: (context) => MenuItemRepository(db),
+        create: (context) => MenuItemRepository(firestore),
       ),
       RepositoryProvider(
-        create: (context) => StrukRepository(db2),
+        create: (context) => StrukRepository(firestore),
       ),
     ],
     child: MultiBlocProvider(
