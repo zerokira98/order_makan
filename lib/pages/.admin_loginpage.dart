@@ -57,8 +57,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
               const Padding(padding: EdgeInsets.all(8)),
               ElevatedButton(
                   onPressed: () async {
-                    var crypted =
-                        Crypt.sha512(password.text, salt: 'garam').hash;
                     // var a = await SharedPreferences.getInstance();
                     // var b = a.getString('adminCred');
                     // if (b != null) {

@@ -50,7 +50,9 @@ void main() async {
     child: MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => StrukBloc(),
+          create: (context) => StrukBloc(
+              RepositoryProvider.of<StrukRepository>(context),
+              RepositoryProvider.of<KaryawanAuthRepo>(context)),
         ),
         BlocProvider(
           create: (context) =>

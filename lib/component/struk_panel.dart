@@ -4,6 +4,7 @@ import 'package:order_makan/bloc/struk/struk_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/component/ordertile.dart';
 import 'package:order_makan/component/toptab.dart';
+import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/use_app/checkout.dart';
 
 class StrukPanel extends StatelessWidget {
@@ -73,6 +74,8 @@ class StrukPanel extends StatelessWidget {
                             Text('Total: Rp.${getTotal().numberFormat()} '),
                             ElevatedButton(
                                 onPressed: () {
+                                  BlocProvider.of<StrukBloc>(context)
+                                      .add(DateUpdate());
                                   showDialog(
                                     context: context,
                                     builder: (c) => BlocProvider.value(

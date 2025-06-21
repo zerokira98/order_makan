@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/helper.dart' show validateEmail;
+import 'package:order_makan/pages/karyawan_signup.dart';
 
 class KaryawanLoginPage extends StatefulWidget {
   const KaryawanLoginPage({super.key});
@@ -49,6 +50,7 @@ class _KaryawanLoginPageState extends State<KaryawanLoginPage> {
                   ),
                   TextFormField(
                     controller: password,
+                    onChanged: (value) => setState(() {}),
                     obscureText: obsecure,
                     decoration: InputDecoration(
                         label: const Text('Password'),
@@ -65,33 +67,26 @@ class _KaryawanLoginPageState extends State<KaryawanLoginPage> {
                                 : Icons.visibility_off))),
                   ),
                   const Padding(padding: EdgeInsets.all(8)),
-                  ElevatedButton(
-                      onPressed: _formkey.currentState?.validate() ?? false
-                          ? () async {
-                              var crypted =
-                                  Crypt.sha512(password.text, salt: 'garam')
-                                      .hash;
-                              BlocProvider.of<KaryawanauthBloc>(context)
-                                  .add(SignIn(email.text, crypted));
-                              // var a = await SharedPreferences.getInstance();
-                              // var b = a.getString('karyawanCred');
-                              // print(b);
-                              // if (b != null) {
-                              //   var c = jsonDecode(b);
-                              //   var crypted =
-                              //       Crypt.sha512(password.text, salt: 'garam').hash;
-                              //   if (c['username'] == username.text &&
-                              //       c['password'] == crypted) {
-                              //     Navigator.pushReplacement(
-                              //         context,
-                              //         MaterialPageRoute(
-                              //           builder: (context) => const UseMain(),
-                              //         ));
-                              //   }
-                              // }
-                            }
-                          : null,
-                      child: const Text('Login')),
+                  Row(
+                    children: [
+                      ElevatedButton(
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => KaryawanSignupPage(),
+                              )),
+                          child: const Text('Signup')),
+                      Padding(padding: EdgeInsetsGeometry.all(8)),
+                      ElevatedButton(
+                          onPressed: _formkey.currentState?.validate() ?? false
+                              ? () async {
+                                  BlocProvider.of<KaryawanauthBloc>(context)
+                                      .add(SignIn(email.text, password.text));
+                                }
+                              : null,
+                          child: const Text('Login')),
+                    ],
+                  ),
                   const Padding(padding: EdgeInsets.all(18)),
                   // ElevatedButton(
                   //     onPressed: () {

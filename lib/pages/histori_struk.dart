@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
+import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 
@@ -34,7 +36,9 @@ class HistoriStruk extends StatelessWidget {
                           onTap: () {
                             showDialog(
                               context: context,
-                              builder: (context) => const DisplayStruk(),
+                              builder: (context) => DisplayStruk(
+                                data: e,
+                              ),
                             );
                           },
                           child: Card(
@@ -96,14 +100,69 @@ class HistoriStruk extends StatelessWidget {
 }
 
 class DisplayStruk extends StatelessWidget {
-  const DisplayStruk({super.key});
+  final StrukState data;
+  const DisplayStruk({required this.data, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Dialog(
+    return Dialog(
       child: Padding(
         padding: EdgeInsets.all(8.0),
-        child: Text('display struk'),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                    child: Text(
+                  'Struk',
+                  textAlign: TextAlign.center,
+                )),
+                InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(Icons.close))
+              ],
+            ),
+            Text('${data.strukId}'),
+            Text(data.karyawanId),
+            Text('${data.ordertime}'),
+            Text('${data.orderItems.map(
+              (e) => e.toJson(),
+            )}'),
+            // BlocBuilder<AntrianBloc, AntrianState>(
+            //   builder: (context, state) {
+            //     return Text(state.antrianStruks.toString());
+            //   },
+            // ),
+            Expanded(child: Container()),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.red),
+                      foregroundColor: WidgetStatePropertyAll(Colors.white),
+                    ),
+                    onPressed: () {
+                      BlocProvider.of<AntrianBloc>(context).add(Delete(data));
+                      Navigator.pop(context);
+                    },
+                    child: Text('Batalkan Pesanan.')),
+                ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.green),
+                      foregroundColor: WidgetStatePropertyAll(Colors.white),
+                    ),
+                    onPressed: () {
+                      BlocProvider.of<AntrianBloc>(context)
+                          .add(OrderFinish(data.strukId!));
+                    },
+                    child: Text('Selesaikan Pesanan.')),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

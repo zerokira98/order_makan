@@ -165,8 +165,6 @@ class _SetupPageState extends State<SetupPage> {
                         if (a.currentState?.validate() ?? false) {
                           var sharedpref =
                               await SharedPreferences.getInstance();
-                          var cryptedpass =
-                              Crypt.sha512(passworda.text, salt: 'garam').hash;
                           Map d = {
                             'namaresto': namaResto.text,
                           };
@@ -176,7 +174,7 @@ class _SetupPageState extends State<SetupPage> {
                               RepositoryProvider.of<FirebaseFirestore>(context);
                           await auth
                               .createUserWithEmailAndPassword(
-                                  email: email.text, password: cryptedpass)
+                                  email: email.text, password: passworda.text)
                               .then(
                             (value) async {
                               await value.user!
@@ -187,32 +185,33 @@ class _SetupPageState extends State<SetupPage> {
                                   .set(
                                       {"name": username.text, "role": "admin"});
                               List firstcat = ['meals', 'snacks', 'drinks'];
-                              for (var e in firstcat) {
-                                await RepositoryProvider.of<MenuItemRepository>(
-                                        context)
-                                    .addCategory(e);
-                              }
-                              List firstmenus = [
-                                MenuItems(
-                                    title: 'Nasi',
-                                    imgDir: 'assets/nasi.jpg',
-                                    categories: ['meals'],
-                                    price: 3500),
-                                MenuItems(
-                                    title: 'Kentang',
-                                    imgDir: 'assets/kentang.jpg',
-                                    categories: ['snacks'],
-                                    price: 5500),
-                                MenuItems(
-                                    title: 'Es Teh',
-                                    imgDir: 'assets/es_teh.jpg',
-                                    categories: ['drinks'],
-                                    price: 3000),
-                              ];
-                              for (var e in firstmenus) {
-                                await RepositoryProvider.of<MenuItemRepository>(
-                                        context)
-                                    .addMenu(e);
+                              var menurepo =
+                                  RepositoryProvider.of<MenuItemRepository>(
+                                      context);
+                              if ((await menurepo.getCategories()).isEmpty) {
+                                for (var e in firstcat) {
+                                  await menurepo.addCategory(e);
+                                }
+                                List firstmenus = [
+                                  MenuItems(
+                                      title: 'Nasi',
+                                      imgDir: 'assets/nasi.jpg',
+                                      categories: ['meals'],
+                                      price: 3500),
+                                  MenuItems(
+                                      title: 'Kentang',
+                                      imgDir: 'assets/kentang.jpg',
+                                      categories: ['snacks'],
+                                      price: 5500),
+                                  MenuItems(
+                                      title: 'Es Teh',
+                                      imgDir: 'assets/es_teh.jpg',
+                                      categories: ['drinks'],
+                                      price: 3000),
+                                ];
+                                for (var e in firstmenus) {
+                                  await menurepo.addMenu(e);
+                                }
                               }
                             },
                           );

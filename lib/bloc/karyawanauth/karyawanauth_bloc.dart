@@ -23,8 +23,11 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
       if (event.user.isEmpty) {
         emit(KaryawanUnAuth());
       } else {
-        emit(KaryawanAuthenticated(
-            user: event.user, isAdmin: await auth.isAdmin()));
+        var isadmin = await auth.isAdmin();
+        if (isadmin) {
+          auth.setcurrentAdmin = true;
+        }
+        emit(KaryawanAuthenticated(user: auth.currentUser, isAdmin: isadmin));
       }
     });
     on<SignIn>((event, emit) async {
@@ -33,6 +36,7 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
             email: event.email, password: event.password);
       } on Exception catch (e) {
         emit(KaryawanUnAuth(errorMsg: e.toString()));
+        print('error $e');
         await Future.delayed(const Duration(seconds: 4));
         emit(KaryawanUnAuth());
       }

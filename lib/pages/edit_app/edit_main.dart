@@ -33,17 +33,30 @@ class EditMain extends StatelessWidget {
                 const Padding(padding: EdgeInsets.all(2)),
                 Expanded(child:
                     BlocBuilder<MenuBloc, MenuState>(builder: (context, state) {
-                  return Wrap(
-                    children: List.generate(
-                        state.datas.length + 1,
-                        (index) => (index < state.datas.length)
-                            ? MenuCard(
-                                onTap: () {},
-                                menudata: state.datas[index],
-                                editmode: true,
-                              )
-                            : const EmptyMenuCard()),
+                  return GridView.count(
+                    childAspectRatio: 0.98,
+                    crossAxisCount: 4,
+                    children: <Widget>[
+                      for (var i = 0; i < state.datas.length; i++)
+                        MenuCard(
+                          onTap: () {},
+                          editmode: true,
+                          menudata: state.datas[i],
+                        ),
+                      EmptyMenuCard()
+                    ],
                   );
+                  // Wrap(
+                  //   children: List.generate(
+                  //       state.datas.length + 1,
+                  //       (index) => (index < state.datas.length)
+                  //           ? MenuCard(
+                  //               onTap: () {},
+                  //               menudata: state.datas[index],
+                  //               editmode: true,
+                  //             )
+                  //           : const ),
+                  // );
                 })),
                 Row(
                   children: [

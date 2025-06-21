@@ -13,7 +13,7 @@ abstract class MenuItemRepo {
   Future addCategorytoMenu(MenuItems menu);
   Future addMenu(MenuItems menu) async {}
   Future deleteMenu(MenuItems menu);
-  Future editMenu(String title, MenuItems menu);
+  Future editMenu(MenuItems menu);
 }
 
 class MenuItemRepository implements MenuItemRepo {
@@ -27,8 +27,8 @@ class MenuItemRepository implements MenuItemRepo {
             toFirestore: (model, _) => model.toFirestore()),
         categoryRef = firestore.collection('categories');
   @override
-  Future editMenu(String title, MenuItems menu) {
-    return menuRef.doc(menu.id).set(menu, SetOptions(merge: true));
+  Future editMenu(MenuItems menu) {
+    return menuRef.doc(menu.id).update(menu.toFirestore());
     // var store = intMapStoreFactory.store('menus');
     // return store.update(db, menu.toJson(),
     //     finder: Finder(filter: Filter.equals('title', title)));

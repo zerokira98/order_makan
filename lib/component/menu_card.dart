@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:order_makan/helper.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
@@ -11,7 +13,6 @@ import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
-import 'package:order_makan/component/toptab.dart';
 import 'package:path_provider/path_provider.dart';
 
 class MenuCard extends StatelessWidget {
@@ -38,9 +39,16 @@ class MenuCard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        const Text('Delete this menu?'),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Delete this menu?'),
+                            Text(menudata.categories.toString())
+                          ],
+                        ),
                         SizedBox(
                           height: 170,
+                          width: 240,
                           child: Stack(
                             children: [
                               MenuCard(
@@ -82,6 +90,7 @@ class MenuCard extends StatelessWidget {
           // width: 12,
           padding: const EdgeInsets.all(6.0),
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: [
               Row(
                 children: [
@@ -98,31 +107,39 @@ class MenuCard extends StatelessWidget {
                   ),
                 ],
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(
-                  // height: 94,
-                  // width: 95,
-                  decoration: BoxDecoration(
-                    color: Colors.black12,
-                    borderRadius: BorderRadius.circular(4),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Container(
+                    // height: 94,
+                    // width: 95,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: menudata.imgDir.contains('assets') ||
+                            menudata.imgDir.isEmpty
+                        ? Image.asset(
+                            menudata.imgDir.isEmpty
+                                ? 'assets/sate.jpg'
+                                : menudata.imgDir,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          )
+                        : (Platform.isAndroid)
+                            ? Image.file(
+                                File(
+                                  menudata.imgDir,
+                                ),
+                                height: 80,
+                                fit: BoxFit.cover,
+                              )
+                            : Image.network(
+                                menudata.imgDir,
+                                height: 80,
+                              ),
+                    // child: Center(child: Text('menu image')),
                   ),
-                  child: menudata.imgDir.contains('assets')
-                      ? Image.asset(
-                          menudata.imgDir.isEmpty
-                              ? 'assets/sate.jpg'
-                              : menudata.imgDir,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.file(
-                          File(
-                            menudata.imgDir,
-                          ),
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                  // child: Center(child: Text('menu image')),
                 ),
               ),
               // Padding(padding: EdgeInsetsGeometry.all(2)),
@@ -174,6 +191,7 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
           // margin: EdgeInsets.all(4),
           padding: const EdgeInsets.all(4.0),
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: [
               const Row(
                 children: [
@@ -190,27 +208,29 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
                   ),
                 ],
               ),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Container(
-                  height: 95,
-                  // width: 95,
-                  decoration: BoxDecoration(
-                    color: Colors.black12,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.add,
-                      size: 48,
-                      color: Colors.white54,
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Container(
+                    height: 95,
+                    // width: 95,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(4),
                     ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.add,
+                        size: 48,
+                        color: Colors.white54,
+                      ),
+                    ),
+                    // child: Image.asset(
+                    //   'assets/sate.jpg',
+                    //   fit: BoxFit.cover,
+                    // ),
+                    // child: Center(child: Text('menu image')),
                   ),
-                  // child: Image.asset(
-                  //   'assets/sate.jpg',
-                  //   fit: BoxFit.cover,
-                  // ),
-                  // child: Center(child: Text('menu image')),
                 ),
               ),
             ],
@@ -326,17 +346,19 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                     categories: category,
                   );
                   if (widget.editmode) {
-                    var pickedfile = File(imgdir);
-                    getApplicationDocumentsDirectory().then((value) {
-                      var copytodir = File(
-                          p.join(value.path, 'imgres/${p.basename(imgdir)}'));
-                      print(copytodir.path);
-                      copytodir.create(recursive: true).then((value) {
-                        value.writeAsBytesSync(pickedfile.readAsBytesSync());
+                    if (Platform.isAndroid) {
+                      var pickedfile = File(imgdir);
+                      getApplicationDocumentsDirectory().then((value) {
+                        var copytodir = File(
+                            p.join(value.path, 'imgres/${p.basename(imgdir)}'));
+                        print(copytodir.path);
+                        copytodir.create(recursive: true).then((value) {
+                          value.writeAsBytesSync(pickedfile.readAsBytesSync());
+                        });
                       });
-                    });
-                    BlocProvider.of<MenuBloc>(context)
-                        .add(EditMenu(widget.menudata!, menuitem));
+                    } else if (kIsWasm) {}
+                    BlocProvider.of<MenuBloc>(context).add(
+                        EditMenu(menuitem.copywith(id: widget.menudata!.id)));
                     Navigator.pop(context);
                     BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
                   } else {

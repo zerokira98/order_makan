@@ -11,10 +11,9 @@ class AddMenu extends MenuEvent {
 }
 
 class EditMenu extends MenuEvent {
-  final MenuItems prevmenu;
   final MenuItems editedmenu;
 
-  EditMenu(this.prevmenu, this.editedmenu);
+  EditMenu(this.editedmenu);
 }
 
 class DelMenu extends MenuEvent {

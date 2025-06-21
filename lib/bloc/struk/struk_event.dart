@@ -4,8 +4,8 @@ part of 'struk_bloc.dart';
 abstract class StrukEvent {}
 
 class InitiateStruk extends StrukEvent {
-  final String? karyawanId;
-  InitiateStruk({this.karyawanId});
+  final String karyawanId;
+  InitiateStruk({required this.karyawanId});
 }
 
 class AddOrderitems extends StrukEvent {
@@ -29,6 +29,8 @@ class ClearErrMsg extends StrukEvent {
 }
 
 class SendtoDb extends StrukEvent {}
+
+class DateUpdate extends StrukEvent {}
 
 // final class _KaryawanUserChanged extends StrukEvent {
 //   final User user;

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:order_makan/helper.dart';
 import 'user_model.dart';
 // import 'package:sembast/sembast.dart';
 
@@ -24,8 +25,11 @@ class KaryawanAuthRepo {
 
   Future<bool> isAdmin() {
     return firestore.collection('users').doc(currentUser.id).get().then(
-          (value) => value.data()?['role'] == 'admin',
-        );
+      (value) {
+        print(value.data()?['role'] == 'admin');
+        return value.data()?['role'] == 'admin';
+      },
+    );
   }
 
   Future<void> signUp(
@@ -80,8 +84,10 @@ class KaryawanAuthRepo {
         password: password,
       );
     } on auth.FirebaseAuthException catch (e) {
+      print(e);
       // throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
+      print(_);
       // throw const LogInWithEmailAndPasswordFailure();
     }
   }
@@ -96,6 +102,8 @@ class KaryawanAuthRepo {
     }
   }
 
+  set setcurrentAdmin(bool set) =>
+      _cache.user = _cache.user?.setAdmin() ?? User.empty;
   User get currentUser => _cache.user ?? User.empty;
   // final Database _db;
   // Future<List<RecordSnapshot>> karyawanList() {
@@ -103,13 +111,6 @@ class KaryawanAuthRepo {
   //   var store = intMapStoreFactory.store('karyawanAuth');
   //   return store.query().getSnapshots(_db);
   // }
-}
-
-extension UserParsing on auth.User {
-  User get toUser {
-    return User(
-        email: email, foto: photoURL, namaKaryawan: displayName, id: uid);
-  }
 }
 
 class Cache {

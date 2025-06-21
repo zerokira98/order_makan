@@ -1,4 +1,6 @@
-class User {
+import 'package:equatable/equatable.dart';
+
+class User extends Equatable {
   final String email;
   final String id;
 
@@ -19,5 +21,16 @@ class User {
   static const empty = User();
   Map<String, dynamic> toJson() =>
       {'email': email, 'namaKaryawan': namaKaryawan, 'foto': foto, 'id': id};
+
   bool get isEmpty => this == User.empty;
+
+  User setAdmin() => User(
+      email: email,
+      namaKaryawan: namaKaryawan,
+      foto: foto,
+      id: id,
+      isAdmin: true);
+
+  @override
+  List<Object?> get props => [email, id, namaKaryawan, foto, isAdmin];
 }

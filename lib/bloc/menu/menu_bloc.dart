@@ -25,12 +25,13 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
     on<DelMenu>((event, emit) async {
       try {
         var a = await repo.deleteMenu(event.menu);
-        if (a == 0) {
-          // send Error:no data deletion
-        } else {
-          var b = await repo.getAllMenus();
-          emit(MenuState(datas: b));
-        }
+        add(Init());
+        // if (a == 0) {
+        //   // send Error:no data deletion
+        // } else {
+        //   var b = await repo.getAllMenus();
+        //   emit(MenuState(datas: b));
+        // }
       } catch (e) {
         throw Exception(e);
       }
@@ -48,8 +49,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
 
     ///useless, no need to bloc?
     on<EditMenu>((event, emit) async {
-      String title = event.prevmenu.title;
-      var a = await repo.editMenu(title, event.editedmenu);
+      var a = await repo.editMenu(event.editedmenu);
       if (a == 0) {
         ///throw no changes
       } else {

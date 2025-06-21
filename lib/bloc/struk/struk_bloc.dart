@@ -1,17 +1,26 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 
 import 'package:meta/meta.dart';
 import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/model/strukitem_model.dart';
+import 'package:order_makan/repo/karyawan_authrepo.dart';
+import 'package:order_makan/repo/strukrepo.dart';
+import 'package:order_makan/repo/user_model.dart';
 
 part 'struk_event.dart';
 
 class StrukBloc extends Bloc<StrukEvent, StrukState> {
-  StrukBloc() : super(StrukState.initial()) {
+  StrukRepository repo;
+  KaryawanAuthRepo auth;
+  late final StreamSubscription<User> _userSubscription;
+  StrukBloc(this.repo, this.auth)
+      : super(StrukState.initial(karyawanId: auth.currentUser.id)) {
     on<InitiateStruk>((event, emit) {
       ///get karyawan id...
 
-      emit(state.copywith(karyawanId: event.karyawanId));
+      emit(StrukState.initial(karyawanId: event.karyawanId));
     });
     on<ClearErrMsg>((event, emit) {
       emit(state.copywith(error: StrukError.empty()));
@@ -56,5 +65,23 @@ class StrukBloc extends Bloc<StrukEvent, StrukState> {
 
       ///Use Color animation on highlight!
     });
+    on<DateUpdate>((event, emit) async {
+      // await repo.sendtoAntrian(state);
+      emit(state.copywith(ordertime: DateTime.now()));
+    });
+    on<SendtoDb>((event, emit) async {
+      await repo.sendtoAntrian(state);
+      add(InitiateStruk(karyawanId: state.karyawanId));
+    });
+
+    _userSubscription = auth.user.listen((event) {
+      add(InitiateStruk(karyawanId: event.id));
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _userSubscription.cancel();
+    return super.close();
   }
 }

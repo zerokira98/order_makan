@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_bloc.dart';
 import 'package:order_makan/bloc/struk/struk_state.dart';
 import 'package:order_makan/component/toptab.dart';
+import 'package:order_makan/helper.dart';
 import 'dart:math' as math;
 
 import 'package:order_makan/model/strukitem_model.dart';

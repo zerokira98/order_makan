@@ -33,6 +33,13 @@ class StrukRepository extends StrukRepo {
   CollectionReference<StrukState> antrianRef;
   CollectionReference<StrukState> strukRef;
   @override
+  Stream<int> getStrukStreamCount() {
+    return strukRef.where('title', isNull: false).snapshots().map(
+          (value) => value.docChanges.length,
+        );
+  }
+
+  @override
   Future<int> getStrukCount() {
     return strukRef.count().get().then(
           (value) => value.count ?? 0,
@@ -92,16 +99,23 @@ class StrukRepository extends StrukRepo {
     return db.runTransaction(
       (transaction) async {
         var data = await transaction.get(antrianRef.doc(docId));
-        transaction.set(deletedRef, data.data());
+        transaction.set(deletedRef, data.data()!.toFirestore());
         transaction.set(
             deletedRef, {"reason": reason}, SetOptions(merge: true));
+        transaction.delete(antrianRef.doc(docId));
       },
     );
   }
 
   @override
-  Future getAntrian() {
-    return antrianRef.get();
+  Future<List<StrukState>> getAntrian() {
+    return antrianRef.get().then(
+          (value) => value.docs
+              .map(
+                (e) => e.data(),
+              )
+              .toList(),
+        );
   }
 
   @override

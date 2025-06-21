@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:order_makan/model/strukitem_model.dart';
+// import 'package:order_makan/repo/user_model.dart' show User;
 
 part 'struk_state.g.dart';
 
@@ -22,8 +23,8 @@ class StrukState {
   }) : error = error ?? StrukError.empty();
   // karyawanId = karyawanId ?? '',
 
-  static StrukState initial({String? karyawanId}) => StrukState(
-        karyawanId: karyawanId ?? '',
+  static StrukState initial({required String karyawanId}) => StrukState(
+        karyawanId: karyawanId,
         ordertime: DateTime.now(),
 
         orderItems: [],
@@ -100,6 +101,10 @@ Map<String, dynamic> _$StrukStateToFirestore(StrukState instance) =>
       'karyawanId': instance.karyawanId,
       // 'strukId': instance.strukId,
       'ordertime': Timestamp.fromDate(instance.ordertime),
-      'orderItems': instance.orderItems,
-      'error': instance.error,
+      'orderItems': instance.orderItems
+          .map(
+            (e) => e.toJson(),
+          )
+          .toList(),
+      // 'error': instance.error,
     };

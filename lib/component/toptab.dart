@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
+import 'package:order_makan/helper.dart';
 
 class TopTab extends StatefulWidget {
   final bool edit;
@@ -42,8 +43,13 @@ class _TopTabState extends State<TopTab> {
                     state.categories.length + 2,
                     (index) => index < state.categories.length + 1
                         ? index == 0
-                            ? const TopBarMenuItem(nama: '[ALL]')
-                            : TopBarMenuItem(nama: state.categories[index - 1])
+                            ? const TopBarMenuItem(
+                                nama: '[ALL]',
+                              )
+                            : TopBarMenuItem(
+                                nama: state.categories[index - 1],
+                                editmode: widget.edit,
+                              )
                         : widget.edit
                             ? AddCategoryButton()
                             : const SizedBox()),
@@ -107,30 +113,10 @@ class AddCategoryButton extends StatelessWidget {
   }
 }
 
-NumberFormat numfor = NumberFormat("###,###", 'ID_id');
-
-extension Uppercasing on String {
-  String firstUpcase() {
-    String a = this[0].toUpperCase() + substring(1);
-
-    return a;
-  }
-
-  String numberFormat() {
-    int? a = int.tryParse(this);
-    if (a != null) {
-      return numfor.format(a);
-    } else {
-      throw Exception('cant parse to int');
-    }
-    // return this.
-  }
-  // ···
-}
-
 class TopBarMenuItem extends StatelessWidget {
   final String nama;
-  const TopBarMenuItem({super.key, required this.nama});
+  final bool editmode;
+  const TopBarMenuItem({super.key, required this.nama, this.editmode = false});
 
   @override
   Widget build(BuildContext context) {
@@ -147,33 +133,35 @@ class TopBarMenuItem extends StatelessWidget {
             // padding: EdgeInsets.all(8),
             child: InkWell(
               onLongPress: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Alert'),
-                    content:
-                        const Text('Are you sure to delete this category?'),
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {
-                            BlocProvider.of<TopbarBloc>(context)
-                                .add(DelCat(name: nama));
-                            Navigator.pop(context);
-                            // var a = await RepositoryProvider.of<MenuItemRepository>(
-                            //         context)
-                            //     .deleteCategory(nama);
-                            // // print(a);
-                            // if (a < 1) {
-                            //   print('No record deleted');
-                            // } else {
-                            //   print('affected records:$a');
-                            //   Navigator.pop(context);
-                            // }
-                          },
-                          child: const Text('Confirm'))
-                    ],
-                  ),
-                );
+                if (editmode) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Alert'),
+                      content:
+                          const Text('Are you sure to delete this category?'),
+                      actions: [
+                        ElevatedButton(
+                            onPressed: () {
+                              BlocProvider.of<TopbarBloc>(context)
+                                  .add(DelCat(name: nama));
+                              Navigator.pop(context);
+                              // var a = await RepositoryProvider.of<MenuItemRepository>(
+                              //         context)
+                              //     .deleteCategory(nama);
+                              // // print(a);
+                              // if (a < 1) {
+                              //   print('No record deleted');
+                              // } else {
+                              //   print('affected records:$a');
+                              //   Navigator.pop(context);
+                              // }
+                            },
+                            child: const Text('Confirm'))
+                      ],
+                    ),
+                  );
+                }
               },
               onTap: () {
                 BlocProvider.of<TopbarBloc>(context)

@@ -17,18 +17,24 @@ class TopbarBloc extends Bloc<TopbarEvent, TopbarState> {
       emit(TopbarState(categories: a, selected: '[ALL]'));
     });
     on<AddCat>((event, emit) async {
-      var a = await repo.addCategory(event.name);
-      if (a > 0) {
-        // Navigator.pop(context);
-        var b = await repo.getCategories();
-        emit(TopbarState(categories: b, selected: '[ALL]'));
+      try {
+        var a = await repo.addCategory(event.name);
+        add(Init());
+      } catch (e) {
+        throw Exception(e);
       }
+      // if (a > 0) {
+      //   // Navigator.pop(context);
+      //   var b = await repo.getCategories();
+      //   emit(TopbarState(categories: b, selected: '[ALL]'));
+      // }
     });
     on<DelCat>((event, emit) async {
-      var a = await repo.deleteCategory(event.name);
-      if (a > 0) {
-        var b = await repo.getCategories();
-        emit(TopbarState(categories: b, selected: '[ALL]'));
+      try {
+        var a = await repo.deleteCategory(event.name);
+        add(Init());
+      } catch (e) {
+        throw Exception(e);
       }
     });
     on<ChangeSelection>(

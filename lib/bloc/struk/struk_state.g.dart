@@ -23,7 +23,11 @@ Map<String, dynamic> _$StrukStateToJson(StrukState instance) =>
       'karyawanId': instance.karyawanId,
       'strukId': instance.strukId,
       'ordertime': instance.ordertime.toIso8601String(),
-      'orderItems': instance.orderItems,
+      'orderItems': instance.orderItems
+          .map(
+            (e) => e.toJson(),
+          )
+          .toList(),
       'error': instance.error,
     };
 

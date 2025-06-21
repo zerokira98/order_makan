@@ -2,14 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
+import 'package:order_makan/bloc/struk/struk_bloc.dart';
+import 'package:order_makan/bloc/struk/struk_state.dart' show StrukState;
 import 'package:order_makan/component/menu_card.dart';
 import 'package:order_makan/component/struk_panel.dart';
 import 'package:order_makan/component/toptab.dart';
 import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
-import 'package:order_makan/pages/antrian/antrianpage.dart';
+import 'package:order_makan/pages/antrian/antrian_main.dart';
 import 'package:order_makan/pages/histori_struk.dart';
+import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UseMain extends StatefulWidget {
@@ -35,6 +39,15 @@ class _UseMainState extends State<UseMain> {
             child: Column(
           children: [
             const Text('Hello'),
+            ListTile(
+              title: const Text('test'),
+              onTap: () {
+                var a = RepositoryProvider.of<KaryawanAuthRepo>(context)
+                    .currentUser;
+                print(a);
+                // BlocProvider.of<KaryawanauthBloc>(context).add(SignOut());
+              },
+            ),
             ListTile(
               title: const Text('LogOut'),
               onTap: () {
@@ -64,9 +77,13 @@ class _UseMainState extends State<UseMain> {
               },
               // child: Text('Resto [NAME]')
             ),
-            const Text(
-              'Senin, 32 Januari 2023',
-              style: TextStyle(fontSize: 10),
+            BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
+              builder: (context, state) {
+                return Text(
+                  'Senin, 32 Januari 2023 ${(state as KaryawanAuthenticated).user.namaKaryawan}',
+                  style: TextStyle(fontSize: 10),
+                );
+              },
             )
           ],
         ),
@@ -81,25 +98,31 @@ class _UseMainState extends State<UseMain> {
               },
               child: const Text('Histori Struk')),
           const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
-          ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AntrianPage(),
-                    ));
-              },
-              child: const Text('Antrian Order (1)')),
+          ElevatedButton(onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AntrianPage(),
+                ));
+          }, child: BlocBuilder<AntrianBloc, AntrianState>(
+            builder: (context, state) {
+              return Text('Antrian Order (${state.antrianStruks.length})');
+            },
+          )),
           const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
-          ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AdminPanel(),
-                    ));
-              },
-              child: const Text('Admin Panel'))
+          if ((BlocProvider.of<KaryawanauthBloc>(context).state
+                  as KaryawanAuthenticated)
+              .user
+              .isAdmin)
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminPanel(),
+                      ));
+                },
+                child: const Text('Admin Panel'))
         ],
       ),
       body: Row(
