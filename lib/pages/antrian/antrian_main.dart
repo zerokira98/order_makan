@@ -1,16 +1,42 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
-import 'package:order_makan/bloc/struk/struk_state.dart';
+import 'package:order_makan/bloc/use_struk/struk_state.dart';
+import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/pages/antrian/time_periodic.dart';
 import 'package:order_makan/pages/histori_struk.dart';
+import 'package:order_makan/repo/strukrepo.dart';
 part 'antrian_card.dart';
 
-class AntrianPage extends StatelessWidget {
-  const AntrianPage({super.key});
+class AntrianPage extends StatefulWidget {
+  final bool fromcheckout;
+  const AntrianPage({super.key, this.fromcheckout = false});
+
+  @override
+  State<AntrianPage> createState() => _AntrianPageState();
+}
+
+class _AntrianPageState extends State<AntrianPage> {
+  @override
+  void initState() {
+    if (widget.fromcheckout) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        RepositoryProvider.of<StrukRepository>(context).getAntrian().then(
+          (value) {
+            showDialog(
+                context: context,
+                builder: (context) => DisplayStruk(data: value.last));
+          },
+        );
+      });
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +50,7 @@ class AntrianPage extends StatelessWidget {
         ],
       ),
       body: BlocListener<AntrianBloc, AntrianState>(
+        listenWhen: (previous, current) => current.msg != null,
         listener: (context, state) {
           ScaffoldMessenger.of(context)
             ..clearSnackBars()
@@ -36,6 +63,10 @@ class AntrianPage extends StatelessWidget {
         },
         child: BlocBuilder<AntrianBloc, AntrianState>(
           builder: (context, state) {
+            if (state.antrianStruks.isEmpty)
+              return Center(
+                child: Text('Empty'),
+              );
             return GridView.count(
               shrinkWrap: true,
               childAspectRatio: 3,

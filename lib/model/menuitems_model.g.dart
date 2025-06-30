@@ -9,6 +9,7 @@ part of 'menuitems_model.dart';
 MenuItems _$MenuItemsFromJson(Map<String, dynamic> json) => MenuItems(
       count: (json['count'] as num?)?.toInt(),
       id: json['id'] as String?,
+      description: json['description'] as String? ?? '',
       price: (json['price'] as num?)?.toInt(),
       title: json['title'] as String,
       imgDir: json['imgDir'] as String,
@@ -22,6 +23,7 @@ Map<String, dynamic> _$MenuItemsToJson(MenuItems instance) => <String, dynamic>{
       'imgDir': instance.imgDir,
       'price': instance.price,
       'id': instance.id,
+      'description': instance.description,
       'categories': instance.categories,
       'count': instance.count,
     };

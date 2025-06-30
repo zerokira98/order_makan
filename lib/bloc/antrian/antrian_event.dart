@@ -9,7 +9,7 @@ class InitiateAntrian extends AntrianEvent {
 }
 
 class AddtoAntrian extends AntrianEvent {
-  final StrukState data;
+  final UseStrukState data;
   AddtoAntrian(this.data);
 }
 
@@ -19,14 +19,14 @@ class OrderFinish extends AntrianEvent {
 }
 
 class OrderFailure extends AntrianEvent {
-  final StrukState data;
+  final UseStrukState data;
   final String reason;
   OrderFailure(this.data, {required this.reason});
 }
 
 ///debug only, dont go production
 class Delete extends AntrianEvent {
-  final StrukState data;
+  final UseStrukState data;
   Delete(
     this.data,
   );

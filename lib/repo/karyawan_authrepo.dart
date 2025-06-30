@@ -32,6 +32,12 @@ class KaryawanAuthRepo {
     );
   }
 
+  Future getAllKaryawan(String karyawanId) {
+    return firestore.collection('users').doc(karyawanId).get().then(
+          (value) => value.data(),
+        );
+  }
+
   Future<void> signUp(
       {required String email,
       required String password,

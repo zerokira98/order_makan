@@ -6,7 +6,11 @@ part of 'struk_state.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-StrukState _$StrukStateFromJson(Map<String, dynamic> json) => StrukState(
+UseStrukState _$StrukStateFromJson(Map<String, dynamic> json) => UseStrukState(
+      nomorMeja: (json['nomorMeja'] as num?)?.toInt() ?? 0,
+      tipePembayaran: $enumDecodeNullable(
+              _$TipePembayaranEnumMap, json['tipePembayaran']) ??
+          TipePembayaran.tunai,
       karyawanId: json['karyawanId'] as String,
       strukId: json['strukId'] as String?,
       ordertime: DateTime.parse(json['ordertime'] as String),
@@ -18,18 +22,21 @@ StrukState _$StrukStateFromJson(Map<String, dynamic> json) => StrukState(
           : StrukError.fromJson(json['error'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$StrukStateToJson(StrukState instance) =>
+Map<String, dynamic> _$StrukStateToJson(UseStrukState instance) =>
     <String, dynamic>{
       'karyawanId': instance.karyawanId,
+      'nomorMeja': instance.nomorMeja,
+      'tipePembayaran': _$TipePembayaranEnumMap[instance.tipePembayaran]!,
       'strukId': instance.strukId,
       'ordertime': instance.ordertime.toIso8601String(),
-      'orderItems': instance.orderItems
-          .map(
-            (e) => e.toJson(),
-          )
-          .toList(),
+      'orderItems': instance.orderItems,
       'error': instance.error,
     };
+
+const _$TipePembayaranEnumMap = {
+  TipePembayaran.tunai: 'tunai',
+  TipePembayaran.qris: 'qris',
+};
 
 StrukError _$StrukErrorFromJson(Map<String, dynamic> json) => StrukError(
       (json['code'] as num).toInt(),

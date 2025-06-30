@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:order_makan/model/kategori_model.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 
-abstract class MenuItemRepo {
+abstract class _MenuItemRepo {
   final FirebaseFirestore firestore;
-  MenuItemRepo(this.firestore);
+  _MenuItemRepo(this.firestore);
   Future<List<MenuItems>> getAllMenus();
   Future<List<MenuItems>> getMenusByCategory(String category);
   Future<List> getCategories();
@@ -16,16 +16,18 @@ abstract class MenuItemRepo {
   Future editMenu(MenuItems menu);
 }
 
-class MenuItemRepository implements MenuItemRepo {
+class MenuItemRepository implements _MenuItemRepo {
   @override
   final FirebaseFirestore firestore;
   CollectionReference<MenuItems> menuRef;
+  CollectionReference menuRefVanilla;
   CollectionReference<Map> categoryRef;
   MenuItemRepository(this.firestore)
       : menuRef = firestore.collection('menu_items').withConverter(
             fromFirestore: (snap, _) => MenuItems.fromFirestore(snap),
             toFirestore: (model, _) => model.toFirestore()),
-        categoryRef = firestore.collection('categories');
+        categoryRef = firestore.collection('categories'),
+        menuRefVanilla = firestore.collection('menu_items');
   @override
   Future editMenu(MenuItems menu) {
     return menuRef.doc(menu.id).update(menu.toFirestore());
@@ -35,12 +37,16 @@ class MenuItemRepository implements MenuItemRepo {
   }
 
   @override
-  Future<List<MenuItems>> getAllMenus() {
-    return menuRef.orderBy('title').get().then((value) => value.docs
-        .map(
-          (e) => e.data(),
-        )
-        .toList());
+  Future<List<MenuItems>> getAllMenus({bool customOrder = false}) {
+    return menuRef
+        .orderBy('title')
+        .where('custom_order', isNull: !customOrder)
+        .get()
+        .then((value) => value.docs
+            .map(
+              (e) => e.data(),
+            )
+            .toList());
     // var store = intMapStoreFactory.store('menus');
     // return store
     //     .query(finder: Finder(sortOrders: [SortOrder('title')]))
@@ -80,11 +86,17 @@ class MenuItemRepository implements MenuItemRepo {
   }
 
   @override
-  Future addMenu(MenuItems menu) async {
+  Future addMenu(MenuItems menu, {bool customOrder = false}) async {
     // give error when they have ssame title
     var check = await menuRef.where('title', isEqualTo: menu.title).get();
     if (check.size > 0) return throw Exception('title exist');
-    return menuRef.add(menu);
+
+    return menuRef.add(menu).then(
+      (value) {
+        value.update({'custom_order': customOrder});
+      },
+    );
+
     // var store = intMapStoreFactory.store('menus');
     // return store
     //     .findFirst(db,

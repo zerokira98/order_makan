@@ -80,6 +80,7 @@ class AddCategoryButton extends StatelessWidget {
           showDialog(
               context: context,
               builder: (context) => AlertDialog(
+                    titlePadding: EdgeInsets.fromLTRB(12, 8, 12, 0),
                     title: Row(
                       children: [
                         const Text('Add Category'),
@@ -98,14 +99,10 @@ class AddCategoryButton extends StatelessWidget {
                             child: const Text('Submit'))
                       ],
                     ),
-                    content: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextField(
-                        controller: catControl,
-                        decoration:
-                            const InputDecoration(label: Text('Category Name')),
-                      ),
-                      // child: Text('TextField'),
+                    content: TextField(
+                      controller: catControl,
+                      decoration:
+                          const InputDecoration(label: Text('Category Name')),
                     ),
                   ));
         },
@@ -174,7 +171,7 @@ class TopBarMenuItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  nama.firstUpcase(),
+                  nama.firstUpcase,
                   style: const TextStyle(
                     fontSize: 20,
                   ),

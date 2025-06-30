@@ -3,7 +3,12 @@ part of 'menu_bloc.dart';
 @immutable
 abstract class MenuEvent {}
 
-class Init extends MenuEvent {}
+class Init extends MenuEvent {
+  final Map? msg;
+  Init({this.msg});
+}
+
+class ClearMsg extends MenuEvent {}
 
 class AddMenu extends MenuEvent {
   final MenuItems menu;

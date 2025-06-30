@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:order_makan/bloc/struk/struk_state.dart';
+import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 
 part 'antrian_event.dart';
@@ -17,22 +17,22 @@ class AntrianBloc extends Bloc<AntrianEvent, AntrianState> {
         super(const AntrianState(antrianStruks: [])) {
     on<InitiateAntrian>((event, emit) async {
       var a = await _repo.getAntrian();
-      emit(state.copywith(
-          antrianStruks: a, msg: event.msg == null ? null : () => event.msg));
+      emit(state.copywith(antrianStruks: a, msg: () => event.msg));
     });
     on<AddtoAntrian>((event, emit) {});
     on<OrderFinish>((event, emit) async {
-      try {
-        await _repo.finishAntrian(event.strukId);
-        add(InitiateAntrian(msg: {
-          "status": "success",
-          "details": "Pesanan telah diselesaikan"
-        }));
-      } catch (e) {
+      await _repo.finishAntrian(event.strukId).then(
+        (value) {
+          add(InitiateAntrian(msg: {
+            "status": "success",
+            "details": "Pesanan telah diselesaikan"
+          }));
+        },
+      ).onError((error, stackTrace) {
+        print(error);
         add(InitiateAntrian(
-            msg: {"status": "failed", "details": "Error : $e"}));
-        throw Exception(e);
-      }
+            msg: {"status": "failed", "details": "Error : $error"}));
+      });
     });
     on<OrderFailure>((event, emit) {});
     on<Delete>((event, emit) async {

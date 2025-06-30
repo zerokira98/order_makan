@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' hide kIsWasm;
 import 'package:order_makan/helper.dart';
 import 'package:path/path.dart' as p;
 
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
-import 'package:order_makan/bloc/struk/struk_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart' as t;
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/model/menuitems_model.dart';
@@ -33,45 +34,8 @@ class MenuCard extends StatelessWidget {
             showDialog(
               context: context,
               builder: (context) {
-                return Dialog(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('Delete this menu?'),
-                            Text(menudata.categories.toString())
-                          ],
-                        ),
-                        SizedBox(
-                          height: 170,
-                          width: 240,
-                          child: Stack(
-                            children: [
-                              MenuCard(
-                                onTap: () {},
-                                menudata: menudata,
-                              ),
-                              Positioned.fill(
-                                child: Container(
-                                  color: Colors.green.withValues(alpha: 0.1),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        ElevatedButton(
-                            onPressed: () {
-                              BlocProvider.of<MenuBloc>(context)
-                                  .add(DelMenu(menu: menudata));
-                            },
-                            child: const Text('Confirm'))
-                      ],
-                    ),
-                  ),
+                return DeleteMenuDialog(
+                  menudata: menudata,
                 );
               },
             );
@@ -84,7 +48,7 @@ class MenuCard extends StatelessWidget {
                     builder: (context) =>
                         TambahmenuDialog(editmode: true, menudata: menudata));
               }
-            : () => BlocProvider.of<StrukBloc>(context)
+            : () => BlocProvider.of<UseStrukBloc>(context)
                 .add(AddOrderitems(item: StrukItem.fromMenuItems(menudata))),
         child: Container(
           // width: 12,
@@ -98,7 +62,7 @@ class MenuCard extends StatelessWidget {
                     child: SizedBox(
                       height: 32,
                       child: Text(
-                        menudata.title.firstUpcase(),
+                        menudata.title.firstUpcase,
                         // textScaler: TextScaler.linear( 1.2,
                         style: const TextStyle(fontSize: 14, height: 1.0),
                         textAlign: TextAlign.left,
@@ -111,35 +75,36 @@ class MenuCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: Container(
-                    // height: 94,
-                    // width: 95,
-                    decoration: BoxDecoration(
-                      color: Colors.black12,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: menudata.imgDir.contains('assets') ||
-                            menudata.imgDir.isEmpty
-                        ? Image.asset(
-                            menudata.imgDir.isEmpty
-                                ? 'assets/sate.jpg'
-                                : menudata.imgDir,
-                            height: 80,
-                            fit: BoxFit.cover,
-                          )
-                        : (Platform.isAndroid)
-                            ? Image.file(
-                                File(
-                                  menudata.imgDir,
-                                ),
-                                height: 80,
-                                fit: BoxFit.cover,
-                              )
-                            : Image.network(
-                                menudata.imgDir,
-                                height: 80,
-                              ),
-                    // child: Center(child: Text('menu image')),
-                  ),
+                      // height: 94,
+                      // width: 95,
+                      decoration: BoxDecoration(
+                        color: Colors.black12,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: menudata.imgDir.contains('assets') ||
+                              menudata.imgDir.isEmpty
+                          ? Image.asset(
+                              menudata.imgDir.isEmpty
+                                  ? 'assets/sate.jpg'
+                                  : menudata.imgDir,
+                              height: 80,
+                              fit: BoxFit.cover,
+                            )
+                          : (!kIsWeb)
+                              ? Image.file(
+                                  File(
+                                    menudata.imgDir,
+                                  ),
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.asset(
+                                  'assets/sate.jpg',
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                )
+                      // child: Center(child: Text('menu image')),
+                      ),
                 ),
               ),
               // Padding(padding: EdgeInsetsGeometry.all(2)),
@@ -172,11 +137,7 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
       child: InkWell(
         onTap: () {
           var ao = BlocProvider.of<TopbarBloc>(context).state.selected;
-          // if (ao != null) {
-          //   if (ao == '[ALL]') {
-          //     ao = null;
-          //   }
-          // }
+
           showDialog(
               context: context,
               builder: (context) => TambahmenuDialog(
@@ -253,6 +214,7 @@ class TambahmenuDialog extends StatefulWidget {
 
 class _TambahmenuDialogState extends State<TambahmenuDialog> {
   late TextEditingController namaMenuC;
+  late TextEditingController deskripsi;
   String imgdir = '';
   late TextEditingController hargaC;
   List<String> category = [];
@@ -266,6 +228,8 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
 
     namaMenuC = TextEditingController(
         text: widget.editmode ? widget.menudata!.title : '');
+    deskripsi = TextEditingController(
+        text: widget.editmode ? widget.menudata!.description : '');
     hargaC = TextEditingController(
         text: widget.editmode ? widget.menudata!.price.toString() : '');
     imgdir = widget.editmode ? widget.menudata!.imgDir : '';
@@ -275,6 +239,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: EdgeInsets.all(0),
       title: Row(
         children: [
           Text(widget.editmode ? 'Edit Menu' : 'Tambah Menu'),
@@ -285,7 +250,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
             children: [
               const Text(
                 'Tag :',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 12),
               ),
               FutureBuilder(
                   future: RepositoryProvider.of<MenuItemRepository>(context)
@@ -309,7 +274,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                                         },
                                         labelPadding: EdgeInsets.zero,
                                         label: Text(
-                                          category[index].firstUpcase(),
+                                          category[index].firstUpcase,
                                           style: const TextStyle(fontSize: 12),
                                         )),
                                   )
@@ -325,8 +290,8 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                                         snapshot.data!.length,
                                         (i) => PopupMenuItem(
                                             value: snapshot.data![i],
-                                            child: Text(snapshot.data![i]
-                                                .firstUpcase()))),
+                                            child: Text(snapshot
+                                                .data![i].firstUpcase))),
                                     child: const Chip(
                                         labelPadding: EdgeInsets.zero,
                                         label: Text('+')),
@@ -338,9 +303,9 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
               onPressed: () {
                 int? hargaInt = int.tryParse(hargaC.text);
                 if (namaMenuC.text.length > 3 && hargaInt != null) {
-                  print(imgdir);
                   var menuitem = MenuItems(
                     title: namaMenuC.text,
+                    description: deskripsi.text,
                     imgDir: imgdir,
                     price: hargaInt,
                     categories: category,
@@ -371,58 +336,141 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
               child: Text(widget.editmode ? 'Save' : 'Submit'))
         ],
       ),
-      content: Row(
-        children: [
-          // Text('TextField: title'),
-          // Text('TextField: harga'),
-          const Padding(padding: EdgeInsets.all(4)),
-          SizedBox(
-              width: 250,
-              child: TextField(
-                controller: namaMenuC,
-                decoration: const InputDecoration(label: Text('Nama menu')),
-              )),
-          const Padding(padding: EdgeInsets.all(4)),
-          SizedBox(
-              width: 250,
-              child: TextField(
-                controller: hargaC,
-                decoration: const InputDecoration(label: Text('Harga')),
-              )),
-          const Padding(padding: EdgeInsets.all(4)),
-          (imgdir.isEmpty)
-              ? ElevatedButton.icon(
-                  onPressed: () async {
-                    var a = await ImagePicker()
-                        .pickImage(source: ImageSource.gallery);
-                    if (a != null) {
-                      setState(() {
-                        imgdir = a.path;
-                      });
-                    }
-                  },
-                  icon: const Icon(Icons.camera_alt_outlined),
-                  label: const Text('Gambar'))
-              : SizedBox(
-                  height: 110,
-                  child: InkWell(
-                    onTap: () async {
-                      var a = await ImagePicker()
-                          .pickImage(source: ImageSource.gallery);
-                      if (a != null) {
-                        setState(() {
-                          imgdir = a.path;
-                        });
-                      }
-                    },
-                    child: imgdir.contains('assets')
-                        ? Image.asset(imgdir)
-                        : Image.file(File(imgdir)),
-                  ),
-                ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                const Padding(padding: EdgeInsets.all(4)),
+                SizedBox(
+                    width: 250,
+                    child: TextField(
+                      controller: namaMenuC,
+                      decoration:
+                          const InputDecoration(label: Text('Nama menu')),
+                    )),
+                const Padding(padding: EdgeInsets.all(4)),
+                SizedBox(
+                    width: 250,
+                    child: TextField(
+                      controller: hargaC,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(label: Text('Harga')),
+                    )),
+                const Padding(padding: EdgeInsets.all(4)),
+                (imgdir.isEmpty)
+                    ? ElevatedButton.icon(
+                        onPressed: () async {
+                          var a = await ImagePicker()
+                              .pickImage(source: ImageSource.gallery);
+                          if (a != null) {
+                            setState(() {
+                              imgdir = a.path;
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.camera_alt_outlined),
+                        label: const Text('Gambar'))
+                    : SizedBox(
+                        height: 110,
+                        child: InkWell(
+                          onTap: () async {
+                            var a = await ImagePicker()
+                                .pickImage(source: ImageSource.gallery);
+                            if (a != null) {
+                              setState(() {
+                                imgdir = a.path;
+                              });
+                            }
+                          },
+                          child: imgdir.contains('assets')
+                              ? Image.asset(imgdir)
+                              : Image.file(File(imgdir)),
+                        ),
+                      ),
 
-          // Text('imgField: img'),
-        ],
+                // Text('imgField: img'),
+              ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                    child: TextFormField(
+                  controller: deskripsi,
+                  decoration: InputDecoration(label: Text('Deskripsi')),
+                ))
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DeleteMenuDialog extends StatelessWidget {
+  final MenuItems menudata;
+  const DeleteMenuDialog({super.key, required this.menudata});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<MenuBloc, MenuState>(
+      listenWhen: (previous, current) =>
+          previous.datas.length != current.datas.length,
+      listener: (context, state) {
+        Navigator.pop(context);
+      },
+      child: Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Delete this menu?'),
+                  Text('Categories : ' + menudata.categories.toString())
+                ],
+              ),
+              SizedBox(
+                height: 170,
+                width: 240,
+                child: Stack(
+                  children: [
+                    MenuCard(
+                      onTap: () {},
+                      menudata: menudata,
+                    ),
+                    Positioned.fill(
+                      child: Container(
+                        color: Colors.green.withValues(alpha: 0.1),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {
+                        BlocProvider.of<MenuBloc>(context)
+                            .add(DelMenu(menu: menudata));
+                      },
+                      child: const Text('Confirm')),
+                  Padding(padding: EdgeInsetsGeometry.all(12)),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Cancel')),
+                ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

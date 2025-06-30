@@ -2,6 +2,7 @@ import 'package:crypt/crypt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
+import 'package:order_makan/component/screen_lock.dart';
 import 'package:order_makan/helper.dart' show validateEmail;
 import 'package:order_makan/pages/karyawan_signup.dart';
 
@@ -70,11 +71,24 @@ class _KaryawanLoginPageState extends State<KaryawanLoginPage> {
                   Row(
                     children: [
                       ElevatedButton(
-                          onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => KaryawanSignupPage(),
-                              )),
+                          onPressed: () {
+                            showDialog<bool?>(
+                              context: context,
+                              builder: (context) => KeyLock(
+                                  tendigits: '392785', title: 'App Pass'),
+                            ).then(
+                              (value) {
+                                if (value != null && value) {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            KaryawanSignupPage(),
+                                      ));
+                                } else {}
+                              },
+                            );
+                          },
                           child: const Text('Signup')),
                       Padding(padding: EdgeInsetsGeometry.all(8)),
                       ElevatedButton(

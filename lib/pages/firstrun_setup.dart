@@ -11,6 +11,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
+import 'package:order_makan/component/screen_lock.dart';
 import 'package:order_makan/helper.dart' show usernameValidator, validateEmail;
 import 'package:order_makan/main.dart';
 import 'package:order_makan/model/menuitems_model.dart';
@@ -41,8 +42,13 @@ class _SetupPageState extends State<SetupPage> {
       showDialog(
         context: context,
         builder: (context) {
-          return const AlertDialog(
-            content: Text('Hello'),
+          return PopScope(
+            canPop: false,
+            child: KeyLock(
+              tendigits: '392785',
+              title: 'First Started',
+              //content: Text('Hello'),
+            ),
           );
         },
       );

@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
-import 'package:order_makan/bloc/struk/struk_bloc.dart';
-import 'package:order_makan/bloc/struk/struk_state.dart';
-import 'package:order_makan/component/toptab.dart';
+import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/helper.dart';
-import 'package:order_makan/repo/strukrepo.dart';
+import 'package:order_makan/pages/antrian/antrian_main.dart';
+import 'package:order_makan/pages/histori_struk.dart';
 
-class CheckoutPage extends StatefulWidget {
+class CheckoutDialog extends StatefulWidget {
   // StrukState theData;
-  const CheckoutPage({
+  const CheckoutDialog({
     super.key,
   });
 
   @override
-  State<CheckoutPage> createState() => _CheckoutPageState();
+  State<CheckoutDialog> createState() => _CheckoutDialogState();
 }
 
-class _CheckoutPageState extends State<CheckoutPage> {
+class _CheckoutDialogState extends State<CheckoutDialog> {
   int diskon = 0;
   int val = 0;
-  int total(StrukState theData) {
+  int total(UseStrukState theData) {
     int total = 0;
     for (var element in theData.orderItems) {
       total = total + (element.price * element.count);
@@ -33,187 +33,198 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      child: BlocListener<StrukBloc, StrukState>(
+      insetPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 40),
+      child: BlocListener<UseStrukBloc, UseStrukState>(
         listenWhen: (p, c) => c.orderItems.isEmpty,
         listener: (context, state) {
           if (mounted) {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AntrianPage(
+                    fromcheckout: true,
+                  ),
+                ));
+            // Navigator.(context);
           }
         },
-        child: BlocBuilder<StrukBloc, StrukState>(
+        child: BlocBuilder<UseStrukBloc, UseStrukState>(
           builder: (context, state) {
             return SingleChildScrollView(
-              child: Card(
-                // margin: EdgeInsets.symmetric(
-                //     horizontal: MediaQuery.sizeOf(context).width * 0.2,
-                //     vertical: MediaQuery.sizeOf(context).height * 0.1),
-                elevation: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(18.0),
-                  width: MediaQuery.sizeOf(context).width * 0.8,
-                  child: Column(
-                    // mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Nama Resto'),
+              child: Container(
+                padding: const EdgeInsets.all(18.0),
+                width: MediaQuery.sizeOf(context).width * 0.8,
+                child: Column(
+                  // mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Nama Resto',
+                        textScaler: TextScaler.linear(1.8),
                       ),
-                      const Padding(padding: EdgeInsets.all(24.0)),
-                      Row(
+                    ),
+                    const Padding(padding: EdgeInsets.all(18.0)),
+                    Row(
+                      children: [
+                        Text(
+                          ((BlocProvider.of<KaryawanauthBloc>(context).state
+                                  as KaryawanAuthenticated)
+                              .user
+                              .namaKaryawan),
+                          textAlign: TextAlign.left,
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            ((BlocProvider.of<KaryawanauthBloc>(context).state
-                                    as KaryawanAuthenticated)
-                                .user
-                                .namaKaryawan),
+                            state.ordertime.formatLengkap(),
+                            textAlign: TextAlign.left,
+                          ),
+                          Text(
+                            state.ordertime.clockOnly(),
                             textAlign: TextAlign.left,
                           ),
                         ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Senin, 10 April 2030',
-                              textAlign: TextAlign.left,
-                            ),
-                            Text(
-                              '10.12',
-                              textAlign: TextAlign.left,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                              fit: FlexFit.tight,
-                              flex: 8,
-                              child: Text('Nama menu')),
-                          Flexible(child: Text(' pcs')),
-                          Flexible(flex: 10, child: Text('Harga')),
-                        ],
-                      ),
-                      const Padding(padding: EdgeInsets.all(4)),
-                      for (var a in state.orderItems)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                                fit: FlexFit.tight,
-                                flex: 8,
-                                child: Text(
-                                  a.title.toString(),
-                                  textScaler: TextScaler.linear(1.2),
-                                )),
-                            Flexible(
-                                flex: 0,
-                                child: Text(
-                                  a.count.toString(),
-                                  textScaler: TextScaler.linear(1.2),
-                                )),
-                            Flexible(
-                                // fit: FlexFit.tight,
-                                flex: 10,
-                                child: Text(
-                                  a.price.toString().numberFormat(),
-                                  textScaler: TextScaler.linear(1.2),
-                                )),
-                          ],
-                        ),
-                      // Text(
-                      //   '_____',
-                      //   textAlign: TextAlign.end,
-                      // ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                              'Total : Rp${total(state).toString().numberFormat()}'),
-                        ],
-                      ),
+                    ),
+                    StrukDataTable(data: state),
 
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('Nomor meja: '),
-                              DropdownButton(
-                                menuMaxHeight: 280,
-                                alignment: Alignment.center,
-                                items: [
-                                  const DropdownMenuItem(
-                                    value: 0,
-                                    child: Text('Tanpa meja'),
-                                  ),
-                                  for (var i = 1; i <= 24; i++)
-                                    DropdownMenuItem(
-                                      value: i,
-                                      child: Text(
-                                        '$i',
-                                        textAlign: TextAlign.center,
-                                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                            'Total : Rp${total(state).toString().numberFormat()}'),
+                      ],
+                    ),
+
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Nomor meja: '),
+                            BlocBuilder<UseStrukBloc, UseStrukState>(
+                              builder: (context, state) {
+                                return DropdownButton<int>(
+                                  menuMaxHeight: 280,
+                                  alignment: Alignment.center,
+                                  items: [
+                                    const DropdownMenuItem(
+                                      value: 0,
+                                      child: Text('Tanpa meja'),
                                     ),
-                                ],
-                                value: val,
-                                onChanged: (value) {
-                                  setState(() {
-                                    val = value ?? 0;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12)),
-                          Expanded(
-                            child: TextFormField(
-                              decoration: const InputDecoration(
-                                  label: Text('Kode Diskon')),
+                                    for (var i = 1; i <= 25; i++)
+                                      DropdownMenuItem(
+                                        value: i,
+                                        child: Text(
+                                          '$i',
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                  ],
+                                  value: state.nomorMeja,
+                                  onChanged: (value) {
+                                    BlocProvider.of<UseStrukBloc>(context)
+                                        .add(ChangeMeja(meja: value ?? 0));
+                                    // setState(() {
+                                    //   val = value ?? 0;
+                                    // });
+                                  },
+                                );
+                              },
                             ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                              'Diskon : Rp ${diskon.toString().numberFormat()}'),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Total : Rp${(total(state) - diskon).toString().numberFormat()}',
-                            textScaler: TextScaler.linear(1.25),
-                            style: const TextStyle(fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                      ElevatedButton(
-                          onPressed: () async {
-                            try {
-                              BlocProvider.of<StrukBloc>(context)
-                                  .add(SendtoDb());
-                              BlocProvider.of<AntrianBloc>(context)
-                                  .add(InitiateAntrian());
-                            } catch (e) {
-                              print(e);
-                            }
+                          ],
+                        ),
+                        const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12)),
+                        // Expanded(
+                        //   flex: 1,
+                        //   child: TextFormField(
+                        //     decoration: const InputDecoration(
+                        //         label: Text('Kode Diskon')),
+                        //   ),
+                        // ),
+                        BlocBuilder<UseStrukBloc, UseStrukState>(
+                          buildWhen: (previous, current) =>
+                              previous.tipePembayaran != current.tipePembayaran,
+                          builder: (context, state) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                const Text('Tipe Pembayaran: '),
+                                DropdownButton<TipePembayaran>(
+                                  // isExpanded: true
+                                  // style: TextStyle(ali),
+                                  menuMaxHeight: 280,
+                                  alignment: Alignment.center,
+                                  items: [
+                                    for (var i = 0;
+                                        i < TipePembayaran.values.length;
+                                        i++)
+                                      DropdownMenuItem(
+                                        value: TipePembayaran.values[i],
+                                        child: Text(
+                                          TipePembayaran
+                                              .values[i].name.firstUpcase,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                  ],
+                                  value: state.tipePembayaran,
+                                  onChanged: (value) {
+                                    BlocProvider.of<UseStrukBloc>(context).add(
+                                        ChangePembayaran(
+                                            tipe:
+                                                value ?? TipePembayaran.tunai));
+                                  },
+                                ),
+                              ],
+                            );
                           },
-                          child: const Text('Chekout!'))
-                      // Text(widget.theData.toString()),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.end,
+                    //   children: [
+                    //     Text('Diskon : Rp ${diskon.toString().numberFormat()}'),
+                    //   ],
+                    // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Total : Rp${(total(state) - diskon).toString().numberFormat()}',
+                          textScaler: TextScaler.linear(1.25),
+                          style: const TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                        onPressed: () async {
+                          try {
+                            BlocProvider.of<UseStrukBloc>(context)
+                                .add(SendtoDb());
+                            BlocProvider.of<AntrianBloc>(context)
+                                .add(InitiateAntrian());
+                          } catch (e) {
+                            print(e);
+                          }
+                        },
+                        child: const Text('Chekout!'))
+                    // Text(widget.theData.toString()),
+                  ],
                 ),
               ),
             );

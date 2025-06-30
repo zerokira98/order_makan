@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 
@@ -11,10 +12,14 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   MenuBloc(this.repo) : super(const MenuState(datas: [])) {
     on<Init>((event, emit) async {
       var a = await repo.getAllMenus();
-      emit(MenuState(datas: a));
+      emit(MenuState(datas: a).copywith(msg: () => event.msg));
+    });
+    on<ClearMsg>((event, emit) async {
+      add(Init());
     });
     on<AddMenu>((event, emit) async {
-      var a = await repo.addMenu(event.menu);
+      var a = await repo
+          .addMenu(event.menu.copywith(title: event.menu.title.firstUpcase));
       if (a == -1) {
         // send Error
       } else {

@@ -4,9 +4,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
-import 'package:order_makan/bloc/struk/struk_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
 import 'package:order_makan/firebase_options.dart';
@@ -21,6 +22,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  initializeDateFormatting('id_ID', null);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   var fireApp = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -50,7 +53,7 @@ void main() async {
     child: MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => StrukBloc(
+          create: (context) => UseStrukBloc(
               RepositoryProvider.of<StrukRepository>(context),
               RepositoryProvider.of<KaryawanAuthRepo>(context)),
         ),
@@ -89,7 +92,7 @@ class MyApp extends StatelessWidget {
         BlocListener<KaryawanauthBloc, KaryawanauthState>(
           listener: (context, state) {
             if (state is KaryawanAuthenticated) {
-              BlocProvider.of<StrukBloc>(context)
+              BlocProvider.of<UseStrukBloc>(context)
                   .add(InitiateStruk(karyawanId: state.user.namaKaryawan));
             }
           },
@@ -105,7 +108,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark(useMaterial3: true),
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -147,77 +150,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// class MyHome extends StatelessWidget {
-//   final String title;
-//   const MyHome({super.key, required this.title});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
-//         overlays: SystemUiOverlay.values);
-//     return Scaffold(
-//       appBar: AppBar(title: BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
-//         builder: (context, state) {
-//           if (state is KaryawanAuthenticated) {
-//             return Text('username:${state.user.username}');
-//           } else {
-//             return const Text('title');
-//           }
-//         },
-//       )),
-//       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-//         // const Text('Login Karyawan'),
-//         // const Card(
-//         //     child: Padding(
-//         //   padding: EdgeInsets.all(28.0),
-//         //   child: Text('login Form'),
-//         // )),
-//         BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
-//           builder: (context, state) {
-//             if (state is! KaryawanAuthenticated) {
-//               return ElevatedButton(
-//                   onPressed: () {
-//                     // BlocProvider.of<TopbarBloc>(context).add(Init());
-//                     Navigator.push(
-//                         context,
-//                         MaterialPageRoute(
-//                           builder: (context) => const KaryawanLoginPage(),
-//                         ));
-//                   },
-//                   child: const Text('Login Karyawan'));
-//             } else {
-//               return ElevatedButton(
-//                   onPressed: () {
-//                     BlocProvider.of<TopbarBloc>(context).add(Init());
-//                     Navigator.push(
-//                         context,
-//                         MaterialPageRoute(
-//                           builder: (context) => const UseMain(),
-//                         ));
-//                   },
-//                   child: const Text('Usemain'));
-//             }
-//           },
-//         ),
-//         ElevatedButton(
-//             onPressed: () async {
-//               var a = await RepositoryProvider.of<StrukRepository>(context)
-//                   .readAllStruk();
-//               print(a[a.length - 1]);
-//               // Navigator.push(
-//               //     context,
-//               //     MaterialPageRoute(
-//               //       builder: (context) => const AdminLoginPage(),
-//               //     ));
-//             },
-//             child: const Text('Admin Panel')),
-//         ElevatedButton(
-//             onPressed: () async {
-//               BlocProvider.of<KaryawanauthBloc>(context).add(SignOut());
-//             },
-//             child: const Text('LogOut')),
-//       ]),
-//     );
-//   }
-// }

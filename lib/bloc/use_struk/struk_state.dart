@@ -1,43 +1,65 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 // import 'package:order_makan/repo/user_model.dart' show User;
 
 part 'struk_state.g.dart';
 
+enum TipePembayaran { tunai, qris }
+
 @JsonSerializable()
-class StrukState {
+class UseStrukState extends Equatable {
   final String karyawanId;
+  final int nomorMeja;
+  final TipePembayaran tipePembayaran;
   final String? strukId;
   final DateTime ordertime;
   final List<StrukItem> orderItems;
+  final int? total;
+  final int? waktuTunggu;
   final StrukError error;
+  final String? deleteReason;
 
-  StrukState({
+  UseStrukState({
+    this.nomorMeja = 0,
+    this.tipePembayaran = TipePembayaran.tunai,
     required this.karyawanId,
     this.strukId,
     required this.ordertime,
     required this.orderItems,
+    this.waktuTunggu,
+    this.total,
+    this.deleteReason,
     StrukError? error,
     // required this.karyawanId,
   }) : error = error ?? StrukError.empty();
   // karyawanId = karyawanId ?? '',
 
-  static StrukState initial({required String karyawanId}) => StrukState(
+  static UseStrukState initial({required String karyawanId}) => UseStrukState(
         karyawanId: karyawanId,
         ordertime: DateTime.now(),
-
         orderItems: [],
         // karyawanId: karyawanId,
       );
-  StrukState copywith(
+  UseStrukState copywith(
           {List<StrukItem>? orderItems,
           bool? isFinished,
           String? karyawanId,
+          String? deleteReason,
+          int? total,
+          int? waktuTunggu,
+          int? nomorMeja,
+          TipePembayaran? tipePembayaran,
           String? strukId,
           StrukError? error,
           DateTime? ordertime}) =>
-      StrukState(
+      UseStrukState(
+        total: total ?? this.total,
+        waktuTunggu: waktuTunggu ?? this.waktuTunggu,
+        deleteReason: deleteReason ?? this.deleteReason,
+        tipePembayaran: tipePembayaran ?? this.tipePembayaran,
+        nomorMeja: nomorMeja ?? this.nomorMeja,
         karyawanId: karyawanId ?? this.karyawanId,
         strukId: strukId ?? this.strukId,
         error: error ?? this.error,
@@ -45,16 +67,27 @@ class StrukState {
         orderItems: orderItems ?? this.orderItems,
       );
 
-  factory StrukState.fromJson(Map<String, dynamic> json) =>
+  factory UseStrukState.fromJson(Map<String, dynamic> json) =>
       _$StrukStateFromJson(json);
 
   Map<String, dynamic> toJson() => _$StrukStateToJson(this);
 
-  factory StrukState.fromFirestore(
-          DocumentSnapshot<Map<String, dynamic>> data) =>
+  factory UseStrukState.fromFirestore(
+          DocumentSnapshot<Map<String, Object?>> data) =>
       _$StrukStateFromFirestore(data);
 
-  Map<String, dynamic> toFirestore() => _$StrukStateToFirestore(this);
+  Map<String, Object?> toFirestore() => _$StrukStateToFirestore(this);
+
+  @override
+  List<Object?> get props => [
+        karyawanId,
+        nomorMeja,
+        tipePembayaran,
+        strukId,
+        ordertime,
+        orderItems,
+        error,
+      ];
 }
 
 class Diskon {
@@ -79,13 +112,20 @@ class StrukError {
   Map<String, dynamic> toJson() => _$StrukErrorToJson(this);
 }
 
-StrukState _$StrukStateFromFirestore(
+UseStrukState _$StrukStateFromFirestore(
     DocumentSnapshot<Map<String, dynamic>> doc) {
   Map<String, dynamic>? data = doc.data();
   if (data == null) throw Exception();
-  return StrukState(
+  return UseStrukState(
+    deleteReason: data['reason'],
+    waktuTunggu: data['waktu_tunggu'],
+    total: data['total_harga'],
     karyawanId: data['karyawanId'] as String,
     strukId: doc.id,
+    nomorMeja: (data['nomorMeja'] as num?)?.toInt() ?? 0,
+    tipePembayaran:
+        $enumDecodeNullable(_$TipePembayaranEnumMap, data['tipePembayaran']) ??
+            TipePembayaran.tunai,
     ordertime: (data['ordertime'] as Timestamp).toDate(),
     orderItems: (data['orderItems'] as List<dynamic>)
         .map((e) => StrukItem.fromJson(e as Map<String, dynamic>))
@@ -96,9 +136,11 @@ StrukState _$StrukStateFromFirestore(
   );
 }
 
-Map<String, dynamic> _$StrukStateToFirestore(StrukState instance) =>
+Map<String, dynamic> _$StrukStateToFirestore(UseStrukState instance) =>
     <String, dynamic>{
       'karyawanId': instance.karyawanId,
+      'nomorMeja': instance.nomorMeja,
+      'tipePembayaran': instance.tipePembayaran.name,
       // 'strukId': instance.strukId,
       'ordertime': Timestamp.fromDate(instance.ordertime),
       'orderItems': instance.orderItems

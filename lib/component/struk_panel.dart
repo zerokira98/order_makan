@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:order_makan/bloc/struk/struk_bloc.dart';
-import 'package:order_makan/bloc/struk/struk_state.dart';
+import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/component/ordertile.dart';
-import 'package:order_makan/component/toptab.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/use_app/checkout.dart';
 
@@ -20,17 +20,32 @@ class StrukPanel extends StatelessWidget {
           elevation: 4,
           margin: const EdgeInsets.all(6.0),
           child: Column(children: [
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                'Struck',
-                textScaler: TextScaler.linear(1.2),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Struk',
+                      textAlign: TextAlign.center,
+                      textScaler: TextScaler.linear(1.2),
+                    ),
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {
+                      BlocProvider.of<UseStrukBloc>(context).add(InitiateStruk(
+                          karyawanId: BlocProvider.of<UseStrukBloc>(context)
+                              .state
+                              .karyawanId));
+                    },
+                    icon: Icon(Icons.delete))
+              ],
             ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
-                child: BlocBuilder<StrukBloc, StrukState>(
+                child: BlocBuilder<UseStrukBloc, UseStrukState>(
                   buildWhen: (previous, current) =>
                       previous.orderItems.length != current.orderItems.length,
                   builder: (context, state) {
@@ -42,9 +57,10 @@ class StrukPanel extends StatelessWidget {
                     return ListView.builder(
                       itemCount: state.orderItems.length,
                       itemBuilder: (context, index) => OrderTile(
-                          // key: Key('$index'),
-                          index: index,
-                          data: state.orderItems[index]),
+                        // key: Key('$index'),
+                        index: index,
+                        // data: state.orderItems[index]
+                      ),
                     );
                   },
                 ),
@@ -53,7 +69,7 @@ class StrukPanel extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: BlocBuilder<StrukBloc, StrukState>(
+                  child: BlocBuilder<UseStrukBloc, UseStrukState>(
                     builder: (context, state) {
                       String getTotal() {
                         var total = 0;
@@ -71,19 +87,25 @@ class StrukPanel extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Total: Rp.${getTotal().numberFormat()} '),
+                            Text(
+                              'Total: Rp${getTotal().numberFormat()} ',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                             ElevatedButton(
                                 onPressed: () {
-                                  BlocProvider.of<StrukBloc>(context)
+                                  BlocProvider.of<UseStrukBloc>(context)
                                       .add(DateUpdate());
-                                  showDialog(
-                                    context: context,
-                                    builder: (c) => BlocProvider.value(
-                                      value:
-                                          BlocProvider.of<StrukBloc>(context),
-                                      child: const CheckoutPage(),
-                                    ),
-                                  );
+                                  if (state.orderItems.isNotEmpty) {
+                                    showDialog(
+                                      // useSafeArea: false,
+                                      context: context,
+                                      builder: (c) => BlocProvider.value(
+                                        value: BlocProvider.of<UseStrukBloc>(
+                                            context),
+                                        child: const CheckoutDialog(),
+                                      ),
+                                    );
+                                  }
                                   // Navigator.push(
                                   //     context,
                                   //     MaterialPageRoute(
