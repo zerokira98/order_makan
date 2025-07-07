@@ -58,6 +58,8 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       if (a == 0) {
         ///throw no changes
       } else {
+        add(Init());
+
         ///what to do xd
         //then, run the topbar bloc on ui button to [ALL]
       }

@@ -6,12 +6,14 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/component/menu_card.dart';
 import 'package:order_makan/component/screen_lock.dart';
-import 'package:order_makan/component/struk_panel.dart';
+import 'package:order_makan/component/struk_panel/struk_panel.dart';
 import 'package:order_makan/component/toptab.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/menuitems_model.dart';
+import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
 import 'package:order_makan/pages/antrian/antrian_main.dart';
 import 'package:order_makan/pages/histori_struk.dart';
@@ -41,7 +43,7 @@ class _UseMainState extends State<UseMain> {
     return Scaffold(
       drawer: UseDrawer(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton.small(
+      floatingActionButton: FloatingActionButton(
         heroTag: 'tag',
         onPressed: () {
           Navigator.push(
@@ -54,7 +56,9 @@ class _UseMainState extends State<UseMain> {
                     return CustomOrderDialog(a1: a1);
                   }));
         },
-        child: Icon(Icons.add),
+        child: Column(
+          children: [Icon(Icons.add), Text("Custom")],
+        ),
       ),
       appBar: AppBar(
         title: Column(
@@ -138,7 +142,16 @@ class _UseMainState extends State<UseMain> {
                                   children: [
                                     for (var i = 0; i < state.datas.length; i++)
                                       MenuCard(
-                                        onTap: ontap,
+                                        onTap: () {
+                                          showAboutDialog(
+                                              context: context,
+                                              children: [
+                                                Text(state.datas[i].title),
+                                                Text(state
+                                                        .datas[i].description ??
+                                                    ''),
+                                              ]);
+                                        },
                                         menudata: state.datas[i],
                                       )
                                   ],
@@ -172,6 +185,7 @@ class CustomOrderDialog extends StatefulWidget {
 class _CustomOrderDialogState extends State<CustomOrderDialog> {
   TextEditingController details = TextEditingController();
   TextEditingController price = TextEditingController();
+  MenuItems? selected;
   @override
   Widget build(BuildContext context) {
     return FadeTransition(
@@ -184,18 +198,36 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
             Text("Custom order"),
             ElevatedButton(
               onPressed: () {
-                print('clicked');
                 //var menuitems? check null
-                RepositoryProvider.of<MenuItemRepository>(context).addMenu(
-                    MenuItems(
-                        title: details.text,
-                        imgDir: '',
-                        price: int.tryParse(price.text)));
-                //end check
-                RepositoryProvider.of<MenuItemRepository>(context)
-                    .getAllMenus(customOrder: true);
-
-                Navigator.pop(context);
+                if (selected == null) {
+                  print('clicked null selected');
+                  RepositoryProvider.of<MenuItemRepository>(context)
+                      .addMenu(
+                          MenuItems(
+                              title: details.text,
+                              imgDir: '',
+                              price: int.tryParse(price.text)),
+                          customOrder: true)
+                      .then(
+                    (value) {
+                      var item = value.get().then(
+                        (value2) {
+                          if (value2.data() != null) {
+                            BlocProvider.of<UseStrukBloc>(context).add(
+                                AddOrderitems(
+                                    item: StrukItem.fromMenuItems(
+                                        value2.data()!)));
+                            Navigator.pop(context);
+                          }
+                        },
+                      );
+                    },
+                  );
+                } else {
+                  BlocProvider.of<UseStrukBloc>(context).add(
+                      AddOrderitems(item: StrukItem.fromMenuItems(selected!)));
+                  Navigator.pop(context);
+                }
               },
               child: Hero(
                 tag: "tag",
@@ -212,9 +244,14 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TypeAheadField(
+                controller: details,
                 builder: (context, controller, focusNode) => TextFormField(
                   controller: controller,
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    setState(() {
+                      selected = null;
+                    });
+                  },
                   focusNode: focusNode,
                   decoration: InputDecoration(label: Text('Details')),
                 ),
@@ -226,6 +263,7 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
                   );
                 },
                 onSelected: (value) {
+                  selected = value;
                   details.text = value.title;
                   price.text = value.price.toString();
                 },
@@ -237,13 +275,14 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
                   return data;
                 },
               ),
-              // TextField(
-              //   decoration:
-              //       InputDecoration(label: Text('Details')),
-              // ),
               TextField(
                 controller: price,
-                decoration: InputDecoration(label: Text('Cost')),
+                onChanged: (value) {
+                  setState(() {
+                    selected = null;
+                  });
+                },
+                decoration: InputDecoration(label: Text('Price')),
               ),
             ],
           ),

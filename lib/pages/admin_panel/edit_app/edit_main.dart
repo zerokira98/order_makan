@@ -58,17 +58,17 @@ class EditMain extends StatelessWidget {
                   //           : const ),
                   // );
                 })),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 24,
-                        color: Colors.orange,
-                        child: const Text('BottomBar'),
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: Container(
+                //         height: 24,
+                //         color: Colors.orange,
+                //         child: const Text('BottomBar'),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ],
             ),
           ),

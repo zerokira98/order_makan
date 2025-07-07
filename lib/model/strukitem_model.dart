@@ -6,18 +6,26 @@ part 'strukitem_model.g.dart';
 @JsonSerializable()
 class StrukItem {
   final String title;
+  final String? catatan;
   final int price;
   final String? id;
   int count;
   StrukItem({
     int? count,
     this.id,
+    this.catatan,
     int? price,
     required this.title,
   })  : count = count ?? 1,
         price = price ?? 0;
-  StrukItem copywith({String? title, int? price, String? id, int? count}) =>
+  StrukItem copywith(
+          {String? title,
+          int? price,
+          String? id,
+          int? count,
+          Function? catatan}) =>
       StrukItem(
+          catatan: catatan != null ? catatan() : this.catatan,
           title: title ?? this.title,
           count: count ?? this.count,
           price: price ?? this.price,

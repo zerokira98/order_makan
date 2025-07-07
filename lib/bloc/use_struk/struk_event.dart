@@ -8,6 +8,12 @@ class InitiateStruk extends UseStrukEvent {
   InitiateStruk({required this.karyawanId});
 }
 
+class ChangeCatatan extends UseStrukEvent {
+  final StrukItem item;
+  final String catatan;
+  ChangeCatatan(this.catatan, this.item);
+}
+
 class AddOrderitems extends UseStrukEvent {
   final StrukItem item;
   AddOrderitems({required this.item});

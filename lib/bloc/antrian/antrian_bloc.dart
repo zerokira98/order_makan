@@ -16,11 +16,14 @@ class AntrianBloc extends Bloc<AntrianEvent, AntrianState> {
       : _repo = repo,
         super(const AntrianState(antrianStruks: [])) {
     on<InitiateAntrian>((event, emit) async {
+      emit(state.copywith(isloading: true));
       var a = await _repo.getAntrian();
-      emit(state.copywith(antrianStruks: a, msg: () => event.msg));
+      emit(state.copywith(
+          antrianStruks: a, msg: () => event.msg, isloading: false));
     });
     on<AddtoAntrian>((event, emit) {});
     on<OrderFinish>((event, emit) async {
+      emit(state.copywith(isloading: true));
       await _repo.finishAntrian(event.strukId).then(
         (value) {
           add(InitiateAntrian(msg: {
@@ -35,10 +38,12 @@ class AntrianBloc extends Bloc<AntrianEvent, AntrianState> {
       });
     });
     on<OrderFailure>((event, emit) {});
+    // delete this method(?)
     on<Delete>((event, emit) async {
       try {
+        emit(state.copywith(isloading: true));
         if (event.data.strukId == null) throw Exception("id struk null");
-        await _repo.deleteAntrian(event.data.strukId!, '');
+        await _repo.deleteAntrian(event.data.strukId!, event.reason);
         add(InitiateAntrian(msg: {
           "status": "success",
           "details": "Pesanan telah dihapus dari antrian"

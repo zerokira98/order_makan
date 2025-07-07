@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
-import 'package:order_makan/component/ordertile.dart';
+import 'package:order_makan/component/struk_panel/ordertile.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/use_app/checkout.dart';
 
@@ -26,7 +25,7 @@ class StrukPanel extends StatelessWidget {
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      'Struk',
+                      'Cart',
                       textAlign: TextAlign.center,
                       textScaler: TextScaler.linear(1.2),
                     ),

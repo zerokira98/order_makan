@@ -1,23 +1,21 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'strukitem_model.dart';
+part of 'ingredient_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-StrukItem _$StrukItemFromJson(Map<String, dynamic> json) => StrukItem(
-      count: (json['count'] as num?)?.toInt(),
+IngredientItem _$IngredientItemFromJson(Map<String, dynamic> json) =>
+    IngredientItem(
       id: json['id'] as String?,
-      catatan: json['catatan'] as String?,
-      price: (json['price'] as num?)?.toInt(),
       title: json['title'] as String,
+      count: (json['count'] as num).toInt(),
     );
 
-Map<String, dynamic> _$StrukItemToJson(StrukItem instance) => <String, dynamic>{
+Map<String, dynamic> _$IngredientItemToJson(IngredientItem instance) =>
+    <String, dynamic>{
       'title': instance.title,
-      'catatan': instance.catatan,
-      'price': instance.price,
       'id': instance.id,
       'count': instance.count,
     };

@@ -2,10 +2,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 
-abstract class StrukRepo {
+abstract class _StrukRepo {
   FirebaseFirestore db;
 
-  StrukRepo(this.db);
+  _StrukRepo(this.db);
 
   Future sendtoAntrian(UseStrukState state);
   Future<List<UseStrukState>> getAntrian();
@@ -18,7 +18,7 @@ abstract class StrukRepo {
   Future readStrukwithFilter(StrukFilter filter);
 }
 
-class StrukRepository extends StrukRepo {
+class StrukRepository extends _StrukRepo {
   StrukRepository(super.db) {
     antrianRefVanilla = db.collection('antrian');
     antrianRef = antrianRefVanilla.withConverter<UseStrukState>(

@@ -64,7 +64,12 @@ class _AntrianCardState extends State<AntrianCard> {
                         for (StrukItem ew in widget.e.orderItems)
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('${ew.title} x${ew.count}'),
+                            child: Column(
+                              children: [
+                                Text('${ew.title} x${ew.count}'),
+                                Text('"${ew.catatan ?? ''}"'),
+                              ],
+                            ),
                           ),
                       ],
                     ),

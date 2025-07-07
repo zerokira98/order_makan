@@ -1,11 +1,10 @@
-import 'dart:async';
-import 'dart:developer';
+// import 'dart:async';
+// import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
-import 'package:flutter_thermal_printer/utils/printer.dart';
+// import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
+// import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/helper.dart';
@@ -170,8 +169,10 @@ class DisplayStruk extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  StrukDataTable(
-                    data: data,
+                  Expanded(
+                    child: StrukDataTable(
+                      data: data,
+                    ),
                   ),
                 ],
               ),
@@ -260,11 +261,19 @@ class DisplayStruk extends StatelessWidget {
                       SubmenuButton(menuChildren: [
                         MenuItemButton(
                           child: Text('Salah Input'),
-                          onPressed: () {},
+                          onPressed: () {
+                            BlocProvider.of<AntrianBloc>(context)
+                                .add(Delete(data, reason: 'Salah Input'));
+                            Navigator.pop(context);
+                          },
                         ),
                         MenuItemButton(
                           child: Text('Lain-lain'),
-                          onPressed: () {},
+                          onPressed: () {
+                            BlocProvider.of<AntrianBloc>(context)
+                                .add(Delete(data, reason: 'Lain-lain'));
+                            Navigator.pop(context);
+                          },
                         ),
                       ], child: Text('Belum Dibuat')),
                       SubmenuButton(menuChildren: [
@@ -296,7 +305,7 @@ class DisplayStruk extends StatelessWidget {
                         },
                         onLongPress: () {
                           BlocProvider.of<AntrianBloc>(context)
-                              .add(Delete(data));
+                              .add(Delete(data, reason: ''));
                           Navigator.pop(context);
                         },
                         child: Text('Batalkan Pesanan.')),
@@ -305,9 +314,9 @@ class DisplayStruk extends StatelessWidget {
                   //   onLongPressStart: (details) => print(details),
                   //   child:
                   // ),
-                  PrintWidget(
-                    theData: data,
-                  ),
+                  // PrintWidget(
+                  //   theData: data,
+                  // ),
                   // ElevatedButton.icon(
                   //   style: ButtonStyle(
                   //     backgroundColor: WidgetStatePropertyAll(Colors.blue),
@@ -340,282 +349,282 @@ class DisplayStruk extends StatelessWidget {
   }
 }
 
-class PrintWidget extends StatefulWidget {
-  final UseStrukState theData;
-  const PrintWidget({super.key, required this.theData});
+// class PrintWidget extends StatefulWidget {
+//   final UseStrukState theData;
+//   const PrintWidget({super.key, required this.theData});
 
-  @override
-  State<PrintWidget> createState() => _PrintWidgetState();
-}
+//   @override
+//   State<PrintWidget> createState() => _PrintWidgetState();
+// }
 
-class _PrintWidgetState extends State<PrintWidget> {
-  FlutterThermalPrinter printerPlugin = FlutterThermalPrinter.instance;
-  List<Printer> _devices = [];
+// class _PrintWidgetState extends State<PrintWidget> {
+//   FlutterThermalPrinter printerPlugin = FlutterThermalPrinter.instance;
+//   List<Printer> _devices = [];
 
-  // List<DropdownMenuItem<BluetoothDevice>> getDeviceItems() {
-  //   List<DropdownMenuItem<BluetoothDevice>> items = [];
-  //   if (_devices.isEmpty) {
-  //     items.add(const DropdownMenuItem(
-  //       value: null,
-  //       child: Text('NONE'),
-  //     ));
-  //   } else {
-  //     for (var device in _devices) {
-  //       items.add(DropdownMenuItem(
-  //         value: device,
-  //         child: Text(device.name ?? ""),
-  //       ));
-  //     }
-  //   }
-  //   return items;
-  // }
+//   // List<DropdownMenuItem<BluetoothDevice>> getDeviceItems() {
+//   //   List<DropdownMenuItem<BluetoothDevice>> items = [];
+//   //   if (_devices.isEmpty) {
+//   //     items.add(const DropdownMenuItem(
+//   //       value: null,
+//   //       child: Text('NONE'),
+//   //     ));
+//   //   } else {
+//   //     for (var device in _devices) {
+//   //       items.add(DropdownMenuItem(
+//   //         value: device,
+//   //         child: Text(device.name ?? ""),
+//   //       ));
+//   //     }
+//   //   }
+//   //   return items;
+//   // }
 
-  StreamSubscription<List<Printer>>? _devicesStreamSubscription;
-  Printer? connectedDevice;
-  // Get Printer List
-  void startScan() async {
-    _devicesStreamSubscription?.cancel();
-    await printerPlugin.getPrinters(connectionTypes: [
-      ConnectionType.USB,
-      ConnectionType.BLE,
-    ]);
-    _devicesStreamSubscription =
-        printerPlugin.devicesStream.listen((List<Printer> event) {
-      if (mounted) {
-        log(event.map((e) => e.name).toList().toString());
-        if (event.isNotEmpty) {
-          setState(() {
-            _devices = event;
-            _devices.removeWhere(
-                (element) => element.name == null || element.name == '');
-          });
-        }
-      }
-    });
-  }
+//   StreamSubscription<List<Printer>>? _devicesStreamSubscription;
+//   Printer? connectedDevice;
+//   // Get Printer List
+//   void startScan() async {
+//     _devicesStreamSubscription?.cancel();
+//     await printerPlugin.getPrinters(connectionTypes: [
+//       ConnectionType.USB,
+//       ConnectionType.BLE,
+//     ]);
+//     _devicesStreamSubscription =
+//         printerPlugin.devicesStream.listen((List<Printer> event) {
+//       if (mounted) {
+//         log(event.map((e) => e.name).toList().toString());
+//         if (event.isNotEmpty) {
+//           setState(() {
+//             _devices = event;
+//             _devices.removeWhere(
+//                 (element) => element.name == null || element.name == '');
+//           });
+//         }
+//       }
+//     });
+//   }
 
-  @override
-  void dispose() {
-    stopScan();
-    _devicesStreamSubscription?.cancel();
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     stopScan();
+//     _devicesStreamSubscription?.cancel();
+//     super.dispose();
+//   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      startScan();
-    });
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+//       startScan();
+//     });
+//   }
 
-  stopScan() {
-    printerPlugin.stopScan();
-  }
+//   stopScan() {
+//     printerPlugin.stopScan();
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    // if (kIsWeb) {
-    //   return Text('Unsupported p[latform]');
-    // }
-    return SizedBox(
-      // width: 240,
-      // height: 240,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  // startScan();
-                  startScan();
-                },
-                child: const Text('Scan'),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (connectedDevice != null) {
-                    await printerPlugin.printWidget(context,
-                        printer: connectedDevice!,
-                        printOnBle: true,
-                        widget: receiptWidget(
-                          connectedDevice!.connectionTypeString,
-                        ));
-                  }
-                  // startScan();
-                  // stopScan();
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(
-                      (connectedDevice?.isConnected ?? false)
-                          ? Colors.green
-                          : Colors.red),
-                  foregroundColor: WidgetStatePropertyAll(Colors.white),
-                ),
-                child: const Text('Print'),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              DropdownButton(
-                value: connectedDevice,
-                onChanged: (value) {
-                  setState(() {
-                    connectedDevice = value;
-                  });
-                  print(value);
-                },
-                items: [
-                  for (var index = 0; index < _devices.length; index++)
-                    DropdownMenuItem(
-                        value: _devices[index],
-                        onTap: () async {
-                          if (_devices[index].isConnected ?? false) {
-                            await printerPlugin.disconnect(_devices[index]);
-                          } else {
-                            await printerPlugin.connect(_devices[index]).then(
-                                  (value) => setState(() {}),
-                                );
-                          }
-                        },
-                        child: Text(_devices[index].name ?? 'No Name'))
-                ],
-              ),
+//   @override
+//   Widget build(BuildContext context) {
+//     // if (kIsWeb) {
+//     //   return Text('Unsupported p[latform]');
+//     // }
+//     return SizedBox(
+//       // width: 240,
+//       // height: 240,
+//       child: Column(
+//         children: [
+//           Row(
+//             children: [
+//               ElevatedButton(
+//                 onPressed: () {
+//                   // startScan();
+//                   startScan();
+//                 },
+//                 child: const Text('Scan'),
+//               ),
+//               ElevatedButton(
+//                 onPressed: () async {
+//                   if (connectedDevice != null) {
+//                     await printerPlugin.printWidget(context,
+//                         printer: connectedDevice!,
+//                         printOnBle: true,
+//                         widget: receiptWidget(
+//                           connectedDevice!.connectionTypeString,
+//                         ));
+//                   }
+//                   // startScan();
+//                   // stopScan();
+//                 },
+//                 style: ButtonStyle(
+//                   backgroundColor: WidgetStatePropertyAll(
+//                       (connectedDevice?.isConnected ?? false)
+//                           ? Colors.green
+//                           : Colors.red),
+//                   foregroundColor: WidgetStatePropertyAll(Colors.white),
+//                 ),
+//                 child: const Text('Print'),
+//               ),
+//             ],
+//           ),
+//           Row(
+//             children: [
+//               DropdownButton(
+//                 value: connectedDevice,
+//                 onChanged: (value) {
+//                   setState(() {
+//                     connectedDevice = value;
+//                   });
+//                   print(value);
+//                 },
+//                 items: [
+//                   for (var index = 0; index < _devices.length; index++)
+//                     DropdownMenuItem(
+//                         value: _devices[index],
+//                         onTap: () async {
+//                           if (_devices[index].isConnected ?? false) {
+//                             await printerPlugin.disconnect(_devices[index]);
+//                           } else {
+//                             await printerPlugin.connect(_devices[index]).then(
+//                                   (value) => setState(() {}),
+//                                 );
+//                           }
+//                         },
+//                         child: Text(_devices[index].name ?? 'No Name'))
+//                 ],
+//               ),
 
-              // ListTile(
-              //   onTap: () async {
-              //     if (_devices[index].isConnected ?? false) {
-              //       await printerPlugin.disconnect(_devices[index]);
-              //     } else {
-              //       await printerPlugin.connect(_devices[index]);
-              //     }
-              //   },
-              //   title: Text(_devices[index].name ?? 'No Name'),
-              //   subtitle: Text("Connected: ${_devices[index].isConnected}"),
-              //   trailing: IconButton(
-              //     icon: const Icon(Icons.connect_without_contact),
-              //     onPressed: () async {
-              //       await printerPlugin.printWidget(
-              //         context,
-              //         printer: _devices[index],
-              //         printOnBle: true,
-              //         widget: receiptWidget(
-              //           _devices[index].connectionTypeString,
-              //         ),
-              //       );
-              //     },
-              //   ),
-              // )
-            ],
-          ),
-        ],
-      ),
-    );
+//               // ListTile(
+//               //   onTap: () async {
+//               //     if (_devices[index].isConnected ?? false) {
+//               //       await printerPlugin.disconnect(_devices[index]);
+//               //     } else {
+//               //       await printerPlugin.connect(_devices[index]);
+//               //     }
+//               //   },
+//               //   title: Text(_devices[index].name ?? 'No Name'),
+//               //   subtitle: Text("Connected: ${_devices[index].isConnected}"),
+//               //   trailing: IconButton(
+//               //     icon: const Icon(Icons.connect_without_contact),
+//               //     onPressed: () async {
+//               //       await printerPlugin.printWidget(
+//               //         context,
+//               //         printer: _devices[index],
+//               //         printOnBle: true,
+//               //         widget: receiptWidget(
+//               //           _devices[index].connectionTypeString,
+//               //         ),
+//               //       );
+//               //     },
+//               //   ),
+//               // )
+//             ],
+//           ),
+//         ],
+//       ),
+//     );
 
-    // ElevatedButton(
-    //     style: ElevatedButton.styleFrom(
-    //         backgroundColor: Colors.green.shade800),
-    //     onPressed: () {
-    //       printThermal(widget.theData);
-    //       // generatePDF(false, theData);
-    //     },
-    //     child: const Row(
-    //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //       children: [
-    //         Icon(
-    //           Icons.print,
-    //           color: Colors.white,
-    //         ),
-    //         Text(
-    //           'Print Bluetooth',
-    //           style: TextStyle(color: Colors.white),
-    //         ),
-    //       ],
-    //     )),
-  }
+//     // ElevatedButton(
+//     //     style: ElevatedButton.styleFrom(
+//     //         backgroundColor: Colors.green.shade800),
+//     //     onPressed: () {
+//     //       printThermal(widget.theData);
+//     //       // generatePDF(false, theData);
+//     //     },
+//     //     child: const Row(
+//     //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//     //       children: [
+//     //         Icon(
+//     //           Icons.print,
+//     //           color: Colors.white,
+//     //         ),
+//     //         Text(
+//     //           'Print Bluetooth',
+//     //           style: TextStyle(color: Colors.white),
+//     //         ),
+//     //       ],
+//     //     )),
+//   }
 
-  Future<List<int>> _generateReceipt() async {
-    final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm80, profile);
-    List<int> bytes = [];
-    bytes += generator.text(
-      "Teste Network print",
-      styles: const PosStyles(
-        bold: true,
-        height: PosTextSize.size3,
-        width: PosTextSize.size3,
-      ),
-    );
-    bytes += generator.cut();
-    return bytes;
-  }
+//   Future<List<int>> _generateReceipt() async {
+//     final profile = await CapabilityProfile.load();
+//     final generator = Generator(PaperSize.mm80, profile);
+//     List<int> bytes = [];
+//     bytes += generator.text(
+//       "Teste Network print",
+//       styles: const PosStyles(
+//         bold: true,
+//         height: PosTextSize.size3,
+//         width: PosTextSize.size3,
+//       ),
+//     );
+//     bytes += generator.cut();
+//     return bytes;
+//   }
 
-  Widget receiptWidget(String printerType) {
-    return SizedBox(
-      width: 550,
-      child: Material(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: Text(
-                  'FLUTTER THERMAL PRINTER',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const Divider(thickness: 2),
-              const SizedBox(height: 10),
-              _buildReceiptRow('Item', 'Price'),
-              const Divider(),
-              _buildReceiptRow('Apple', '\$1.00'),
-              _buildReceiptRow('Banana', '\$0.50'),
-              _buildReceiptRow('Orange', '\$0.75'),
-              const Divider(thickness: 2),
-              _buildReceiptRow('Total', '\$2.25', isBold: true),
-              const SizedBox(height: 20),
-              _buildReceiptRow('Printer Type', printerType),
-              const SizedBox(height: 50),
-              const Center(
-                child: Text(
-                  'Thank you for your purchase!',
-                  style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+//   Widget receiptWidget(String printerType) {
+//     return SizedBox(
+//       width: 550,
+//       child: Material(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               const Center(
+//                 child: Text(
+//                   'FLUTTER THERMAL PRINTER',
+//                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+//                 ),
+//               ),
+//               const Divider(thickness: 2),
+//               const SizedBox(height: 10),
+//               _buildReceiptRow('Item', 'Price'),
+//               const Divider(),
+//               _buildReceiptRow('Apple', '\$1.00'),
+//               _buildReceiptRow('Banana', '\$0.50'),
+//               _buildReceiptRow('Orange', '\$0.75'),
+//               const Divider(thickness: 2),
+//               _buildReceiptRow('Total', '\$2.25', isBold: true),
+//               const SizedBox(height: 20),
+//               _buildReceiptRow('Printer Type', printerType),
+//               const SizedBox(height: 50),
+//               const Center(
+//                 child: Text(
+//                   'Thank you for your purchase!',
+//                   style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 
-  Widget _buildReceiptRow(String leftText, String rightText,
-      {bool isBold = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            leftText,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
-          ),
-          Text(
-            rightText,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   Widget _buildReceiptRow(String leftText, String rightText,
+//       {bool isBold = false}) {
+//     return Padding(
+//       padding: const EdgeInsets.symmetric(vertical: 4.0),
+//       child: Row(
+//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//         children: [
+//           Text(
+//             leftText,
+//             style: TextStyle(
+//                 fontSize: 16,
+//                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+//           ),
+//           Text(
+//             rightText,
+//             style: TextStyle(
+//                 fontSize: 16,
+//                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class StrukDataTable extends StatefulWidget {
   final UseStrukState data;
@@ -641,6 +650,7 @@ class _StrukDataTableState extends State<StrukDataTable> {
       sortColumnIndex: 0,
       columns: <DataColumn>[
         DataColumn(
+          columnWidth: FlexColumnWidth(1),
           onSort: (columnIndex, ascending) {
             setState(() {
               sort = !sort;
@@ -679,7 +689,18 @@ class _StrukDataTableState extends State<StrukDataTable> {
         for (var i = 0; i < statedData.orderItems.length; i++)
           DataRow(
             cells: <DataCell>[
-              DataCell(Text(statedData.orderItems[i].title)),
+              DataCell(Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(statedData.orderItems[i].title),
+                  if (statedData.orderItems[i].catatan != null)
+                    Text(
+                      statedData.orderItems[i].catatan ?? "",
+                      style: TextStyle(fontSize: 8),
+                    ),
+                ],
+              )),
               DataCell(Text(statedData.orderItems[i].count.toString())),
               DataCell(Text(
                   statedData.orderItems[i].price.numberFormat(currency: true))),

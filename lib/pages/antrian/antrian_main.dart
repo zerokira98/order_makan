@@ -63,14 +63,18 @@ class _AntrianPageState extends State<AntrianPage> {
         },
         child: BlocBuilder<AntrianBloc, AntrianState>(
           builder: (context, state) {
-            if (state.antrianStruks.isEmpty)
+            if (state.antrianStruks.isEmpty) {
               return Center(
                 child: Text('Empty'),
               );
+            }
+            if (state.isloading) {
+              return Center(child: CircularProgressIndicator());
+            }
             return GridView.count(
               shrinkWrap: true,
-              childAspectRatio: 3,
-              crossAxisCount: 2,
+              childAspectRatio: 8,
+              crossAxisCount: 1,
               children: state.antrianStruks.map((e) {
                 return InkWell(
                     onTap: () {

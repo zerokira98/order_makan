@@ -27,7 +27,6 @@ class OrderFailure extends AntrianEvent {
 ///debug only, dont go production
 class Delete extends AntrianEvent {
   final UseStrukState data;
-  Delete(
-    this.data,
-  );
+  final String reason;
+  Delete(this.data, {required this.reason});
 }

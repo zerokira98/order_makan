@@ -22,6 +22,14 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
 
       emit(UseStrukState.initial(karyawanId: event.karyawanId));
     });
+    on<ChangeCatatan>((event, emit) {
+      List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
+          .map((e) => e.title == event.item.title
+              ? e.copywith(catatan: () => event.catatan)
+              : e)
+          .toList();
+      emit(state.copywith(orderItems: newlist));
+    });
     on<ClearErrMsg>((event, emit) {
       emit(state.copywith(error: StrukError.empty()));
     });
@@ -30,7 +38,6 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
           .map((e) =>
               e.title == event.item.title ? e.copywith(count: e.count + 1) : e)
           .toList();
-      // emit(StrukState(orderItems: newlist));
       emit(state.copywith(orderItems: newlist));
     });
     on<ChangeCount>((event, emit) async {
@@ -38,7 +45,6 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
           .map((e) =>
               e.title == event.item.title ? e.copywith(count: event.count) : e)
           .toList();
-      // emit(StrukState(orderItems: newlist));
       emit(state.copywith(orderItems: newlist));
     });
     on<DecreaseCount>((event, emit) async {

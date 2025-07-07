@@ -18,6 +18,13 @@ String? validateEmail(String? value) {
       : null;
 }
 
+String? numberValidator(String? value) {
+  if (value == null) return "not initialized";
+  if (value.isEmpty) return "cant empty";
+  if (int.tryParse(value) == null) return "not valid number";
+  return null;
+}
+
 String? usernameValidator(String? value) {
   if (value == null) return "not initialized";
   if (value.isEmpty) return "cant empty";

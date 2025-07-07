@@ -4,13 +4,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
 import 'package:order_makan/firebase_options.dart';
+import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
+import 'package:order_makan/pages/admin_panel/cubit/inputbeliform_cubit.dart';
+import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
+import 'package:order_makan/pages/admin_panel/input_bahanbaku.dart';
 import 'package:order_makan/pages/firstrun_setup.dart';
 import 'package:order_makan/pages/karyawan_loginpage.dart';
 import 'package:order_makan/pages/karyawan_signup.dart';
@@ -52,6 +58,13 @@ void main() async {
     ],
     child: MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) =>
+              MenueditCubit(RepositoryProvider.of<MenuItemRepository>(context)),
+        ),
+        BlocProvider(
+          create: (context) => InputbeliformCubit()..initiate(),
+        ),
         BlocProvider(
           create: (context) => UseStrukBloc(
               RepositoryProvider.of<StrukRepository>(context),
@@ -107,6 +120,10 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          MonthYearPickerLocalizations.delegate,
+        ],
         title: 'Flutter Demo',
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark(useMaterial3: true),
@@ -136,7 +153,7 @@ class MyApp extends StatelessWidget {
                       if (state is! KaryawanAuthenticated) {
                         return const KaryawanLoginPage();
                       } else {
-                        return const UseMain();
+                        return const InputBeliBahanbaku();
                       }
                     },
                   );

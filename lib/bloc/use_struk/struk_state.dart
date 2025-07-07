@@ -8,7 +8,7 @@ part 'struk_state.g.dart';
 
 enum TipePembayaran { tunai, qris }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class UseStrukState extends Equatable {
   final String karyawanId;
   final int nomorMeja;
@@ -68,9 +68,9 @@ class UseStrukState extends Equatable {
       );
 
   factory UseStrukState.fromJson(Map<String, dynamic> json) =>
-      _$StrukStateFromJson(json);
+      _$UseStrukStateFromJson(json);
 
-  Map<String, dynamic> toJson() => _$StrukStateToJson(this);
+  Map<String, dynamic> toJson() => _$UseStrukStateToJson(this);
 
   factory UseStrukState.fromFirestore(
           DocumentSnapshot<Map<String, Object?>> data) =>
@@ -138,6 +138,7 @@ UseStrukState _$StrukStateFromFirestore(
 
 Map<String, dynamic> _$StrukStateToFirestore(UseStrukState instance) =>
     <String, dynamic>{
+      'custom_order': null,
       'karyawanId': instance.karyawanId,
       'nomorMeja': instance.nomorMeja,
       'tipePembayaran': instance.tipePembayaran.name,

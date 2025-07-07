@@ -1,19 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:order_makan/model/ingredient_model.dart';
 
 part 'menuitems_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class MenuItems {
   final String title;
   final String imgDir;
   final int price;
+  final List<IngredientItem> ingredientItems;
   final String? id;
+  final bool? customOrder;
   final String? description;
   final List<String> categories;
   int count;
   MenuItems(
       {int? count,
+      this.ingredientItems = const [],
+      this.customOrder,
       this.id,
       this.description = '',
       int? price,
@@ -24,6 +29,8 @@ class MenuItems {
         categories = categories ?? [],
         price = price ?? 0;
   MenuItems countchange(int newcount) => MenuItems(
+      customOrder: customOrder,
+      ingredientItems: ingredientItems,
       title: title,
       imgDir: imgDir,
       description: description,
@@ -36,12 +43,16 @@ class MenuItems {
     String? title,
     String? imgDir,
     String? description,
+    List<IngredientItem>? ingredientItems,
+    bool? customOrder,
     String? id,
     int? price,
     List<String>? categories,
     int? count,
   }) =>
       MenuItems(
+        ingredientItems: ingredientItems ?? this.ingredientItems,
+        customOrder: customOrder ?? this.customOrder,
         title: title ?? this.title,
         imgDir: imgDir ?? this.imgDir,
         description: description ?? this.description,
@@ -70,6 +81,11 @@ MenuItems _$MenuItemsFromFirestore(DocumentSnapshot<Map> data) {
   return MenuItems(
     id: data.id,
     description: menudata?['description'],
+    customOrder: menudata?['custom_order'],
+    ingredientItems: (menudata?['ingredientItems'] as List<dynamic>?)
+            ?.map((e) => IngredientItem.fromMap(e))
+            .toList() ??
+        const [],
     price: menudata?['price'],
     title: menudata?['title'],
     imgDir: menudata?['imgDir'],
@@ -84,6 +100,12 @@ MenuItems _$MenuItemsFromFirestore(DocumentSnapshot<Map> data) {
 Map<String, dynamic> _$MenuItemsToFirestore(MenuItems instance) =>
     <String, dynamic>{
       'title': instance.title,
+      'ingredientItems': instance.ingredientItems
+          .map(
+            (e) => e.toMap(),
+          )
+          .toList(),
+      'custom_order': instance.customOrder,
       'description': instance.description,
       'imgDir': instance.imgDir,
       'price': instance.price,

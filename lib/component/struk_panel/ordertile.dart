@@ -67,8 +67,50 @@ class _OrderTileState extends State<OrderTile>
                       children: [
                         Text('${widget.index + 1}. '),
                         Expanded(
+                          child: GestureDetector(
+                            onTap: () => showDialog(
+                              context: context,
+                              builder: (context) {
+                                var tc = TextEditingController(
+                                    text:
+                                        state.orderItems[widget.index].catatan);
+                                return AlertDialog(
+                                  // actions: [
+                                  //   ElevatedButton(
+                                  //       onPressed: () {}, child: Text("Save"))
+                                  // ],
+                                  title: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Catatan"),
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            BlocProvider.of<UseStrukBloc>(
+                                                    context)
+                                                .add(ChangeCatatan(
+                                                    tc.text,
+                                                    state.orderItems[
+                                                        widget.index]));
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("Save"))
+                                    ],
+                                  ),
+                                  content: TextField(
+                                    controller: tc,
+                                    minLines: 2,
+                                    maxLines: 2,
+                                    decoration:
+                                        InputDecoration(label: Text('Catatan')),
+                                  ),
+                                );
+                              },
+                            ),
                             child: Text(state
-                                .orderItems[widget.index].title.firstUpcase)),
+                                .orderItems[widget.index].title.firstUpcase),
+                          ),
+                        ),
                         GestureDetector(
                             onTap: () {
                               BlocProvider.of<UseStrukBloc>(context).add(
@@ -151,9 +193,8 @@ class _OrderTileState extends State<OrderTile>
                       children: [
                         Expanded(
                             flex: 4,
-                            child: Text(state.orderItems[widget.index].price
-                                .toString()
-                                .numberFormat())),
+                            child: Text(
+                                '"${state.orderItems[widget.index].catatan ?? ''}"')),
                         Expanded(
                             flex: 2,
                             child: SizedBox(
