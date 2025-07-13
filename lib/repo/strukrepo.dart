@@ -1,6 +1,8 @@
 // import 'package:order_makan/model/menuitems_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
+import 'package:order_makan/repo/menuitemsrepo.dart';
 
 abstract class _StrukRepo {
   FirebaseFirestore db;
@@ -19,7 +21,8 @@ abstract class _StrukRepo {
 }
 
 class StrukRepository extends _StrukRepo {
-  StrukRepository(super.db) {
+  MenuItemRepository menuitemrepo;
+  StrukRepository(super.db, this.menuitemrepo) {
     antrianRefVanilla = db.collection('antrian');
     antrianRef = antrianRefVanilla.withConverter<UseStrukState>(
       fromFirestore: (snapshot, options) =>
@@ -97,9 +100,16 @@ class StrukRepository extends _StrukRepo {
                       previousValue + (element.count * element.price),
                 )
           });
+          for (var e in b.data()!.orderItems) {
+            for (var f in e.ingredientItems) {
+              var getid = await menuitemrepo.getIngredients(title: f.title);
+              transaction.update(menuitemrepo.ingredientRef.doc(getid.first.id),
+                  {'count': FieldValue.increment(-f.count)});
+            }
+          }
           transaction.delete(a);
         } catch (e) {
-          print(e);
+          debugPrint(e.toString());
           throw Exception(e);
         }
       },

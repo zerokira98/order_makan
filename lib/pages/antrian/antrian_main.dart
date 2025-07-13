@@ -52,14 +52,16 @@ class _AntrianPageState extends State<AntrianPage> {
       body: BlocListener<AntrianBloc, AntrianState>(
         listenWhen: (previous, current) => current.msg != null,
         listener: (context, state) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(
-                    content: Text(
-                        "${state.msg?['status'] as String} ${state.msg?['details'] as String}")))
-                .closed
-                .then((a) => BlocProvider.of<AntrianBloc>(context)
-                    .add(InitiateAntrian()));
+          if (mounted) {
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(SnackBar(
+                      content: Text(
+                          "${state.msg?['status'] as String} ${state.msg?['details'] as String}")))
+                  .closed
+                  .then((a) => BlocProvider.of<AntrianBloc>(context)
+                      .add(InitiateAntrian()));
+          }
         },
         child: BlocBuilder<AntrianBloc, AntrianState>(
           builder: (context, state) {
@@ -71,22 +73,25 @@ class _AntrianPageState extends State<AntrianPage> {
             if (state.isloading) {
               return Center(child: CircularProgressIndicator());
             }
-            return GridView.count(
-              shrinkWrap: true,
-              childAspectRatio: 8,
-              crossAxisCount: 1,
-              children: state.antrianStruks.map((e) {
-                return InkWell(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => DisplayStruk(data: e),
-                      );
-                    },
-                    child: AntrianCard(
-                      e: e,
-                    ));
-              }).toList(),
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.count(
+                shrinkWrap: true,
+                childAspectRatio: 8,
+                crossAxisCount: 1,
+                children: state.antrianStruks.map((e) {
+                  return InkWell(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DisplayStruk(data: e),
+                        );
+                      },
+                      child: AntrianCard(
+                        e: e,
+                      ));
+                }).toList(),
+              ),
             );
           },
         ),

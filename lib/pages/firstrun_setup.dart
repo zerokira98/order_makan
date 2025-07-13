@@ -4,16 +4,12 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypt/crypt.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:order_makan/bloc/menu/menu_bloc.dart';
-import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/component/screen_lock.dart';
 import 'package:order_makan/helper.dart' show usernameValidator, validateEmail;
-import 'package:order_makan/main.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -160,6 +156,7 @@ class _SetupPageState extends State<SetupPage> {
                     //
                   },
                   controller: namaResto,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   onEditingComplete: () {
                     FocusScope.of(context).nextFocus();
                   },
@@ -242,7 +239,7 @@ class _SetupPageState extends State<SetupPage> {
                           //     ));
                         }
                       } catch (e) {
-                        print(e);
+                        debugPrint(e.toString());
                       }
                     },
                     child: const Text('Next')),

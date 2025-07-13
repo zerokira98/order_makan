@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
-import 'package:order_makan/component/toptab.dart';
 import 'package:order_makan/helper.dart';
 import 'dart:math' as math;
 
-import 'package:order_makan/model/strukitem_model.dart';
+import 'package:order_makan/pages/use_app/struk_panel/strukitemedit_dialog.dart';
+import 'package:order_makan/repo/menuitemsrepo.dart';
 
 class OrderTile extends StatefulWidget {
   final int index;
-  // final StrukItem data;
+  // final MenuItems menudata;
   const OrderTile({
     super.key,
     required this.index,
+    // required this.menudata,
     // required this.data
   });
 
@@ -68,45 +69,61 @@ class _OrderTileState extends State<OrderTile>
                         Text('${widget.index + 1}. '),
                         Expanded(
                           child: GestureDetector(
-                            onTap: () => showDialog(
-                              context: context,
-                              builder: (context) {
-                                var tc = TextEditingController(
-                                    text:
-                                        state.orderItems[widget.index].catatan);
-                                return AlertDialog(
-                                  // actions: [
-                                  //   ElevatedButton(
-                                  //       onPressed: () {}, child: Text("Save"))
-                                  // ],
-                                  title: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("Catatan"),
-                                      ElevatedButton(
-                                          onPressed: () {
-                                            BlocProvider.of<UseStrukBloc>(
-                                                    context)
-                                                .add(ChangeCatatan(
-                                                    tc.text,
-                                                    state.orderItems[
-                                                        widget.index]));
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text("Save"))
-                                    ],
-                                  ),
-                                  content: TextField(
-                                    controller: tc,
-                                    minLines: 2,
-                                    maxLines: 2,
-                                    decoration:
-                                        InputDecoration(label: Text('Catatan')),
-                                  ),
+                            onTap: () async {
+                              try {
+                                var menuitem = await RepositoryProvider.of<
+                                        MenuItemRepository>(context)
+                                    .getMenus(
+                                        title: state
+                                            .orderItems[widget.index].title);
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return StrukitemeditDialog(
+                                        strukItem:
+                                            state.orderItems[widget.index],
+                                        menuItems: menuitem);
+                                  },
                                 );
-                              },
-                            ),
+                              } catch (e) {
+                                debugPrint(e.toString());
+                              }
+                              // var tc = TextEditingController(
+                              //     text:
+                              //         state.orderItems[widget.index].catatan);
+
+                              // return AlertDialog(
+                              //   // actions: [
+                              //   //   ElevatedButton(
+                              //   //       onPressed: () {}, child: Text("Save"))
+                              //   // ],
+                              //   title: Row(
+                              //     mainAxisAlignment:
+                              //         MainAxisAlignment.spaceBetween,
+                              //     children: [
+                              //       Text("Catatan"),
+                              //       ElevatedButton(
+                              //           onPressed: () {
+                              //             BlocProvider.of<UseStrukBloc>(
+                              //                     context)
+                              //                 .add(ChangeCatatan(
+                              //                     tc.text,
+                              //                     state.orderItems[
+                              //                         widget.index]));
+                              //             Navigator.pop(context);
+                              //           },
+                              //           child: Text("Save"))
+                              //     ],
+                              //   ),
+                              //   content: TextField(
+                              //     controller: tc,
+                              //     minLines: 2,
+                              //     maxLines: 2,
+                              //     decoration:
+                              //         InputDecoration(label: Text('Catatan')),
+                              //   ),
+                              // );
+                            },
                             child: Text(state
                                 .orderItems[widget.index].title.firstUpcase),
                           ),
@@ -136,22 +153,14 @@ class _OrderTileState extends State<OrderTile>
                                             child: TextFormField(
                                               // controller: tct,
 
-                                              validator: (value) {
-                                                if (value == null) {
-                                                  return 'uninitialized';
-                                                }
-                                                if (int.tryParse(value) ==
-                                                    null) {
-                                                  return 'not number/format error';
-                                                }
-                                              },
+                                              validator: numberValidator,
                                               initialValue: state
                                                   .orderItems[widget.index]
                                                   .count
                                                   .toString(),
 
                                               onFieldSubmitted: (value) {
-                                                print(value);
+                                                debugPrint(value);
                                                 BlocProvider.of<UseStrukBloc>(
                                                         context)
                                                     .add(ChangeCount(
@@ -171,7 +180,7 @@ class _OrderTileState extends State<OrderTile>
                                         ),
                                       );
                                     });
-                                print('tapped');
+                                debugPrint('tapped');
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -193,8 +202,10 @@ class _OrderTileState extends State<OrderTile>
                       children: [
                         Expanded(
                             flex: 4,
-                            child: Text(
-                                '"${state.orderItems[widget.index].catatan ?? ''}"')),
+                            child: (state
+                                    .orderItems[widget.index].submenues.isEmpty
+                                ? SizedBox()
+                                : Text('Custom'))),
                         Expanded(
                             flex: 2,
                             child: SizedBox(
@@ -209,7 +220,30 @@ class _OrderTileState extends State<OrderTile>
                               ),
                             )),
                       ],
-                    )
+                    ),
+                    Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(
+                          state.orderItems[widget.index].submenues.length,
+                          (index) {
+                            var submenudata =
+                                state.orderItems[widget.index].submenues[index];
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(submenudata.title),
+                                Text((submenudata.adjustHarga *
+                                        state.orderItems[widget.index].count)
+                                    .numberFormat()),
+                              ],
+                            );
+                          },
+                        )
+                        //  [
+                        //   Text(
+                        //       '"${state.orderItems[widget.index].catatan ?? ''}"'),
+                        // ],
+                        )
                   ],
                 ),
               ),

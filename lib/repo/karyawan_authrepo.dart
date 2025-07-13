@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:flutter/material.dart';
 import 'package:order_makan/helper.dart';
 import 'user_model.dart';
 // import 'package:sembast/sembast.dart';
@@ -26,7 +27,7 @@ class KaryawanAuthRepo {
   Future<bool> isAdmin() {
     return firestore.collection('users').doc(currentUser.id).get().then(
       (value) {
-        print(value.data()?['role'] == 'admin');
+        debugPrint((value.data()?['role'] == 'admin').toString());
         return value.data()?['role'] == 'admin';
       },
     );
@@ -58,6 +59,7 @@ class KaryawanAuthRepo {
         },
       );
     } on auth.FirebaseAuthException catch (e) {
+      debugPrint(e.toString());
       // throw SignUpWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
       // throw const SignUpWithEmailAndPasswordFailure();
@@ -74,6 +76,7 @@ class KaryawanAuthRepo {
         password: password,
       );
     } on auth.FirebaseAuthException catch (e) {
+      print(e.toString());
       // throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
       // throw const LogInWithEmailAndPasswordFailure();
@@ -90,10 +93,10 @@ class KaryawanAuthRepo {
         password: password,
       );
     } on auth.FirebaseAuthException catch (e) {
-      print(e);
+      debugPrint(e.toString());
       // throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
     } catch (_) {
-      print(_);
+      debugPrint(_.toString());
       // throw const LogInWithEmailAndPasswordFailure();
     }
   }
@@ -111,6 +114,10 @@ class KaryawanAuthRepo {
   set setcurrentAdmin(bool set) =>
       _cache.user = _cache.user?.setAdmin() ?? User.empty;
   User get currentUser => _cache.user ?? User.empty;
+
+  Future<QuerySnapshot<Map<String, dynamic>>> karyawanList() {
+    return firestore.collection('users').get();
+  }
   // final Database _db;
   // Future<List<RecordSnapshot>> karyawanList() {
 

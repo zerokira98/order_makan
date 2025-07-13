@@ -4,19 +4,23 @@ part of 'inputbeliform_cubit.dart';
 
 class InputbeliformState extends Equatable {
   final IngredientItem ingredientItem;
+  final DateTime tanggalbeli;
   final String nama;
   final String tempatbeli;
   final int count;
   final int harga;
   const InputbeliformState({
     required this.ingredientItem,
+    required this.tanggalbeli,
     required this.nama,
     required this.tempatbeli,
     required this.count,
     required this.harga,
   });
   static InputbeliformState initial() => InputbeliformState(
-      ingredientItem: IngredientItem(title: '', count: 0),
+      tanggalbeli: DateTime(
+          DateTime.now().year, DateTime.now().month, DateTime.now().day),
+      ingredientItem: IngredientItem(title: '', count: 0, satuan: ''),
       nama: '',
       tempatbeli: '',
       count: 0,
@@ -25,6 +29,7 @@ class InputbeliformState extends Equatable {
   List<Object> get props {
     return [
       ingredientItem,
+      tanggalbeli,
       nama,
       tempatbeli,
       count,
@@ -34,6 +39,7 @@ class InputbeliformState extends Equatable {
 
   InputbeliformState copyWith({
     IngredientItem? ingredientItem,
+    DateTime? tanggalbeli,
     String? nama,
     String? tempatbeli,
     int? count,
@@ -41,6 +47,7 @@ class InputbeliformState extends Equatable {
   }) {
     return InputbeliformState(
       ingredientItem: ingredientItem ?? this.ingredientItem,
+      tanggalbeli: tanggalbeli ?? this.tanggalbeli,
       nama: nama ?? this.nama,
       tempatbeli: tempatbeli ?? this.tempatbeli,
       count: count ?? this.count,
@@ -51,6 +58,7 @@ class InputbeliformState extends Equatable {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'ingredientItem': ingredientItem.toMap(),
+      'tanggalbeli': tanggalbeli.millisecondsSinceEpoch,
       'nama': nama,
       'tempatbeli': tempatbeli,
       'count': count,
@@ -62,6 +70,8 @@ class InputbeliformState extends Equatable {
     return InputbeliformState(
       ingredientItem:
           IngredientItem.fromMap(map['ingredientItem'] as Map<String, dynamic>),
+      tanggalbeli:
+          DateTime.fromMillisecondsSinceEpoch(map['tanggalbeli'] as int),
       nama: map['nama'] as String,
       tempatbeli: map['tempatbeli'] as String,
       count: map['count'] as int,

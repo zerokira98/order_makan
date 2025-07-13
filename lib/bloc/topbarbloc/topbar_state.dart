@@ -7,6 +7,5 @@ class TopbarState extends Equatable {
       : selected = selected ?? '[ALL]';
 
   @override
-  // TODO: implement props
   List<Object?> get props => [selected, categories];
 }

@@ -1,6 +1,11 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+
 import 'package:order_makan/model/ingredient_model.dart';
+import 'package:order_makan/model/submenuitem_model.dart';
 
 part 'menuitems_model.g.dart';
 
@@ -10,6 +15,7 @@ class MenuItems {
   final String imgDir;
   final int price;
   final List<IngredientItem> ingredientItems;
+  final List<SubMenuItem> submenues;
   final String? id;
   final bool? customOrder;
   final String? description;
@@ -18,6 +24,7 @@ class MenuItems {
   MenuItems(
       {int? count,
       this.ingredientItems = const [],
+      this.submenues = const [],
       this.customOrder,
       this.id,
       this.description = '',
@@ -31,6 +38,7 @@ class MenuItems {
   MenuItems countchange(int newcount) => MenuItems(
       customOrder: customOrder,
       ingredientItems: ingredientItems,
+      submenues: submenues,
       title: title,
       imgDir: imgDir,
       description: description,
@@ -44,6 +52,7 @@ class MenuItems {
     String? imgDir,
     String? description,
     List<IngredientItem>? ingredientItems,
+    List<SubMenuItem>? submenues,
     bool? customOrder,
     String? id,
     int? price,
@@ -51,6 +60,7 @@ class MenuItems {
     int? count,
   }) =>
       MenuItems(
+        submenues: submenues ?? this.submenues,
         ingredientItems: ingredientItems ?? this.ingredientItems,
         customOrder: customOrder ?? this.customOrder,
         title: title ?? this.title,
@@ -61,12 +71,12 @@ class MenuItems {
         categories: categories ?? this.categories,
         count: count ?? this.count,
       );
-  factory MenuItems.fromJson(Map<String, dynamic> json) =>
-      _$MenuItemsFromJson(json);
+  // factory MenuItems.fromJson(Map<String, dynamic> json) =>
+  //     _$MenuItemsFromJson(json);
   factory MenuItems.fromFirestore(DocumentSnapshot<Map> data) =>
       _$MenuItemsFromFirestore(data);
 
-  Map<String, dynamic> toJson() => _$MenuItemsToJson(this);
+  // Map<String, dynamic> toJson() => _$MenuItemsToJson(this);
 
   // @override
   // String toString() {
@@ -74,6 +84,51 @@ class MenuItems {
   // }
 
   Map<String, dynamic> toFirestore() => _$MenuItemsToFirestore(this);
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'title': title,
+      'imgDir': imgDir,
+      'price': price,
+      'ingredientItems': ingredientItems.map((x) => x.toMap()).toList(),
+      'submenues': submenues.map((x) => x.toMap()).toList(),
+      'id': id,
+      'customOrder': customOrder,
+      'description': description,
+      'categories': categories,
+      'count': count,
+    };
+  }
+
+  factory MenuItems.fromMap(Map<String, dynamic> map) {
+    return MenuItems(
+      title: map['title'] as String,
+      imgDir: map['imgDir'] as String,
+      price: map['price'] as int,
+      ingredientItems: List<IngredientItem>.from(
+        (map['ingredientItems'] as List).map<IngredientItem>(
+          (x) => IngredientItem.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+      submenues: List<SubMenuItem>.from(
+        (map['submenues'] as List).map<SubMenuItem>(
+          (x) => SubMenuItem.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+      id: map['id'] != null ? map['id'] as String : null,
+      customOrder:
+          map['customOrder'] != null ? map['customOrder'] as bool : null,
+      description:
+          map['description'] != null ? map['description'] as String : null,
+      categories: List<String>.from((map['categories'] as List<String>)),
+      count: map['count'] as int,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory MenuItems.fromJson(String source) =>
+      MenuItems.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
 MenuItems _$MenuItemsFromFirestore(DocumentSnapshot<Map> data) {
@@ -84,6 +139,10 @@ MenuItems _$MenuItemsFromFirestore(DocumentSnapshot<Map> data) {
     customOrder: menudata?['custom_order'],
     ingredientItems: (menudata?['ingredientItems'] as List<dynamic>?)
             ?.map((e) => IngredientItem.fromMap(e))
+            .toList() ??
+        const [],
+    submenues: (menudata?['submenues'] as List<dynamic>?)
+            ?.map((e) => SubMenuItem.fromMap(e))
             .toList() ??
         const [],
     price: menudata?['price'],
@@ -100,6 +159,11 @@ MenuItems _$MenuItemsFromFirestore(DocumentSnapshot<Map> data) {
 Map<String, dynamic> _$MenuItemsToFirestore(MenuItems instance) =>
     <String, dynamic>{
       'title': instance.title,
+      'submenues': instance.submenues
+          .map(
+            (e) => e.toMap(),
+          )
+          .toList(),
       'ingredientItems': instance.ingredientItems
           .map(
             (e) => e.toMap(),

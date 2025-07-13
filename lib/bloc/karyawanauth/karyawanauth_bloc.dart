@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/material.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/user_model.dart' show User;
 
@@ -36,7 +36,7 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
             email: event.email, password: event.password);
       } on Exception catch (e) {
         emit(KaryawanUnAuth(errorMsg: e.toString()));
-        print('error $e');
+        debugPrint('error $e');
         await Future.delayed(const Duration(seconds: 4));
         emit(KaryawanUnAuth());
       }

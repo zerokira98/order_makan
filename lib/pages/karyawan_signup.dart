@@ -1,4 +1,3 @@
-import 'package:crypt/crypt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
@@ -104,7 +103,7 @@ class _KaryawanSignupPageState extends State<KaryawanSignupPage> {
                                   );
                                 } else {}
                               } catch (e) {
-                                print(e);
+                                debugPrint(e.toString());
                               }
                             }
                           : null,

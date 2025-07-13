@@ -5,25 +5,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart' show JsonSerializable;
 
-part 'ingredient_model.g.dart';
-
 @JsonSerializable()
 class IngredientItem extends Equatable {
   final String title;
+  final String satuan;
   final String? id;
+  final int? incrementindex;
   final int count;
   const IngredientItem({
-    this.id,
     required this.title,
+    this.incrementindex,
+    required this.satuan,
+    this.id,
     required this.count,
   });
 
   @override
-  List<Object> get props => [title, id ?? '', count];
+  List<Object?> get props => [title, satuan, id, count, incrementindex];
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'title': title,
+      'satuan': satuan,
       'id': id,
       'count': count,
     };
@@ -32,6 +35,7 @@ class IngredientItem extends Equatable {
   factory IngredientItem.fromMap(Map<String, dynamic> map) {
     return IngredientItem(
       title: map['title'] as String,
+      satuan: map['satuan'] as String? ?? 'mg',
       id: map['id'] != null ? map['id'] as String : null,
       count: map['count'] as int,
     );
@@ -55,18 +59,28 @@ class IngredientItem extends Equatable {
     var data = snapshot.data();
     if (data == null) throw Exception();
     return IngredientItem(
-        title: data['title'], count: data['count'], id: snapshot.id);
+        satuan: data['satuan'] ?? 'mg',
+        title: data['title'],
+        count: data['count'],
+        id: snapshot.id);
   }
 
   IngredientItem copyWith({
     String? title,
-    String? Function()? id,
+    String? satuan,
+    Function()? id,
+    int? incrementindex,
     int? count,
   }) {
     return IngredientItem(
+      incrementindex: incrementindex ?? this.incrementindex,
       title: title ?? this.title,
+      satuan: satuan ?? this.satuan,
       id: id != null ? id() : this.id,
       count: count ?? this.count,
     );
   }
+
+  @override
+  bool get stringify => true;
 }

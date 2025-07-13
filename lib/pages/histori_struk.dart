@@ -78,9 +78,8 @@ class HistoriStruk extends StatelessWidget {
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 8.0),
-                                            child: Text(ew.title +
-                                                ' x' +
-                                                ew.count.toString()),
+                                            child: Text(
+                                                '${ew.title} x${ew.count}'),
                                           ),
                                       ],
                                     ),
@@ -155,7 +154,7 @@ class DisplayStruk extends StatelessWidget {
                   }
                   return snapshot.hasData
                       ? Text(snapshot.data['name'])
-                      : Text('Id : ' + data.karyawanId);
+                      : Text('Id : ${data.karyawanId}');
                 },
               ),
               // Text(data.karyawanId),
@@ -311,7 +310,7 @@ class DisplayStruk extends StatelessWidget {
                         child: Text('Batalkan Pesanan.')),
                   ),
                   // GestureDetector(
-                  //   onLongPressStart: (details) => print(details),
+                  //   onLongPressStart: (details) => debugPrint(details),
                   //   child:
                   // ),
                   // PrintWidget(
@@ -473,7 +472,7 @@ class DisplayStruk extends StatelessWidget {
 //                   setState(() {
 //                     connectedDevice = value;
 //                   });
-//                   print(value);
+//                   debugPrint(value);
 //                 },
 //                 items: [
 //                   for (var index = 0; index < _devices.length; index++)

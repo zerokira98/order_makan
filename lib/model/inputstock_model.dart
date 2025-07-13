@@ -1,31 +1,44 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:order_makan/model/ingredient_model.dart';
 
 class InputstockModel extends Equatable {
   final String title;
-  final int stocks;
+  final String tempatbeli;
+  final Timestamp tanggalbeli;
+  final int count;
+  final int price;
   final String units;
   final IngredientItem asIngredient;
   const InputstockModel({
     required this.title,
-    required this.stocks,
+    required this.tempatbeli,
+    required this.tanggalbeli,
+    required this.count,
+    required this.price,
     required this.units,
     required this.asIngredient,
   });
 
   InputstockModel copyWith({
     String? title,
-    int? stocks,
+    String? tempatbeli,
+    Timestamp? tanggalbeli,
+    int? count,
+    int? price,
     String? units,
     IngredientItem? asIngredient,
   }) {
     return InputstockModel(
       title: title ?? this.title,
-      stocks: stocks ?? this.stocks,
+      tempatbeli: tempatbeli ?? this.tempatbeli,
+      tanggalbeli: tanggalbeli ?? this.tanggalbeli,
+      count: count ?? this.count,
+      price: price ?? this.price,
       units: units ?? this.units,
       asIngredient: asIngredient ?? this.asIngredient,
     );
@@ -34,7 +47,10 @@ class InputstockModel extends Equatable {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'title': title,
-      'stocks': stocks,
+      'tempatbeli': tempatbeli,
+      'tanggalbeli': tanggalbeli,
+      'count': count,
+      'price': price,
       'units': units,
       'asIngredient': asIngredient.toMap(),
     };
@@ -43,7 +59,10 @@ class InputstockModel extends Equatable {
   factory InputstockModel.fromMap(Map<String, dynamic> map) {
     return InputstockModel(
       title: map['title'] as String,
-      stocks: map['stocks'] as int,
+      tempatbeli: map['tempatbeli'] as String,
+      tanggalbeli: map['tanggalbeli'] as Timestamp,
+      count: map['count'] as int,
+      price: map['price'] as int,
       units: map['units'] as String,
       asIngredient:
           IngredientItem.fromMap(map['asIngredient'] as Map<String, dynamic>),
@@ -56,7 +75,17 @@ class InputstockModel extends Equatable {
       InputstockModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  List<Object> get props => [title, stocks, units, asIngredient];
+  List<Object> get props {
+    return [
+      title,
+      tempatbeli,
+      tanggalbeli,
+      count,
+      price,
+      units,
+      asIngredient,
+    ];
+  }
 
   @override
   bool get stringify => true;

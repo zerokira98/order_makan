@@ -24,7 +24,7 @@ class RangkumBulan extends StatelessWidget {
       body: BlocBuilder<RangkumanBloc, RangkumanState>(
         builder: (context, state) {
           if (state.struks.isNotEmpty) {
-            print(state.struks);
+            debugPrint(state.struks.toString());
             return Row(
               children: [
                 Flexible(

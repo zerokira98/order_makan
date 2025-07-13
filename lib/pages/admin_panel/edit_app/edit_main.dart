@@ -46,29 +46,7 @@ class EditMain extends StatelessWidget {
                       EmptyMenuCard()
                     ],
                   );
-                  // Wrap(
-                  //   children: List.generate(
-                  //       state.datas.length + 1,
-                  //       (index) => (index < state.datas.length)
-                  //           ? MenuCard(
-                  //               onTap: () {},
-                  //               menudata: state.datas[index],
-                  //               editmode: true,
-                  //             )
-                  //           : const ),
-                  // );
                 })),
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: Container(
-                //         height: 24,
-                //         color: Colors.orange,
-                //         child: const Text('BottomBar'),
-                //       ),
-                //     ),
-                //   ],
-                // ),
               ],
             ),
           ),

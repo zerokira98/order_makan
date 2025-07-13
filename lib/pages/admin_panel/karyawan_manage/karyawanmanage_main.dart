@@ -12,12 +12,12 @@ class KaryawanManageMain extends StatelessWidget {
           future:
               RepositoryProvider.of<KaryawanAuthRepo>(context).karyawanList(),
           builder: (context, snap) {
-            print(snap.data);
+            debugPrint(snap.data.toString());
             if (snap.hasData) {
               return ListView.builder(
-                itemCount: snap.data!.length,
+                itemCount: snap.data!.docs.length,
                 itemBuilder: (context, index) => ListTile(
-                    title: Text(snap.data![index]["username"].toString())),
+                    title: Text(snap.data!.docs[index].data().toString())),
               );
             }
             return const Column(

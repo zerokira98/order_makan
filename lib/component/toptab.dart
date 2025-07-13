@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/helper.dart';
 
@@ -146,11 +145,11 @@ class TopBarMenuItem extends StatelessWidget {
                               // var a = await RepositoryProvider.of<MenuItemRepository>(
                               //         context)
                               //     .deleteCategory(nama);
-                              // // print(a);
+                              // // debugPrint(a);
                               // if (a < 1) {
-                              //   print('No record deleted');
+                              //   debugPrint('No record deleted');
                               // } else {
-                              //   print('affected records:$a');
+                              //   debugPrint('affected records:$a');
                               //   Navigator.pop(context);
                               // }
                             },

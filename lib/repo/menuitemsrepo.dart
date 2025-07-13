@@ -52,7 +52,7 @@ class MenuItemRepository implements _MenuItemRepo {
       await ingredientRef.where('title', isEqualTo: ele.title).get().then(
         (value) async {
           if (value.docs.isEmpty) {
-            await ingredientRef.add(ele).then(
+            await addIngredients(ele).then(
               (value2) {
                 newingredientItems = newingredientItems
                     .map(
@@ -109,16 +109,67 @@ class MenuItemRepository implements _MenuItemRepo {
             .toList());
   }
 
-  Future<QuerySnapshot<IngredientItem>> getIngredients() {
-    return ingredientRef.get();
+  Future<DocumentReference<IngredientItem>> addIngredients(
+      IngredientItem data) async {
+    if ((await ingredientRef.where('title', isEqualTo: data.title).get())
+        .docs
+        .isNotEmpty) {
+      throw Exception('same title exist');
+    }
+    return ingredientRef.add(data.copyWith(count: 0)).then(
+      (value) async {
+        await value.update({'id': value.id});
+        return value;
+      },
+    );
+  }
+
+  Future<void> editIngredientsSatuan(IngredientItem data) async {
+    var dbdata =
+        await ingredientRef.where('title', isEqualTo: data.title).get();
+    if ((dbdata).docs.length == 1) {
+      return ingredientRef
+          .doc(dbdata.docs.single.id)
+          .update({'satuan': data.satuan});
+    } else {
+      throw Exception('not single : ${(dbdata).docs.length}');
+    }
+  }
+
+  Future<List<IngredientItem>> getIngredients({String? title}) {
+    if (title != null) {
+      return ingredientRef.where('title', isEqualTo: title).get().then(
+            (value) => value.docs
+                .map(
+                  (e) => e.data().copyWith(
+                        id: () => e.id,
+                      ),
+                )
+                .toList(),
+          );
+    }
+    return ingredientRef.get().then(
+          (value) => value.docs
+              .map(
+                (e) => e.data().copyWith(
+                      id: () => e.id,
+                    ),
+              )
+              .toList(),
+        );
   }
 
   Future<QuerySnapshot<IngredientItem>> getStocks() {
     return ingredientRef.get();
   }
 
+  Future<void> updateIngredientsStockCount(String id, int count) {
+    return ingredientRef.doc(id).update({'count': FieldValue.increment(count)});
+  }
+
   Future<DocumentReference<InputstockModel>> addInputstocks(
-      InputstockModel data) {
+      InputstockModel data) async {
+    await updateIngredientsStockCount(data.asIngredient.id!, data.count);
     return inputstocksRef.add(data);
   }
 
@@ -147,13 +198,28 @@ class MenuItemRepository implements _MenuItemRepo {
         });
     }
     for (var e in menu.ingredientItems) {
-      await ingredientRef
-          .where('title', isEqualTo: menu.ingredientItems)
-          .get()
-          .then(
+      await ingredientRef.where('title', isEqualTo: e.title).get().then(
         (value) async {
           if (value.docs.isEmpty) {
-            await ingredientRef.add(e.copyWith(count: 0));
+            var igid = await addIngredients(e.copyWith(count: 0));
+            menu = menu.copywith(
+                ingredientItems: menu.ingredientItems
+                    .map(
+                      (e1) => e.title == e1.title
+                          ? e1.copyWith(id: () => igid.id)
+                          : e1,
+                    )
+                    .toList());
+            // await ingredientRef.add(e.copyWith(count: 0));
+          } else {
+            menu = menu.copywith(
+                ingredientItems: menu.ingredientItems
+                    .map(
+                      (e1) => e.title == e1.title
+                          ? e1.copyWith(id: () => value.docs.single.id)
+                          : e1,
+                    )
+                    .toList());
           }
         },
       );
@@ -166,7 +232,7 @@ class MenuItemRepository implements _MenuItemRepo {
     // );
     return menuRef.add(menu).then(
       (value) {
-        value.update({'custom_order': customOrder});
+        value.update({'custom_order': customOrder, 'id': value.id});
         return value;
       },
     );
@@ -215,5 +281,11 @@ class MenuItemRepository implements _MenuItemRepo {
     // var store = intMapStoreFactory.store('categories');
     // return store.delete(db,
     //     finder: Finder(filter: Filter.equals('name', category)));
+  }
+
+  Future<MenuItems> getMenus({required String title}) async {
+    return await menuRef.where('title', isEqualTo: title).get().then(
+          (value) => value.docs.single.data(),
+        );
   }
 }

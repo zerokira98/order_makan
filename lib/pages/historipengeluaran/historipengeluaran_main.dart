@@ -19,7 +19,7 @@ class HistoriPengeluaranMain extends StatelessWidget {
                 end: DateTime(now.year, now.month, now.day + 1))),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            print(snapshot.data);
+            debugPrint(snapshot.data.toString());
             return Column(
               children: [
                 for (var e in snapshot.data!) Kartu(e),

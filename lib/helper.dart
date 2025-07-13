@@ -102,6 +102,12 @@ extension DateParsing on DateTime {
     DateFormat tanggalFormat = DateFormat('EEEE, d MMMM yyyy ', 'ID_id');
     return tanggalFormat.format(this);
   }
+
+  String formatBasic() {
+    initializeDateFormatting();
+    DateFormat tanggalFormat = DateFormat.yMMMd('ID_id');
+    return tanggalFormat.format(this);
+  }
 }
 
 extension DurationParsing on Duration {
@@ -138,8 +144,6 @@ extension PrintSize on Size {
         return 3;
       case Size.extraLarge:
         return 4;
-      default:
-        return 0;
     }
   }
 }
@@ -153,8 +157,6 @@ extension PrintAlign on Align {
         return 1;
       case Align.right:
         return 2;
-      default:
-        return 0;
     }
   }
 }

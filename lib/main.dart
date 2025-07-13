@@ -13,10 +13,8 @@ import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
 import 'package:order_makan/firebase_options.dart';
-import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
-import 'package:order_makan/pages/admin_panel/cubit/inputbeliform_cubit.dart';
+import 'package:order_makan/pages/admin_panel/inputbelibahan/cubit/inputbeliform_cubit.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
-import 'package:order_makan/pages/admin_panel/input_bahanbaku.dart';
 import 'package:order_makan/pages/firstrun_setup.dart';
 import 'package:order_makan/pages/karyawan_loginpage.dart';
 import 'package:order_makan/pages/karyawan_signup.dart';
@@ -53,7 +51,8 @@ void main() async {
         create: (context) => MenuItemRepository(firestore),
       ),
       RepositoryProvider(
-        create: (context) => StrukRepository(firestore),
+        create: (context) => StrukRepository(
+            firestore, RepositoryProvider.of<MenuItemRepository>(context)),
       ),
     ],
     child: MultiBlocProvider(
@@ -63,7 +62,9 @@ void main() async {
               MenueditCubit(RepositoryProvider.of<MenuItemRepository>(context)),
         ),
         BlocProvider(
-          create: (context) => InputbeliformCubit()..initiate(),
+          create: (context) => InputbeliformCubit(
+              RepositoryProvider.of<MenuItemRepository>(context))
+            ..initiate(),
         ),
         BlocProvider(
           create: (context) => UseStrukBloc(
@@ -125,7 +126,7 @@ class MyApp extends StatelessWidget {
           MonthYearPickerLocalizations.delegate,
         ],
         title: 'Flutter Demo',
-        themeMode: ThemeMode.dark,
+        themeMode: ThemeMode.system,
         darkTheme: ThemeData.dark(useMaterial3: true),
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -153,7 +154,7 @@ class MyApp extends StatelessWidget {
                       if (state is! KaryawanAuthenticated) {
                         return const KaryawanLoginPage();
                       } else {
-                        return const InputBeliBahanbaku();
+                        return const UseMain();
                       }
                     },
                   );

@@ -9,15 +9,15 @@ import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/component/menu_card.dart';
 import 'package:order_makan/component/screen_lock.dart';
-import 'package:order_makan/component/struk_panel/struk_panel.dart';
+import 'package:order_makan/pages/use_app/struk_panel/struk_panel.dart';
 import 'package:order_makan/component/toptab.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
 import 'package:order_makan/pages/antrian/antrian_main.dart';
-import 'package:order_makan/pages/histori_struk.dart';
 import 'package:order_makan/pages/historipenjualan/historipenjualan_harian.dart';
+import 'package:order_makan/pages/use_app/checkout.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +31,7 @@ class UseMain extends StatefulWidget {
 }
 
 class _UseMainState extends State<UseMain> {
+  PageController pageController = PageController();
   int listLength = 1;
   void ontap() {
     setState(() {
@@ -42,24 +43,24 @@ class _UseMainState extends State<UseMain> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: UseDrawer(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'tag',
-        onPressed: () {
-          Navigator.push(
-              context,
-              PageRouteBuilder(
-                  barrierDismissible: true,
-                  opaque: false,
-                  fullscreenDialog: true,
-                  pageBuilder: (BuildContext context, a1, a2) {
-                    return CustomOrderDialog(a1: a1);
-                  }));
-        },
-        child: Column(
-          children: [Icon(Icons.add), Text("Custom")],
-        ),
-      ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: FloatingActionButton(
+      //   heroTag: 'tag',
+      //   onPressed: () {
+      //     Navigator.push(
+      //         context,
+      //         PageRouteBuilder(
+      //             barrierDismissible: true,
+      //             opaque: false,
+      //             fullscreenDialog: true,
+      //             pageBuilder: (BuildContext context, a1, a2) {
+      //               return CustomOrderDialog(a1: a1);
+      //             }));
+      //   },
+      //   child: Column(
+      //     children: [Icon(Icons.add), Text("Custom")],
+      //   ),
+      // ),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,72 +104,115 @@ class _UseMainState extends State<UseMain> {
       body: BlocListener<MenuBloc, MenuState>(
         listenWhen: (previous, current) => current.msg != null,
         listener: (context, state) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AntrianPage(),
-              ));
+          if (state.msg != null) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.msg.toString())));
+            BlocProvider.of<MenuBloc>(context).add(ClearMsg());
+          }
+          // Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => AntrianPage(),
+          //     ));
         },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 7,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Expanded(child: TopTab()),
-                    ],
-                  ),
-                  const Padding(padding: EdgeInsets.all(2)),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          BlocBuilder<MenuBloc, MenuState>(
-                            builder: (context, state) {
-                              // if (state.menus.isEmpty) {
-                              //   return const Center(child: Text('empty'));
-                              // }
-                              return Expanded(
-                                child: GridView.count(
-                                  childAspectRatio: 0.98,
-                                  crossAxisCount: 4,
-                                  children: [
-                                    for (var i = 0; i < state.datas.length; i++)
-                                      MenuCard(
-                                        onTap: () {
-                                          showAboutDialog(
+        child: PageView(controller: pageController, children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 7,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Expanded(child: TopTab()),
+                      ],
+                    ),
+                    const Padding(padding: EdgeInsets.all(2)),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            BlocBuilder<MenuBloc, MenuState>(
+                              builder: (context, state) {
+                                // if (state.menus.isEmpty) {
+                                //   return const Center(child: Text('empty'));
+                                // }
+                                return Expanded(
+                                  child: GridView.count(
+                                    childAspectRatio: 0.98,
+                                    crossAxisCount: 4,
+                                    children: [
+                                      for (var i = 0;
+                                          i < state.datas.length;
+                                          i++)
+                                        MenuCard(
+                                          onTap: () {
+                                            showDialog(
                                               context: context,
-                                              children: [
-                                                Text(state.datas[i].title),
-                                                Text(state
-                                                        .datas[i].description ??
-                                                    ''),
-                                              ]);
-                                        },
-                                        menudata: state.datas[i],
-                                      )
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                                              builder: (context) => Dialog(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      18.0),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Text(
+                                                          state.datas[i].title),
+                                                      Text(state.datas[i]
+                                                              .description ??
+                                                          ''),
+                                                      Text(state.datas[i]
+                                                          .ingredientItems
+                                                          .toString()),
+                                                      Text(state
+                                                          .datas[i].submenues
+                                                          .toString()),
+                                                      Row(
+                                                        children: [
+                                                          ElevatedButton(
+                                                              onPressed: () {},
+                                                              child: Text(
+                                                                  'Batal')),
+                                                          ElevatedButton(
+                                                              onPressed: () {},
+                                                              child: Text('Ok'))
+                                                        ],
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          menudata: state.datas[i],
+                                        )
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const StrukPanel()
-          ],
-        ),
+              StrukPanel(
+                pageController: pageController,
+              )
+            ],
+          ),
+          CheckoutDialog(
+            pageController: pageController,
+          )
+        ]),
       ),
     );
   }
@@ -200,7 +244,7 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
               onPressed: () {
                 //var menuitems? check null
                 if (selected == null) {
-                  print('clicked null selected');
+                  debugPrint('clicked null selected');
                   RepositoryProvider.of<MenuItemRepository>(context)
                       .addMenu(
                           MenuItems(
@@ -210,7 +254,7 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
                           customOrder: true)
                       .then(
                     (value) {
-                      var item = value.get().then(
+                      value.get().then(
                         (value2) {
                           if (value2.data() != null) {
                             BlocProvider.of<UseStrukBloc>(context).add(

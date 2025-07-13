@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/repo/strukrepo.dart';
@@ -32,7 +33,7 @@ class AntrianBloc extends Bloc<AntrianEvent, AntrianState> {
           }));
         },
       ).onError((error, stackTrace) {
-        print(error);
+        debugPrint(error.toString());
         add(InitiateAntrian(
             msg: {"status": "failed", "details": "Error : $error"}));
       });

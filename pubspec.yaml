@@ -57,6 +57,7 @@ dependencies:
   month_year_picker: ^0.5.0+1 
   flutter_localizations:
     sdk: flutter
+  simple_numpad: ^1.0.5
 
 dev_dependencies:
   flutter_test:

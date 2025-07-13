@@ -8,10 +8,16 @@ class InitiateStruk extends UseStrukEvent {
   InitiateStruk({required this.karyawanId});
 }
 
-class ChangeCatatan extends UseStrukEvent {
+class AddSubmenu extends UseStrukEvent {
   final StrukItem item;
-  final String catatan;
-  ChangeCatatan(this.catatan, this.item);
+  final SubMenuItem submenu;
+  AddSubmenu(this.submenu, this.item);
+}
+
+class DeleteSubmenu extends UseStrukEvent {
+  final StrukItem item;
+  final SubMenuItem submenu;
+  DeleteSubmenu(this.submenu, this.item);
 }
 
 class AddOrderitems extends UseStrukEvent {

@@ -16,7 +16,7 @@ UseStrukState _$UseStrukStateFromJson(Map<String, dynamic> json) =>
       strukId: json['strukId'] as String?,
       ordertime: DateTime.parse(json['ordertime'] as String),
       orderItems: (json['orderItems'] as List<dynamic>)
-          .map((e) => StrukItem.fromJson(e as Map<String, dynamic>))
+          .map((e) => StrukItem.fromMap(e as Map<String, dynamic>))
           .toList(),
       waktuTunggu: (json['waktuTunggu'] as num?)?.toInt(),
       total: (json['total'] as num?)?.toInt(),

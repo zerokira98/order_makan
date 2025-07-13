@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:order_makan/pages/admin_panel/input_bahanbaku.dart';
+import 'package:order_makan/helper.dart';
+import 'package:order_makan/pages/admin_panel/inputbelibahan/input_bahanbaku.dart';
+import 'package:order_makan/pages/admin_panel/karyawan_manage/karyawanmanage_main.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/bloc/rangkuman_bloc.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/rangkum_bulan/rangkum_bulan.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/rangkum_hari/rangkum_hari.dart';
@@ -29,6 +31,15 @@ class AdminDrawer extends StatelessWidget {
                       ));
                 },
                 title: const Text('Pembelian Bahanbaku')),
+            ListTile(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const KaryawanManageMain(),
+                      ));
+                },
+                title: const Text('Manage Karyawan')),
             Divider(),
             Text('Rangkuman'),
             ListTile(
@@ -83,20 +94,14 @@ class AdminDrawer extends StatelessWidget {
                               child: TextFormField(
                                 // controller: tct,
 
-                                validator: (value) {
-                                  if (value == null) {
-                                    return 'uninitialized';
-                                  }
-                                  if (int.tryParse(value) == null) {
-                                    return 'not number/format error';
-                                  }
-                                },
+                                validator: numberValidator,
+
                                 // initialValue: state
                                 //     .orderItems[widget.index].count
                                 //     .toString(),
 
                                 onFieldSubmitted: (value) {
-                                  print(value);
+                                  debugPrint(value);
                                   // BlocProvider.of<UseStrukBloc>(
                                   //         context)
                                   //     .add(ChangeCount(

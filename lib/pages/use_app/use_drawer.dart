@@ -24,7 +24,7 @@ class UseDrawer extends StatelessWidget {
                   ));
               // var a =
               //     RepositoryProvider.of<KaryawanAuthRepo>(context).currentUser;
-              // print(a);
+              // debugPrint(a);
               // BlocProvider.of<KaryawanauthBloc>(context).add(SignOut());
             },
           ),

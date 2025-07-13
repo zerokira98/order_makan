@@ -15,29 +15,33 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
       emit(MenuState(datas: a).copywith(msg: () => event.msg));
     });
     on<ClearMsg>((event, emit) async {
-      add(Init());
+      add(Init(msg: null));
     });
     on<AddMenu>((event, emit) async {
-      var a = await repo
-          .addMenu(event.menu.copywith(title: event.menu.title.firstUpcase));
-      if (a == -1) {
-        // send Error
-      } else {
-        var b = await repo.getAllMenus();
-        emit(MenuState(datas: b));
+      try {
+        await repo
+            .addMenu(event.menu.copywith(title: event.menu.title.firstUpcase));
+        add(Init());
+      } catch (e) {
+        emit(state.copywith(
+          msg: () => {'error': e.toString()},
+        ));
       }
+      // if (a == -1) {
+      //   // send Error
+      // } else {
+      //   var b = await repo.getAllMenus();
+      //   emit(MenuState(datas: b));
+      // }
     });
     on<DelMenu>((event, emit) async {
       try {
-        var a = await repo.deleteMenu(event.menu);
-        add(Init());
-        // if (a == 0) {
-        //   // send Error:no data deletion
-        // } else {
-        //   var b = await repo.getAllMenus();
-        //   emit(MenuState(datas: b));
-        // }
+        await repo.deleteMenu(event.menu);
+        add(Init(msg: {'sukses': 'delete sukses'}));
       } catch (e) {
+        emit(state.copywith(
+          msg: () => {'error': e.toString()},
+        ));
         throw Exception(e);
       }
     });
@@ -54,15 +58,15 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
 
     ///useless, no need to bloc?
     on<EditMenu>((event, emit) async {
-      var a = await repo.editMenu(event.editedmenu);
-      if (a == 0) {
-        ///throw no changes
-      } else {
-        add(Init());
+      await repo.editMenu(event.editedmenu);
+      add(Init());
+      // if (a == 0) {
+      //   ///throw no changes
+      // } else {
 
-        ///what to do xd
-        //then, run the topbar bloc on ui button to [ALL]
-      }
+      //   ///what to do xd
+      //   //then, run the topbar bloc on ui button to [ALL]
+      // }
     });
   }
 }

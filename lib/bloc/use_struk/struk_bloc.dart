@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/model/strukitem_model.dart';
+import 'package:order_makan/model/submenuitem_model.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 import 'package:order_makan/repo/user_model.dart';
@@ -22,10 +23,32 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
 
       emit(UseStrukState.initial(karyawanId: event.karyawanId));
     });
-    on<ChangeCatatan>((event, emit) {
+    on<AddSubmenu>((event, emit) {
+      var cursubmenues = state.orderItems
+          .singleWhere(
+            (element) => element.title == event.item.title,
+          )
+          .submenues
+          .toList();
+      cursubmenues.add(event.submenu);
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
           .map((e) => e.title == event.item.title
-              ? e.copywith(catatan: () => event.catatan)
+              ? e.copywith(submenues: cursubmenues)
+              : e)
+          .toList();
+      // debugPrint(event.item.title);
+      emit(state.copywith(orderItems: newlist));
+    });
+    on<DeleteSubmenu>((event, emit) {
+      List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
+          .map((e) => e.title == event.item.title
+              ? e.copywith(
+                  submenues: e.submenues
+                      .map(
+                        (e2) => e2.title == event.submenu.title ? null : e2,
+                      )
+                      .nonNulls
+                      .toList())
               : e)
           .toList();
       emit(state.copywith(orderItems: newlist));
@@ -69,8 +92,8 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
     });
     on<AddOrderitems>((event, emit) async {
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
-          .map((e) => StrukItem(
-              title: e.title, count: e.count, price: e.price, id: e.id))
+          // .map((e) => StrukItem(
+          //     title: e.title, count: e.count, price: e.price, id: e.id))
           .toList();
       StrukError error = StrukError.empty();
       !(newlist.every((element) => element.title != event.item.title))

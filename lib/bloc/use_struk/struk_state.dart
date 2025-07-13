@@ -128,7 +128,7 @@ UseStrukState _$StrukStateFromFirestore(
             TipePembayaran.tunai,
     ordertime: (data['ordertime'] as Timestamp).toDate(),
     orderItems: (data['orderItems'] as List<dynamic>)
-        .map((e) => StrukItem.fromJson(e as Map<String, dynamic>))
+        .map((e) => StrukItem.fromMap(e as Map<String, dynamic>))
         .toList(),
     error: data['error'] == null
         ? null
@@ -146,7 +146,7 @@ Map<String, dynamic> _$StrukStateToFirestore(UseStrukState instance) =>
       'ordertime': Timestamp.fromDate(instance.ordertime),
       'orderItems': instance.orderItems
           .map(
-            (e) => e.toJson(),
+            (e) => e.toMap(),
           )
           .toList(),
       // 'error': instance.error,

@@ -18,7 +18,7 @@ class TopbarBloc extends Bloc<TopbarEvent, TopbarState> {
     });
     on<AddCat>((event, emit) async {
       try {
-        var a = await repo.addCategory(event.name);
+        await repo.addCategory(event.name);
         add(Init());
       } catch (e) {
         throw Exception(e);
@@ -31,7 +31,7 @@ class TopbarBloc extends Bloc<TopbarEvent, TopbarState> {
     });
     on<DelCat>((event, emit) async {
       try {
-        var a = await repo.deleteCategory(event.name);
+        await repo.deleteCategory(event.name);
         add(Init());
       } catch (e) {
         throw Exception(e);

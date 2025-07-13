@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class DateTimer extends StatefulWidget {
   final DateTime ordertime;
-  DateTimer({Key? key, required this.ordertime}) : super(key: key);
+  const DateTimer({super.key, required this.ordertime});
 
   @override
   _DateTimerState createState() => _DateTimerState();

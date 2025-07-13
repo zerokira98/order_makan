@@ -31,8 +31,10 @@ class _AntrianCardState extends State<AntrianCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-        color: Color.fromARGB(255, 75 + ((diff * 5) >= 150 ? 150 : (diff * 5)),
-            120 - ((diff * 2) >= 100 ? 100 : (diff * 2)), 70),
+        elevation: 2,
+
+        // color: Color.fromARGB(255, 75 + ((diff * 5) >= 150 ? 150 : (diff * 5)),
+        //     120 - ((diff * 2) >= 100 ? 100 : (diff * 2)), 70),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(

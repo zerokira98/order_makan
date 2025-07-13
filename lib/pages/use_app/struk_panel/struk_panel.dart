@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
-import 'package:order_makan/component/struk_panel/ordertile.dart';
+import 'package:order_makan/pages/use_app/struk_panel/ordertile.dart';
 import 'package:order_makan/helper.dart';
-import 'package:order_makan/pages/use_app/checkout.dart';
 
 class StrukPanel extends StatelessWidget {
-  const StrukPanel({
-    super.key,
-  });
+  final PageController pageController;
+  const StrukPanel({super.key, required this.pageController});
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +54,7 @@ class StrukPanel extends StatelessWidget {
                     return ListView.builder(
                       itemCount: state.orderItems.length,
                       itemBuilder: (context, index) => OrderTile(
+                        // menudata: ,
                         // key: Key('$index'),
                         index: index,
                         // data: state.orderItems[index]
@@ -70,12 +69,16 @@ class StrukPanel extends StatelessWidget {
                 Expanded(
                   child: BlocBuilder<UseStrukBloc, UseStrukState>(
                     builder: (context, state) {
-                      String getTotal() {
+                      num getTotal() {
                         var total = 0;
+                        var adjust = 0;
                         for (var e in state.orderItems) {
                           total = total + (e.price * e.count);
+                          for (var f in e.submenues) {
+                            adjust += f.adjustHarga * e.count;
+                          }
                         }
-                        return total.toString();
+                        return (total + adjust);
                       }
 
                       return Container(
@@ -95,25 +98,22 @@ class StrukPanel extends StatelessWidget {
                                   BlocProvider.of<UseStrukBloc>(context)
                                       .add(DateUpdate());
                                   if (state.orderItems.isNotEmpty) {
-                                    showDialog(
-                                      // useSafeArea: false,
-                                      context: context,
-                                      builder: (c) => BlocProvider.value(
-                                        value: BlocProvider.of<UseStrukBloc>(
-                                            context),
-                                        child: const CheckoutDialog(),
-                                      ),
-                                    );
+                                    pageController.animateToPage(
+                                        ((pageController.page?.floor() ?? 0) +
+                                                1) %
+                                            2,
+                                        duration: Durations.medium4,
+                                        curve: Curves.easeInOut);
+                                    // showDialog(
+                                    //   // useSafeArea: false,
+                                    //   context: context,
+                                    //   builder: (c) => BlocProvider.value(
+                                    //     value: BlocProvider.of<UseStrukBloc>(
+                                    //         context),
+                                    //     child: const CheckoutDialog(),
+                                    //   ),
+                                    // );
                                   }
-                                  // Navigator.push(
-                                  //     context,
-                                  //     MaterialPageRoute(
-                                  //       builder: (c) => BlocProvider.value(
-                                  //         value: BlocProvider.of<StrukBloc>(
-                                  //             context),
-                                  //         child: const CheckoutPage(),
-                                  //       ),
-                                  //     ));
                                 },
                                 child: const Text('CheckOut'))
                           ],
