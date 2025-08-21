@@ -1,21 +1,45 @@
 // import 'dart:async';
 // import 'dart:developer';
 
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 // import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
 // import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/strukitem_model.dart';
+import 'package:order_makan/pages/antrian/print_widget.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 
 import '../helper.dart' as x;
 
-class HistoriStruk extends StatelessWidget {
-  const HistoriStruk({super.key});
+class HistoriStruk extends StatefulWidget {
+  HistoriStruk({super.key});
+
+  @override
+  State<HistoriStruk> createState() => _HistoriStrukState();
+}
+
+class _HistoriStrukState extends State<HistoriStruk> {
+  late DateTime selected;
+  late TextEditingController monthfilter;
+  Future<List<UseStrukState>> thefuture(BuildContext context) =>
+      RepositoryProvider.of<StrukRepository>(context)
+          .readStrukwithFilter(StrukFilter(
+        start: DateTime(selected.year, selected.month),
+        end: DateTime(selected.year, selected.month + 1),
+      ));
+  @override
+  void initState() {
+    selected = DateTime.now();
+    monthfilter = TextEditingController(text: selected.formatMonthYear());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +53,7 @@ class HistoriStruk extends StatelessWidget {
             children: [
               Expanded(
                 child: FutureBuilder(
+                  future: thefuture(context),
                   builder: (context, snapshot) {
                     if (snapshot.data == null) {
                       return const Text('null');
@@ -49,6 +74,7 @@ class HistoriStruk extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder: (context) => DisplayStruk(
+                                viewonly: true,
                                 data: e,
                               ),
                             );
@@ -93,17 +119,70 @@ class HistoriStruk extends StatelessWidget {
                       }).toList(),
                     );
                   },
-                  future: RepositoryProvider.of<StrukRepository>(context)
-                      .readAllStruk(descending: true),
                 ),
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                    var after =
-                        await RepositoryProvider.of<StrukRepository>(context)
-                            .readAllStruk();
-                  },
-                  child: const Text('press me!')),
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: Column(
+                          children: [
+                            Text('Filter'),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () {
+                                      showMonthYearPicker(
+                                              context: context,
+                                              initialDate: selected,
+                                              firstDate: DateTime(2023),
+                                              lastDate: DateTime.now())
+                                          .then(
+                                        (value) {
+                                          if (value != null) {
+                                            monthfilter.text =
+                                                value.formatMonthYear();
+                                            setState(() {
+                                              selected = value;
+                                            });
+                                          }
+                                        },
+                                      );
+                                    },
+                                    child: TextField(
+                                      // enabled: false,
+
+                                      readOnly: true,
+                                      decoration: InputDecoration(
+                                          label: Text('Bulan'),
+                                          disabledBorder:
+                                              UnderlineInputBorder()),
+                                      controller: monthfilter,
+                                    ),
+                                  ),
+                                ),
+                                Padding(padding: EdgeInsetsGeometry.all(8)),
+                                ElevatedButton(
+                                    onPressed: () {}, child: Text('Ok'))
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // ElevatedButton(
+              //     onPressed: () async {
+              //       // var after =
+              //       //     await RepositoryProvider.of<StrukRepository>(context)
+              //       //         .readAllStruk();
+              //     },
+              //     child: const Text('press me!')),
             ],
           ),
         ),
@@ -114,233 +193,255 @@ class HistoriStruk extends StatelessWidget {
 
 class DisplayStruk extends StatelessWidget {
   final UseStrukState data;
-  const DisplayStruk({required this.data, super.key});
+  final bool viewonly;
+  const DisplayStruk({required this.data, super.key, this.viewonly = false});
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: Padding(
-        padding: EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      'Struk',
-                      textAlign: TextAlign.center,
-                      textScaler: TextScaler.linear(1.5),
-                    )),
-                    InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(Icons.close))
-                  ],
-                ),
-              ),
-              Text('Id : ${data.strukId}'),
-              FutureBuilder(
-                future: RepositoryProvider.of<KaryawanAuthRepo>(context)
-                    .getAllKaryawan(data.karyawanId),
-                builder: (context, snapshot) {
-                  if (!(snapshot.connectionState == ConnectionState.done)) {
-                    return CircularProgressIndicator();
-                  }
-                  return snapshot.hasData
-                      ? Text(snapshot.data['name'])
-                      : Text('Id : ${data.karyawanId}');
-                },
-              ),
-              // Text(data.karyawanId),
-              Row(
-                children: [
-                  Text(data.ordertime.formatLengkap()),
-                  Text(data.ordertime.clockOnly()),
-                ],
-              ),
-              Padding(padding: EdgeInsetsGeometry.all(12)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: StrukDataTable(
-                      data: data,
-                    ),
-                  ),
-                ],
-              ),
-              // for (var i = 0; i < data.orderItems.length; i++)
-              //   Padding(
-              //     padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              //     child: Row(
-              //       mainAxisSize: MainAxisSize.max,
-              //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-              //       spacing: 2,
-              //       children: [
-              //         Expanded(flex: 4, child: Text(data.orderItems[i].title)),
-              //         Expanded(
-              //             flex: 2,
-              //             child: Text(
-              //               data.orderItems[i].price.numberFormatCurrency,
-              //               textAlign: TextAlign.end,
-              //             )),
-              //         Expanded(
-              //             flex: 1,
-              //             child: Text(
-              //               '${data.orderItems[i].count}',
-              //               textAlign: TextAlign.end,
-              //             )),
-              //         Expanded(
-              //             flex: 2,
-              //             child: Text(
-              //               (data.orderItems[i].count *
-              //                       data.orderItems[i].price)
-              //                   .numberFormatCurrency,
-              //               textAlign: TextAlign.end,
-              //             )),
-              //       ],
-              //     ),
-              //   ),
-              Padding(
-                padding: const EdgeInsets.only(top: 12.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      'Nomor meja : ${data.nomorMeja == 0 ? 'Tanpa Meja' : data.nomorMeja}',
-                      textAlign: TextAlign.end,
-                    )),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      'Pembayaran : ${data.tipePembayaran}',
-                      textAlign: TextAlign.end,
-                    )),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: Text(
-                      'Total : ${data.orderItems.fold(
-                            0,
-                            (previousValue, element) =>
-                                previousValue + (element.count * element.price),
-                          ).numberFormatCurrency}',
-                      textAlign: TextAlign.end,
-                    )),
-                  ],
-                ),
-              ), // BlocBuilder<AntrianBloc, AntrianState>(
-              //   builder: (context, state) {
-              //     return Text(state.antrianStruks.toString());
-              //   },
-              // ),
-              // Expanded(child: Container()),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  MenuAnchor(
-                    menuChildren: [
-                      SubmenuButton(menuChildren: [
-                        MenuItemButton(
-                          child: Text('Salah Input'),
-                          onPressed: () {
-                            BlocProvider.of<AntrianBloc>(context)
-                                .add(Delete(data, reason: 'Salah Input'));
+    return BlocListener<AntrianBloc, AntrianState>(
+      listenWhen: (previous, current) => previous.msg != current.msg,
+      listener: (context, state) {
+        Navigator.pop(context);
+      },
+      child: Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        'Struk',
+                        textAlign: TextAlign.center,
+                        textScaler: TextScaler.linear(1.5),
+                      )),
+                      InkWell(
+                          onTap: () {
                             Navigator.pop(context);
                           },
-                        ),
-                        MenuItemButton(
-                          child: Text('Lain-lain'),
-                          onPressed: () {
-                            BlocProvider.of<AntrianBloc>(context)
-                                .add(Delete(data, reason: 'Lain-lain'));
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ], child: Text('Belum Dibuat')),
-                      SubmenuButton(menuChildren: [
-                        MenuItemButton(
-                          child: Text('Salah Input'),
-                          onPressed: () {},
-                        ),
-                        MenuItemButton(
-                          child: Text('Batal beli,uang kembali'),
-                          onPressed: () {},
-                        ),
-                        MenuItemButton(
-                          child: Text('data3'),
-                          onPressed: () {},
-                        )
-                      ], child: Text('Sudah/sedang Dibuat')),
+                          child: Icon(Icons.close))
                     ],
-                    builder: (context, controller, child) => ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(Colors.red),
-                          foregroundColor: WidgetStatePropertyAll(Colors.white),
-                        ),
-                        onPressed: () {
-                          if (controller.isOpen) {
-                            controller.close();
-                          } else {
-                            controller.open();
-                          }
-                        },
-                        onLongPress: () {
-                          BlocProvider.of<AntrianBloc>(context)
-                              .add(Delete(data, reason: ''));
-                          Navigator.pop(context);
-                        },
-                        child: Text('Batalkan Pesanan.')),
                   ),
-                  // GestureDetector(
-                  //   onLongPressStart: (details) => debugPrint(details),
-                  //   child:
-                  // ),
-                  // PrintWidget(
-                  //   theData: data,
-                  // ),
-                  // ElevatedButton.icon(
-                  //   style: ButtonStyle(
-                  //     backgroundColor: WidgetStatePropertyAll(Colors.blue),
-                  //     foregroundColor: WidgetStatePropertyAll(Colors.white),
-                  //   ),
-                  //   onPressed: () {},
-                  //   label: Text('Print'),
-                  //   icon: Icon(Icons.print_outlined),
-                  // ),
-                  ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.green),
-                        foregroundColor: WidgetStatePropertyAll(Colors.white),
+                ),
+                Text('Id : ${data.strukId}'),
+                FutureBuilder(
+                  future: RepositoryProvider.of<KaryawanAuthRepo>(context)
+                      .getAllKaryawan(data.karyawanId),
+                  builder: (context, snapshot) {
+                    if (!(snapshot.connectionState == ConnectionState.done)) {
+                      return CircularProgressIndicator();
+                    }
+                    return snapshot.hasData
+                        ? Text(snapshot.data['name'])
+                        : Text('Id : ${data.karyawanId}');
+                  },
+                ),
+                // Text(data.karyawanId),
+                Row(
+                  children: [
+                    Text(data.ordertime.formatLengkap()),
+                    Text(data.ordertime.clockOnly()),
+                  ],
+                ),
+                Padding(padding: EdgeInsetsGeometry.all(12)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: StrukDataTable(
+                        data: data,
                       ),
-                      onPressed: () {
-                        BlocProvider.of<AntrianBloc>(context)
-                            .add(OrderFinish(data.strukId!));
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 12.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        'Nomor meja : ${data.nomorMeja == 0 ? 'Tanpa Meja' : data.nomorMeja}',
+                        textAlign: TextAlign.end,
+                      )),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        'Pembayaran : ${data.tipePembayaran}',
+                        textAlign: TextAlign.end,
+                      )),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        'Total : ${data.orderItems.fold(
+                              0,
+                              (previousValue, element) =>
+                                  previousValue +
+                                  (element.count * element.price) +
+                                  element.submenues.fold(
+                                    0,
+                                    (prevValue, ele) =>
+                                        prevValue +
+                                        (ele.adjustHarga * element.count),
+                                  ),
+                            ).numberFormatCurrency}',
+                        textAlign: TextAlign.end,
+                      )),
+                    ],
+                  ),
+                ), // BlocBuilder<AntrianBloc, AntrianState>(
+                //   builder: (context, state) {
+                //     return Text(state.antrianStruks.toString());
+                //   },
+                // ),
+                // Expanded(child: Container()),
+                if (viewonly == false)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      MenuAnchor(
+                        menuChildren: [
+                          SubmenuButton(menuChildren: [
+                            MenuItemButton(
+                              child: Text('Salah Input'),
+                              onPressed: () {
+                                BlocProvider.of<AntrianBloc>(context)
+                                    .add(Delete(data, reason: 'Salah Input'));
+                                Navigator.pop(context);
+                              },
+                            ),
+                            MenuItemButton(
+                              child: Text('Lain-lain'),
+                              onPressed: () {
+                                BlocProvider.of<AntrianBloc>(context)
+                                    .add(Delete(data, reason: 'Lain-lain'));
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ], child: Text('Belum Dibuat')),
+                          SubmenuButton(menuChildren: [
+                            MenuItemButton(
+                              child: Text('Salah Input'),
+                              onPressed: () {},
+                            ),
+                            MenuItemButton(
+                              child: Text('Batal beli,uang kembali'),
+                              onPressed: () {},
+                            ),
+                            MenuItemButton(
+                              child: Text('data3'),
+                              onPressed: () {},
+                            )
+                          ], child: Text('Sudah/sedang Dibuat')),
+                        ],
+                        builder: (context, controller, child) => ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStatePropertyAll(Colors.red),
+                              foregroundColor:
+                                  WidgetStatePropertyAll(Colors.white),
+                            ),
+                            onPressed: () {
+                              if (controller.isOpen) {
+                                controller.close();
+                              } else {
+                                controller.open();
+                              }
+                            },
+                            onLongPress: () {
+                              BlocProvider.of<AntrianBloc>(context)
+                                  .add(Delete(data, reason: ''));
+                              Navigator.pop(context);
+                            },
+                            child: Text('Batalkan Pesanan.')),
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  foregroundColor: Colors.white),
+                              onPressed: () async {
+                                if (await PrintBluetoothThermal
+                                    .connectionStatus) {
+                                  var ticket = await StrukPrint.printStruk(
+                                      data, context);
 
-                        Navigator.pop(context);
-                        //change to pop on listener
-                      },
-                      child: Text('Selesaikan Pesanan.')),
-                ],
-              )
-            ],
+                                  await PrintBluetoothThermal.writeBytes(
+                                      ticket);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'no connection to printer')));
+                                }
+                              },
+                              icon: Icon(Icons.print_rounded),
+                              label: Text('Print')),
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  backgroundColor: Colors.blue.shade900),
+                              onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PrintWidgetSetting(),
+                                  )),
+                              child: Icon(Icons.settings)),
+                        ],
+                      ),
+                      // GestureDetector(
+                      //   onLongPressStart: (details) => debugPrint(details),
+                      //   child:
+                      // ),
+                      // PrintWidget(
+                      //   theData: data,
+                      // ),
+                      // ElevatedButton.icon(
+                      //   style: ButtonStyle(
+                      //     backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                      //     foregroundColor: WidgetStatePropertyAll(Colors.white),
+                      //   ),
+                      //   onPressed: () {},
+                      //   label: Text('Print'),
+                      //   icon: Icon(Icons.print_outlined),
+                      // ),
+                      ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStatePropertyAll(Colors.green),
+                            foregroundColor:
+                                WidgetStatePropertyAll(Colors.white),
+                          ),
+                          onPressed: () {
+                            BlocProvider.of<AntrianBloc>(context)
+                                .add(OrderFinish(data.strukId!));
+
+                            //change to pop on listener
+                          },
+                          child: Text('Selesaikan Pesanan.')),
+                    ],
+                  )
+              ],
+            ),
           ),
         ),
       ),
@@ -348,282 +449,131 @@ class DisplayStruk extends StatelessWidget {
   }
 }
 
-// class PrintWidget extends StatefulWidget {
-//   final UseStrukState theData;
-//   const PrintWidget({super.key, required this.theData});
+class StrukPrint {
+  static Future<List<int>> printStruk(
+      UseStrukState data, BuildContext context) async {
+    List<int> bytes = [];
+    // Using default profile
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm58, profile);
+    var datakaryawan = await RepositoryProvider.of<KaryawanAuthRepo>(context)
+        .getAllKaryawan(data.karyawanId);
+    //bytes += generator.setGlobalFont(PosFontType.fontA);
+    bytes += generator.reset();
 
-//   @override
-//   State<PrintWidget> createState() => _PrintWidgetState();
-// }
+    bytes += generator.text('Nama Toko',
+        styles: const PosStyles(
+            align: PosAlign.center,
+            width: PosTextSize.size2,
+            height: PosTextSize.size2));
+    bytes += generator.text('Jl. Gajahmada no.xx',
+        styles: const PosStyles(
+          align: PosAlign.center,
+        ));
 
-// class _PrintWidgetState extends State<PrintWidget> {
-//   FlutterThermalPrinter printerPlugin = FlutterThermalPrinter.instance;
-//   List<Printer> _devices = [];
+    bytes += generator.feed(2);
+    bytes += generator.text('No. meja: ${data.nomorMeja}',
+        styles: const PosStyles(
+          align: PosAlign.left,
+          fontType: PosFontType.fontB,
+        ));
+    bytes += generator.text('Id: ${data.strukId}',
+        styles: const PosStyles(
+          align: PosAlign.left,
+          fontType: PosFontType.fontB,
+        ));
+    bytes += generator.text('Karyawan: ${datakaryawan['name']}',
+        styles: const PosStyles(
+          align: PosAlign.left,
+          fontType: PosFontType.fontB,
+        ));
+    bytes += generator.row([
+      PosColumn(
+        text: data.ordertime.formatLengkap(),
+        width: 6,
+        styles:
+            const PosStyles(align: PosAlign.left, fontType: PosFontType.fontB),
+      ),
+      PosColumn(
+        text: data.ordertime.clockOnly(),
+        width: 3,
+        styles:
+            const PosStyles(align: PosAlign.right, fontType: PosFontType.fontB),
+      ),
+    ]);
+    bytes += generator.feed(2);
+    for (var i = 0; i < data.orderItems.length; i++) {
+      bytes += generator.row([
+        PosColumn(
+          text: data.orderItems[i].title,
+          width: 6,
+          styles: const PosStyles(
+              align: PosAlign.left, fontType: PosFontType.fontB),
+        ),
+        PosColumn(
+          text: data.orderItems[i].count.toString(),
+          width: 2,
+          styles: const PosStyles(align: PosAlign.center),
+        ),
+        PosColumn(
+          text: (data.orderItems[i].price * data.orderItems[i].count)
+              .numberFormat(),
+          width: 3,
+          styles: const PosStyles(align: PosAlign.right),
+        ),
+      ]);
+      for (var e in data.orderItems[i].submenues) {
+        bytes += generator.row([
+          PosColumn(
+            text: '-${e.title}',
+            width: 6,
+            styles: const PosStyles(
+              align: PosAlign.left,
+              fontType: PosFontType.fontB,
+            ),
+          ),
+          PosColumn(
+            text: '',
+            width: 3,
+            styles: const PosStyles(align: PosAlign.center),
+          ),
+          PosColumn(
+            text: (e.adjustHarga * data.orderItems[i].count).numberFormat(),
+            width: 3,
+            styles: const PosStyles(align: PosAlign.right),
+          ),
+        ]);
+      }
+    }
+    bytes += generator.feed(1);
+    bytes += generator.text(
+        'Total : ${data.orderItems.fold(
+              0,
+              (previousValue, element) =>
+                  previousValue +
+                  (element.count * element.price) +
+                  element.submenues.fold(
+                    0,
+                    (prevValue, ele) =>
+                        prevValue + (ele.adjustHarga * element.count),
+                  ),
+            ).numberFormatCurrency}',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            fontType: PosFontType.fontA,
+            width: PosTextSize.size1,
+            height: PosTextSize.size1));
+    bytes += generator.feed(2);
+    bytes += generator.text('Terimakasi',
+        styles: const PosStyles(
+          align: PosAlign.center,
+        ));
 
-//   // List<DropdownMenuItem<BluetoothDevice>> getDeviceItems() {
-//   //   List<DropdownMenuItem<BluetoothDevice>> items = [];
-//   //   if (_devices.isEmpty) {
-//   //     items.add(const DropdownMenuItem(
-//   //       value: null,
-//   //       child: Text('NONE'),
-//   //     ));
-//   //   } else {
-//   //     for (var device in _devices) {
-//   //       items.add(DropdownMenuItem(
-//   //         value: device,
-//   //         child: Text(device.name ?? ""),
-//   //       ));
-//   //     }
-//   //   }
-//   //   return items;
-//   // }
-
-//   StreamSubscription<List<Printer>>? _devicesStreamSubscription;
-//   Printer? connectedDevice;
-//   // Get Printer List
-//   void startScan() async {
-//     _devicesStreamSubscription?.cancel();
-//     await printerPlugin.getPrinters(connectionTypes: [
-//       ConnectionType.USB,
-//       ConnectionType.BLE,
-//     ]);
-//     _devicesStreamSubscription =
-//         printerPlugin.devicesStream.listen((List<Printer> event) {
-//       if (mounted) {
-//         log(event.map((e) => e.name).toList().toString());
-//         if (event.isNotEmpty) {
-//           setState(() {
-//             _devices = event;
-//             _devices.removeWhere(
-//                 (element) => element.name == null || element.name == '');
-//           });
-//         }
-//       }
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     stopScan();
-//     _devicesStreamSubscription?.cancel();
-//     super.dispose();
-//   }
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-//       startScan();
-//     });
-//   }
-
-//   stopScan() {
-//     printerPlugin.stopScan();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     // if (kIsWeb) {
-//     //   return Text('Unsupported p[latform]');
-//     // }
-//     return SizedBox(
-//       // width: 240,
-//       // height: 240,
-//       child: Column(
-//         children: [
-//           Row(
-//             children: [
-//               ElevatedButton(
-//                 onPressed: () {
-//                   // startScan();
-//                   startScan();
-//                 },
-//                 child: const Text('Scan'),
-//               ),
-//               ElevatedButton(
-//                 onPressed: () async {
-//                   if (connectedDevice != null) {
-//                     await printerPlugin.printWidget(context,
-//                         printer: connectedDevice!,
-//                         printOnBle: true,
-//                         widget: receiptWidget(
-//                           connectedDevice!.connectionTypeString,
-//                         ));
-//                   }
-//                   // startScan();
-//                   // stopScan();
-//                 },
-//                 style: ButtonStyle(
-//                   backgroundColor: WidgetStatePropertyAll(
-//                       (connectedDevice?.isConnected ?? false)
-//                           ? Colors.green
-//                           : Colors.red),
-//                   foregroundColor: WidgetStatePropertyAll(Colors.white),
-//                 ),
-//                 child: const Text('Print'),
-//               ),
-//             ],
-//           ),
-//           Row(
-//             children: [
-//               DropdownButton(
-//                 value: connectedDevice,
-//                 onChanged: (value) {
-//                   setState(() {
-//                     connectedDevice = value;
-//                   });
-//                   debugPrint(value);
-//                 },
-//                 items: [
-//                   for (var index = 0; index < _devices.length; index++)
-//                     DropdownMenuItem(
-//                         value: _devices[index],
-//                         onTap: () async {
-//                           if (_devices[index].isConnected ?? false) {
-//                             await printerPlugin.disconnect(_devices[index]);
-//                           } else {
-//                             await printerPlugin.connect(_devices[index]).then(
-//                                   (value) => setState(() {}),
-//                                 );
-//                           }
-//                         },
-//                         child: Text(_devices[index].name ?? 'No Name'))
-//                 ],
-//               ),
-
-//               // ListTile(
-//               //   onTap: () async {
-//               //     if (_devices[index].isConnected ?? false) {
-//               //       await printerPlugin.disconnect(_devices[index]);
-//               //     } else {
-//               //       await printerPlugin.connect(_devices[index]);
-//               //     }
-//               //   },
-//               //   title: Text(_devices[index].name ?? 'No Name'),
-//               //   subtitle: Text("Connected: ${_devices[index].isConnected}"),
-//               //   trailing: IconButton(
-//               //     icon: const Icon(Icons.connect_without_contact),
-//               //     onPressed: () async {
-//               //       await printerPlugin.printWidget(
-//               //         context,
-//               //         printer: _devices[index],
-//               //         printOnBle: true,
-//               //         widget: receiptWidget(
-//               //           _devices[index].connectionTypeString,
-//               //         ),
-//               //       );
-//               //     },
-//               //   ),
-//               // )
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-
-//     // ElevatedButton(
-//     //     style: ElevatedButton.styleFrom(
-//     //         backgroundColor: Colors.green.shade800),
-//     //     onPressed: () {
-//     //       printThermal(widget.theData);
-//     //       // generatePDF(false, theData);
-//     //     },
-//     //     child: const Row(
-//     //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//     //       children: [
-//     //         Icon(
-//     //           Icons.print,
-//     //           color: Colors.white,
-//     //         ),
-//     //         Text(
-//     //           'Print Bluetooth',
-//     //           style: TextStyle(color: Colors.white),
-//     //         ),
-//     //       ],
-//     //     )),
-//   }
-
-//   Future<List<int>> _generateReceipt() async {
-//     final profile = await CapabilityProfile.load();
-//     final generator = Generator(PaperSize.mm80, profile);
-//     List<int> bytes = [];
-//     bytes += generator.text(
-//       "Teste Network print",
-//       styles: const PosStyles(
-//         bold: true,
-//         height: PosTextSize.size3,
-//         width: PosTextSize.size3,
-//       ),
-//     );
-//     bytes += generator.cut();
-//     return bytes;
-//   }
-
-//   Widget receiptWidget(String printerType) {
-//     return SizedBox(
-//       width: 550,
-//       child: Material(
-//         child: Padding(
-//           padding: const EdgeInsets.all(16.0),
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               const Center(
-//                 child: Text(
-//                   'FLUTTER THERMAL PRINTER',
-//                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//                 ),
-//               ),
-//               const Divider(thickness: 2),
-//               const SizedBox(height: 10),
-//               _buildReceiptRow('Item', 'Price'),
-//               const Divider(),
-//               _buildReceiptRow('Apple', '\$1.00'),
-//               _buildReceiptRow('Banana', '\$0.50'),
-//               _buildReceiptRow('Orange', '\$0.75'),
-//               const Divider(thickness: 2),
-//               _buildReceiptRow('Total', '\$2.25', isBold: true),
-//               const SizedBox(height: 20),
-//               _buildReceiptRow('Printer Type', printerType),
-//               const SizedBox(height: 50),
-//               const Center(
-//                 child: Text(
-//                   'Thank you for your purchase!',
-//                   style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildReceiptRow(String leftText, String rightText,
-//       {bool isBold = false}) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 4.0),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//         children: [
-//           Text(
-//             leftText,
-//             style: TextStyle(
-//                 fontSize: 16,
-//                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
-//           ),
-//           Text(
-//             rightText,
-//             style: TextStyle(
-//                 fontSize: 16,
-//                 fontWeight: isBold ? FontWeight.bold : FontWeight.normal),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+    bytes += generator.qrcode('instagram.com/groom_barbershop_pare');
+    bytes += generator.feed(3);
+    return bytes;
+  }
+}
 
 class StrukDataTable extends StatefulWidget {
   final UseStrukState data;
@@ -646,6 +596,7 @@ class _StrukDataTableState extends State<StrukDataTable> {
   Widget build(BuildContext context) {
     return DataTable(
       sortAscending: sort,
+      dataRowMaxHeight: double.infinity,
       sortColumnIndex: 0,
       columns: <DataColumn>[
         DataColumn(
@@ -690,24 +641,82 @@ class _StrukDataTableState extends State<StrukDataTable> {
             cells: <DataCell>[
               DataCell(Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Text(statedData.orderItems[i].title),
-                  if (statedData.orderItems[i].catatan != null)
-                    Text(
-                      statedData.orderItems[i].catatan ?? "",
-                      style: TextStyle(fontSize: 8),
+                      Text(statedData.orderItems[i].title),
+                      // if (statedData.orderItems[i].catatan != null)
+                      //   Text(
+                      //     statedData.orderItems[i].catatan ?? "",
+                      //     style: TextStyle(fontSize: 8),
+                      //   ),
+                    ] +
+                    List.generate(
+                      statedData.orderItems[i].submenues.length,
+                      (index) => Text(
+                        statedData.orderItems[i].submenues[index].title,
+                        textScaler: TextScaler.linear(0.8),
+                      ),
                     ),
+              )),
+              DataCell(Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                // mainAxisSize: MainAxisSize.max,
+                children: [
+                  Text(statedData.orderItems[i].count.toString()),
                 ],
               )),
-              DataCell(Text(statedData.orderItems[i].count.toString())),
-              DataCell(Text(
-                  statedData.orderItems[i].price.numberFormat(currency: true))),
-              DataCell(Text(
-                (statedData.orderItems[i].count *
-                        statedData.orderItems[i].price)
-                    .numberFormat(currency: true),
-                textAlign: TextAlign.end,
+              DataCell(Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                      Text(
+                        statedData.orderItems[i].price
+                            .numberFormat(currency: true),
+                        textAlign: TextAlign.end,
+                      ),
+                    ] +
+                    List.generate(
+                      statedData.orderItems[i].submenues.length,
+                      (index) => Text(
+                        statedData.orderItems[i].submenues[index].adjustHarga
+                            .numberFormat(),
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+              )),
+              DataCell(Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                      Builder(builder: (context) {
+                        var itemtotal = (statedData.orderItems[i].count *
+                            statedData.orderItems[i].price);
+                        for (var e in statedData.orderItems[i].submenues) {
+                          itemtotal +=
+                              e.adjustHarga * statedData.orderItems[i].count;
+                        }
+                        return Text(
+                          itemtotal.numberFormat(currency: true),
+                          textAlign: TextAlign.end,
+                        );
+                      }),
+                    ] +
+                    List<Widget>.generate(
+                      statedData.orderItems[i].submenues.length,
+                      (index) {
+                        // if (index ==
+                        //     statedData.orderItems[i].submenues.length) {
+                        //   return Text('total');
+                        // }
+                        return Text('');
+                        //   return Text(
+                        //   statedData.orderItems[i].submenues[index].adjustHarga
+                        //       .numberFormat(),
+                        //   textAlign: TextAlign.end,
+                        // );
+                      },
+                    ),
               )),
               // DataCell(Text('19')),
               // DataCell(Text('Student')),

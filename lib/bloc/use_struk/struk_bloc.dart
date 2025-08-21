@@ -26,13 +26,13 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
     on<AddSubmenu>((event, emit) {
       var cursubmenues = state.orderItems
           .singleWhere(
-            (element) => element.title == event.item.title,
+            (element) => element.cardId == event.item.cardId,
           )
           .submenues
           .toList();
       cursubmenues.add(event.submenu);
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
-          .map((e) => e.title == event.item.title
+          .map((e) => e.cardId == event.item.cardId
               ? e.copywith(submenues: cursubmenues)
               : e)
           .toList();
@@ -41,7 +41,7 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
     });
     on<DeleteSubmenu>((event, emit) {
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
-          .map((e) => e.title == event.item.title
+          .map((e) => e.cardId == event.item.cardId
               ? e.copywith(
                   submenues: e.submenues
                       .map(
@@ -58,32 +58,34 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
     });
     on<IncreaseCount>((event, emit) async {
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
-          .map((e) =>
-              e.title == event.item.title ? e.copywith(count: e.count + 1) : e)
+          .map((e) => e.cardId == event.item.cardId
+              ? e.copywith(count: e.count + 1)
+              : e)
           .toList();
       emit(state.copywith(orderItems: newlist));
     });
     on<ChangeCount>((event, emit) async {
       List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
-          .map((e) =>
-              e.title == event.item.title ? e.copywith(count: event.count) : e)
+          .map((e) => e.cardId == event.item.cardId
+              ? e.copywith(count: event.count)
+              : e)
           .toList();
       emit(state.copywith(orderItems: newlist));
     });
     on<DecreaseCount>((event, emit) async {
       if (state.orderItems
-                  .singleWhere((e) => e.title == event.item.title)
+                  .singleWhere((e) => e.cardId == event.item.cardId)
                   .count -
               1 <=
           0) {
         List<StrukItem> newlist = List<StrukItem>.from(state.orderItems);
         newlist.removeWhere((element) =>
-            element.title ==
-            event.item.title); //Plz change to id after db created///maybe not
+            element.cardId ==
+            event.item.cardId); //Plz change to id after db created///maybe not
         emit(state.copywith(orderItems: newlist));
       } else {
         List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
-            .map((e) => e.title == event.item.title
+            .map((e) => e.cardId == event.item.cardId
                 ? e.copywith(count: e.count - 1)
                 : e)
             .toList();
@@ -91,14 +93,16 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       }
     });
     on<AddOrderitems>((event, emit) async {
-      List<StrukItem> newlist = List<StrukItem>.from(state.orderItems)
-          // .map((e) => StrukItem(
-          //     title: e.title, count: e.count, price: e.price, id: e.id))
-          .toList();
+      List<StrukItem> newlist = List<StrukItem>.from(state.orderItems).toList();
       StrukError error = StrukError.empty();
-      !(newlist.every((element) => element.title != event.item.title))
-          ? error = StrukError.existed(event.item)
-          : newlist.add(event.item.copywith(count: 1));
+      int increment = newlist.isEmpty ? 0 : newlist.last.cardId;
+      newlist.add(event.item.copywith(count: 1, cardId: increment + 1));
+
+      ///old logic, dont delete.
+      // !(newlist.every((element) => element.title != event.item.title))
+      //     ? error = StrukError.existed(event.item)
+      //     : newlist.add(event.item.copywith(count: 1));
+      ///-----------=====---------
       emit(state.copywith(orderItems: newlist, error: error));
 
       ///Use Color animation on highlight!

@@ -31,6 +31,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
   late TextEditingController deskripsi;
   String imgdir = '';
   late TextEditingController hargaC;
+  GlobalKey<FormState> formkey = GlobalKey<FormState>();
   List<String> category = [];
   @override
   void initState() {
@@ -65,43 +66,58 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                 // debugPrint(state);
                 return ElevatedButton(
                     onPressed: () {
-                      int? hargaInt = int.tryParse(hargaC.text);
-                      if (namaMenuC.text.length > 3 && hargaInt != null) {
-                        var ingredients = state.ingredients;
-                        var menuitem = MenuItems(
-                          submenues: state.submenu,
-                          ingredientItems: ingredients,
-                          title: namaMenuC.text,
-                          description: deskripsi.text,
-                          imgDir: imgdir,
-                          price: hargaInt,
-                          categories: category,
-                        );
-                        debugPrint(menuitem.toString());
-                        if (widget.editmode) {
-                          if (!kIsWeb) {
-                            if (imgdir.isNotEmpty) {
-                              var pickedfile = File(imgdir);
-                              getApplicationDocumentsDirectory().then((value) {
-                                var copytodir = File(p.join(value.path,
-                                    'imgres/${p.basename(imgdir)}'));
-                                debugPrint(copytodir.path);
-                                copytodir.create(recursive: true).then((value) {
-                                  value.writeAsBytesSync(
-                                      pickedfile.readAsBytesSync());
+                      if (formkey.currentState?.validate() ?? false) {
+                        int? hargaInt = int.tryParse(hargaC.text);
+                        if (namaMenuC.text.length > 3 && hargaInt != null) {
+                          var ingredients = state.ingredients;
+                          if (ingredients.any(
+                            (element) => element.id == null,
+                          )) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text(
+                                    'Nama bahanbaku jangan di-edit setelah memilih')));
+                            throw Exception('Nama bahanbaku jangan diedit');
+                          }
+                          var menuitem = MenuItems(
+                            submenues: state.submenu,
+                            ingredientItems: ingredients,
+                            title: namaMenuC.text,
+                            description: deskripsi.text,
+                            imgDir: imgdir,
+                            price: hargaInt,
+                            categories: category,
+                          );
+
+                          if (widget.editmode) {
+                            if (!kIsWeb) {
+                              if (imgdir.isNotEmpty) {
+                                var pickedfile = File(imgdir);
+                                getApplicationDocumentsDirectory()
+                                    .then((value) {
+                                  var copytodir = File(p.join(value.path,
+                                      'imgres/${p.basename(imgdir)}'));
+                                  debugPrint(copytodir.path);
+                                  copytodir
+                                      .create(recursive: true)
+                                      .then((value) {
+                                    value.writeAsBytesSync(
+                                        pickedfile.readAsBytesSync());
+                                  });
                                 });
-                              });
-                            }
-                          } else if (kIsWasm) {}
-                          BlocProvider.of<MenuBloc>(context).add(EditMenu(
-                              menuitem.copywith(id: widget.menudata!.id)));
-                          BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
-                          Navigator.pop(context);
-                        } else {
-                          BlocProvider.of<MenuBloc>(context)
-                              .add(AddMenu(menuitem));
-                          BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
-                          Navigator.pop(context);
+                              }
+                            } else if (kIsWasm) {}
+                            BlocProvider.of<MenuBloc>(context).add(EditMenu(
+                                menuitem.copywith(id: widget.menudata!.id)));
+                            BlocProvider.of<t.TopbarBloc>(context)
+                                .add(t.Init());
+                            Navigator.pop(context);
+                          } else {
+                            BlocProvider.of<MenuBloc>(context)
+                                .add(AddMenu(menuitem));
+                            BlocProvider.of<t.TopbarBloc>(context)
+                                .add(t.Init());
+                            Navigator.pop(context);
+                          }
                         }
                       }
                     },
@@ -132,111 +148,48 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                   Expanded(
                       child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Tag :',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      FutureBuilder(
-                          future:
-                              RepositoryProvider.of<MenuItemRepository>(context)
-                                  .getCategories(),
-                          builder: (context, snapshot) {
-                            if (snapshot.data == null) {
-                              return const Text('Empty:null');
-                            }
-                            return Wrap(
-                                children: List.generate(
-                                    category.length + 1,
-                                    (index) => index < category.length
-                                        ? Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 4.0),
-                                            child: Chip(
-                                                onDeleted: () {
-                                                  setState(() {
-                                                    category.remove(
-                                                        category[index]);
-                                                  });
-                                                },
-                                                labelPadding: EdgeInsets.zero,
-                                                label: Text(
-                                                  category[index].firstUpcase,
-                                                  style: const TextStyle(
-                                                      fontSize: 12),
-                                                )),
-                                          )
-                                        : PopupMenuButton(
-                                            onSelected: (value) {
-                                              setState(() {
-                                                category.contains(value)
-                                                    ? null
-                                                    : category.add(value);
-                                              });
-                                            },
-                                            itemBuilder: (context) =>
-                                                List.generate(
-                                                    snapshot.data!.length,
-                                                    (i) => PopupMenuItem(
-                                                        value:
-                                                            snapshot.data![i],
-                                                        child: Text(snapshot
-                                                            .data![i]
-                                                            .firstUpcase))),
-                                            child: const Chip(
-                                                labelPadding: EdgeInsets.zero,
-                                                label: Text('+')),
-                                          )));
-                          }),
-                    ],
+                    children: [],
                   )),
                 ],
               ),
               Expanded(
                 child: BlocBuilder<MenueditCubit, MenueditState>(
                   builder: (context, state) {
-                    return Column(
-                      // mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            const Padding(padding: EdgeInsets.all(4)),
-                            SizedBox(
-                                width: 250,
-                                child: TextField(
-                                  controller: namaMenuC,
-                                  decoration: const InputDecoration(
-                                      label: Text('Nama menu')),
-                                )),
-                            const Padding(padding: EdgeInsets.all(4)),
-                            SizedBox(
-                                width: 250,
-                                child: TextField(
-                                  controller: hargaC,
-                                  keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                      label: Text('Harga')),
-                                )),
-                            const Padding(padding: EdgeInsets.all(4)),
-                            Expanded(
-                              child: (imgdir.isEmpty)
-                                  ? ElevatedButton.icon(
-                                      onPressed: () async {
-                                        var a = await ImagePicker().pickImage(
-                                            source: ImageSource.gallery);
-                                        if (a != null) {
-                                          setState(() {
-                                            imgdir = a.path;
-                                          });
-                                        }
-                                      },
-                                      icon:
-                                          const Icon(Icons.camera_alt_outlined),
-                                      label: const Text('Gambar'))
-                                  : SizedBox(
-                                      height: 110,
-                                      child: InkWell(
-                                        onTap: () async {
+                    return Form(
+                      key: formkey,
+                      child: Column(
+                        // mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              const Padding(padding: EdgeInsets.all(4)),
+                              SizedBox(
+                                  width: 250,
+                                  child: TextFormField(
+                                    controller: namaMenuC,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: usernameValidator,
+                                    decoration: const InputDecoration(
+                                        label: Text('Nama menu')),
+                                  )),
+                              const Padding(padding: EdgeInsets.all(4)),
+                              SizedBox(
+                                  width: 250,
+                                  child: TextFormField(
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    controller: hargaC,
+                                    validator: numberValidator,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                        label: Text('Harga')),
+                                  )),
+                              const Padding(padding: EdgeInsets.all(4)),
+                              Expanded(
+                                child: (imgdir.isEmpty)
+                                    ? ElevatedButton.icon(
+                                        onPressed: () async {
                                           var a = await ImagePicker().pickImage(
                                               source: ImageSource.gallery);
                                           if (a != null) {
@@ -245,103 +198,244 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                                             });
                                           }
                                         },
-                                        child: (!kIsWasm || !kIsWeb)
-                                            ? const Icon(
-                                                Icons.camera_alt_outlined)
-                                            : imgdir.contains('assets')
-                                                ? Image.asset(imgdir)
-                                                : Image.file(File(imgdir)),
+                                        icon: const Icon(
+                                            Icons.camera_alt_outlined),
+                                        label: const Text('Gambar'))
+                                    : SizedBox(
+                                        height: 110,
+                                        child: InkWell(
+                                          onTap: () async {
+                                            var a = await ImagePicker()
+                                                .pickImage(
+                                                    source:
+                                                        ImageSource.gallery);
+                                            if (a != null) {
+                                              setState(() {
+                                                imgdir = a.path;
+                                              });
+                                            }
+                                          },
+                                          child: (!kIsWasm || !kIsWeb)
+                                              ? const Icon(
+                                                  Icons.camera_alt_outlined)
+                                              : imgdir.contains('assets')
+                                                  ? Image.asset(imgdir)
+                                                  : Image.file(File(imgdir)),
+                                        ),
                                       ),
-                                    ),
-                            ),
+                              ),
 
-                            // Text('imgField: img'),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: TextFormField(
-                              controller: deskripsi,
-                              decoration:
-                                  InputDecoration(label: Text('Deskripsi')),
-                            ))
-                          ],
-                        ),
-                        Divider(),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Text('Ingredients'),
-                                    Expanded(
-                                        flex: 1,
-                                        child: ListView.builder(
-                                          itemCount:
-                                              state.ingredients.length + 1,
-                                          itemBuilder: (context, index) =>
-                                              index < state.ingredients.length
-                                                  ? IngredientInputRow(
-                                                      key: Key(state
-                                                          .ingredients[index]
-                                                          .incrementindex
-                                                          .toString()),
-                                                      data: state
-                                                          .ingredients[index],
-                                                    )
-                                                  : IconButton(
-                                                      onPressed: () {
-                                                        BlocProvider.of<
-                                                                    MenueditCubit>(
-                                                                context)
-                                                            .addIngredients();
-                                                      },
-                                                      icon: Icon(Icons.add)),
-                                        )),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: VerticalDivider(
-                                  width: 2,
-                                  thickness: 2,
-                                ),
-                              ),
-                              Expanded(
-                                child: Column(
-                                  children: [
-                                    Text('Submenu (${state.submenu.length})'),
-                                    Expanded(
-                                        flex: 1,
-                                        child: ListView.builder(
-                                          itemCount: state.submenu.length + 1,
-                                          itemBuilder: (context, index) =>
-                                              index < state.submenu.length
-                                                  ? SubMenuInputRow(
-                                                      state.submenu[index],
-                                                      key: Key(state
-                                                          .submenu[index].cardId
-                                                          .toString()))
-                                                  : IconButton(
-                                                      onPressed: () {
-                                                        BlocProvider.of<
-                                                                    MenueditCubit>(
-                                                                context)
-                                                            .addSubmenu();
-                                                      },
-                                                      icon: Icon(Icons.add)),
-                                        )),
-                                  ],
-                                ),
-                              )
+                              // Text('imgField: img'),
                             ],
                           ),
-                        )
-                      ],
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  controller: deskripsi,
+                                  decoration:
+                                      InputDecoration(label: Text('Deskripsi')),
+                                ),
+                              )),
+                              Text(
+                                'Tag :',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                              Expanded(
+                                child: FutureBuilder(
+                                    future: RepositoryProvider.of<
+                                            MenuItemRepository>(context)
+                                        .getCategories(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.data == null) {
+                                        return const Text('Empty:null');
+                                      }
+                                      return Wrap(
+                                          children: List.generate(
+                                              category.length + 1,
+                                              (index) => index < category.length
+                                                  ? Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 4.0),
+                                                      child: Chip(
+                                                          onDeleted: () {
+                                                            setState(() {
+                                                              category.remove(
+                                                                  category[
+                                                                      index]);
+                                                            });
+                                                          },
+                                                          labelPadding:
+                                                              EdgeInsets.zero,
+                                                          label: Text(
+                                                            category[index]
+                                                                .firstUpcase,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        12),
+                                                          )),
+                                                    )
+                                                  : PopupMenuButton(
+                                                      onSelected: (value) {
+                                                        setState(() {
+                                                          category.contains(
+                                                                  value)
+                                                              ? null
+                                                              : category
+                                                                  .add(value);
+                                                        });
+                                                      },
+                                                      itemBuilder: (context) =>
+                                                          List.generate(
+                                                              snapshot
+                                                                  .data!.length,
+                                                              (i) => PopupMenuItem(
+                                                                  value: snapshot
+                                                                      .data![i],
+                                                                  child: Text(
+                                                                      snapshot
+                                                                          .data![
+                                                                              i]
+                                                                          .firstUpcase))),
+                                                      child: const Chip(
+                                                          labelPadding:
+                                                              EdgeInsets.zero,
+                                                          label: Text('+')),
+                                                    )));
+                                    }),
+                              ),
+                            ],
+                          ),
+                          Divider(),
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Text('Ingredients'),
+                                      Expanded(
+                                          flex: 1,
+                                          child: ListView.builder(
+                                            itemCount:
+                                                state.ingredients.length + 1,
+                                            itemBuilder: (context, index) =>
+                                                index < state.ingredients.length
+                                                    ? Row(
+                                                        children: [
+                                                          Text((index + 1)
+                                                                  .toString() +
+                                                              '.'),
+                                                          Expanded(
+                                                            child:
+                                                                IngredientInputRow(
+                                                              key: Key(state
+                                                                  .ingredients[
+                                                                      index]
+                                                                  .incrementindex
+                                                                  .toString()),
+                                                              data: state
+                                                                      .ingredients[
+                                                                  index],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                                    : Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(top: 8.0),
+                                                        child:
+                                                            IconButton.filled(
+                                                                onPressed: () {
+                                                                  BlocProvider.of<
+                                                                              MenueditCubit>(
+                                                                          context)
+                                                                      .addIngredients();
+                                                                },
+                                                                icon: Icon(
+                                                                    Icons.add)),
+                                                      ),
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0, vertical: 2),
+                                  child: VerticalDivider(
+                                    width: 2,
+                                    thickness: 2,
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    children: [
+                                      Text('Submenu (${state.submenu.length})'),
+                                      Expanded(
+                                          flex: 1,
+                                          child: ListView.builder(
+                                            itemCount: state.submenu.length + 1,
+                                            itemBuilder: (context, index) =>
+                                                index < state.submenu.length
+                                                    ? Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                bottom: 8.0),
+                                                        child: Row(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(2.0),
+                                                              child: Text(
+                                                                  '${index + 1}.'),
+                                                            ),
+                                                            Expanded(
+                                                              child: SubMenuInputRow(
+                                                                  state.submenu[
+                                                                      index],
+                                                                  key: Key(state
+                                                                      .submenu[
+                                                                          index]
+                                                                      .cardId
+                                                                      .toString())),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )
+                                                    : Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(top: 8.0),
+                                                        child:
+                                                            IconButton.filled(
+                                                                onPressed: () {
+                                                                  BlocProvider.of<
+                                                                              MenueditCubit>(
+                                                                          context)
+                                                                      .addSubmenu();
+                                                                },
+                                                                icon: Icon(
+                                                                    Icons.add)),
+                                                      ),
+                                          )),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     );
                   },
                 ),
@@ -388,6 +482,8 @@ class _IngredientInputRowState extends State<IngredientInputRow> {
     return Row(
       // key: GlobalKey(),
       children: [
+        // Text(widget.data.incrementindex.toString() + '.'),
+        Padding(padding: EdgeInsetsGeometry.all(4)),
         Expanded(flex: 4, child: _NamaInput(data: widget.data, title: title)),
         Padding(padding: EdgeInsetsGeometry.all(8)),
         Expanded(flex: 2, child: _CountInput(data: widget.data, count: count)),
@@ -428,9 +524,10 @@ class _NamaInput extends StatelessWidget {
       builder: (context, controller, focusNode) => TextFormField(
           controller: controller,
           focusNode: focusNode,
+          validator: usernameValidator,
           onChanged: (value) {
-            BlocProvider.of<MenueditCubit>(context)
-                .editIngredients(data: data.copyWith(title: value, id: null));
+            BlocProvider.of<MenueditCubit>(context).editIngredients(
+                data: data.copyWith(title: value, id: () => null));
           },
           decoration: InputDecoration(
             label: Text('Ingredient Name'),
@@ -443,7 +540,11 @@ class _NamaInput extends StatelessWidget {
       onSelected: (value) {
         title.text = value.title;
         BlocProvider.of<MenueditCubit>(context).editIngredients(
-          data: value.copyWith(incrementindex: data.incrementindex, count: 0),
+          data: value.copyWith(
+            incrementindex: data.incrementindex,
+            count: 0,
+            id: () => value.id,
+          ),
         );
       },
       suggestionsCallback: (search) async {
@@ -473,6 +574,7 @@ class _CountInput extends StatelessWidget {
     return TextFormField(
       autovalidateMode: AutovalidateMode.always,
       validator: numberValidator,
+      keyboardType: TextInputType.number,
       onChanged: (value) {
         BlocProvider.of<MenueditCubit>(context).editIngredients(
             data: data.copyWith(count: int.tryParse(value) ?? 0));

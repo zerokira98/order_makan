@@ -97,14 +97,28 @@ class StrukRepository extends _StrukRepo {
             "total_harga": b.data()!.orderItems.fold(
                   0,
                   (previousValue, element) =>
-                      previousValue + (element.count * element.price),
+                      previousValue +
+                      (element.count * element.price) +
+                      element.submenues.fold(
+                        0,
+                        (prevValue, ele) =>
+                            prevValue + (ele.adjustHarga * element.count),
+                      ),
                 )
           });
           for (var e in b.data()!.orderItems) {
             for (var f in e.ingredientItems) {
               var getid = await menuitemrepo.getIngredients(title: f.title);
               transaction.update(menuitemrepo.ingredientRef.doc(getid.first.id),
-                  {'count': FieldValue.increment(-f.count)});
+                  {'count': FieldValue.increment(-(f.count * e.count))});
+            }
+            for (var g in e.submenues) {
+              for (var h in g.adjustIngredient) {
+                var getid = await menuitemrepo.getIngredients(title: h.title);
+                transaction.update(
+                    menuitemrepo.ingredientRef.doc(getid.first.id),
+                    {'count': FieldValue.increment(-(h.count * e.count))});
+              }
             }
           }
           transaction.delete(a);

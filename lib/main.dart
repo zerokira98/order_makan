@@ -9,6 +9,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
+import 'package:order_makan/bloc/notif/notif_cubit.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
@@ -18,6 +19,7 @@ import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart
 import 'package:order_makan/pages/firstrun_setup.dart';
 import 'package:order_makan/pages/karyawan_loginpage.dart';
 import 'package:order_makan/pages/karyawan_signup.dart';
+import 'package:order_makan/repo/firestore_kas.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
@@ -45,6 +47,10 @@ void main() async {
         create: (context) => firestore,
       ),
       RepositoryProvider(
+        create: (context) => KasRepository(fire: firestore),
+        child: Container(),
+      ),
+      RepositoryProvider(
         create: (context) => KaryawanAuthRepo(firebase, firestore),
       ),
       RepositoryProvider(
@@ -57,6 +63,11 @@ void main() async {
     ],
     child: MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) =>
+              NotifCubit(RepositoryProvider.of<MenuItemRepository>(context)),
+          child: Container(),
+        ),
         BlocProvider(
           create: (context) =>
               MenueditCubit(RepositoryProvider.of<MenuItemRepository>(context)),

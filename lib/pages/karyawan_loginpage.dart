@@ -26,10 +26,16 @@ class _KaryawanLoginPageState extends State<KaryawanLoginPage> {
       ),
       body: BlocListener<KaryawanauthBloc, KaryawanauthState>(
         listener: (context, state) {
+          print(state);
           if (state is KaryawanUnAuth) {
             if (state.errorMsg != null) {
               ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text('${state.errorMsg}')));
+                  .showSnackBar(SnackBar(content: Text('${state.errorMsg}')))
+                  .closed
+                  .then(
+                    (value) => BlocProvider.of<KaryawanauthBloc>(context)
+                        .add(InitiateKaryawan()),
+                  );
             }
           }
         },
@@ -45,13 +51,22 @@ class _KaryawanLoginPageState extends State<KaryawanLoginPage> {
                 children: [
                   TextFormField(
                     controller: email,
+                    keyboardType: TextInputType.emailAddress,
                     validator: validateEmail,
+                    enableSuggestions: true,
+                    onChanged: (value) => setState(() {}),
                     decoration: const InputDecoration(label: Text('Email')),
                   ),
                   TextFormField(
                     controller: password,
                     onChanged: (value) => setState(() {}),
                     obscureText: obsecure,
+                    onFieldSubmitted: _formkey.currentState?.validate() ?? false
+                        ? (value) async {
+                            BlocProvider.of<KaryawanauthBloc>(context)
+                                .add(SignIn(email.text, password.text));
+                          }
+                        : null,
                     decoration: InputDecoration(
                         label: const Text('Password'),
                         suffixIcon: IconButton(
@@ -67,38 +82,41 @@ class _KaryawanLoginPageState extends State<KaryawanLoginPage> {
                                 : Icons.visibility_off))),
                   ),
                   const Padding(padding: EdgeInsets.all(8)),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                          onPressed: () {
-                            showDialog<bool?>(
-                              context: context,
-                              builder: (context) => KeyLock(
-                                  tendigits: '392785', title: 'App Pass'),
-                            ).then(
-                              (value) {
-                                if (value != null && value) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            KaryawanSignupPage(),
-                                      ));
-                                } else {}
-                              },
-                            );
-                          },
-                          child: const Text('Signup')),
-                      Padding(padding: EdgeInsetsGeometry.all(8)),
-                      ElevatedButton(
-                          onPressed: _formkey.currentState?.validate() ?? false
-                              ? () async {
-                                  BlocProvider.of<KaryawanauthBloc>(context)
-                                      .add(SignIn(email.text, password.text));
-                                }
-                              : null,
-                          child: const Text('Login')),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              showDialog<bool?>(
+                                context: context,
+                                builder: (context) => KeyLock(
+                                    tendigits: '392785', title: 'App Pass'),
+                              ).then(
+                                (value) {
+                                  if (value != null && value) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              KaryawanSignupPage(),
+                                        ));
+                                  } else {}
+                                },
+                              );
+                            },
+                            child: const Text('Signup')),
+                        Padding(padding: EdgeInsetsGeometry.all(8)),
+                        ElevatedButton(
+                            onPressed: _formkey.currentState?.validate() ??
+                                    false
+                                ? () =>
+                                    BlocProvider.of<KaryawanauthBloc>(context)
+                                        .add(SignIn(email.text, password.text))
+                                : null,
+                            child: const Text('Login')),
+                      ],
+                    ),
                   ),
                   const Padding(padding: EdgeInsets.all(18)),
                   // ElevatedButton(

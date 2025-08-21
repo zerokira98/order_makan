@@ -4,27 +4,36 @@ part of 'rangkuman_bloc.dart';
 
 class RangkumanState extends Equatable {
   final List<UseStrukState> struks;
+  final List pengeluaranKas;
   final StrukFilter filter;
   final Map? errmsg;
   const RangkumanState(
-      {required this.struks, required this.filter, this.errmsg});
+      {required this.pengeluaranKas,
+      required this.struks,
+      required this.filter,
+      this.errmsg});
   static RangkumanState get initial =>
-      RangkumanState(struks: [], filter: StrukFilter());
+      RangkumanState(struks: [], filter: StrukFilter(), pengeluaranKas: []);
 
   @override
-  List<Object?> get props => [struks, filter, errmsg];
+  List<Object?> get props => [struks, pengeluaranKas, filter, errmsg];
 
   RangkumanState copyWith({
     List<UseStrukState>? struks,
+    List? pengeluaranKas,
     StrukFilter? filter,
-    Function? errmsg,
+    Map? errmsg,
   }) {
     return RangkumanState(
       struks: struks ?? this.struks,
+      pengeluaranKas: pengeluaranKas ?? this.pengeluaranKas,
       filter: filter ?? this.filter,
-      errmsg: errmsg != null ? errmsg() : this.errmsg,
+      errmsg: errmsg ?? this.errmsg,
     );
   }
+
+  @override
+  bool get stringify => true;
 }
 
 // final class RangkumanInitial extends RangkumanState {}

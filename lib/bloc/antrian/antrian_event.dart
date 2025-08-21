@@ -8,6 +8,10 @@ class InitiateAntrian extends AntrianEvent {
   InitiateAntrian({this.msg});
 }
 
+class ClrMsg extends AntrianEvent {
+  ClrMsg();
+}
+
 class AddtoAntrian extends AntrianEvent {
   final UseStrukState data;
   AddtoAntrian(this.data);

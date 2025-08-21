@@ -7,8 +7,11 @@ class KaryawanManageMain extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: FutureBuilder(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Karyawan info'),
+      ),
+      body: FutureBuilder(
           future:
               RepositoryProvider.of<KaryawanAuthRepo>(context).karyawanList(),
           builder: (context, snap) {

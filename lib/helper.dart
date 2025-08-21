@@ -22,6 +22,7 @@ String? numberValidator(String? value) {
   if (value == null) return "not initialized";
   if (value.isEmpty) return "cant empty";
   if (int.tryParse(value) == null) return "not valid number";
+  if (int.tryParse(value) == 0) return "cant zero";
   return null;
 }
 
@@ -97,6 +98,20 @@ extension DateParsing on DateTime {
     return tanggalFormat.format(this);
   }
 
+  String clockDetails() {
+    initializeDateFormatting();
+    StringBuffer thestring = StringBuffer();
+    if (hour > 0) {
+      thestring.write('${hour}jam ');
+    }
+    if (minute > 0) {
+      thestring.write('${minute}menit ');
+    }
+    thestring.write('${second}detik');
+    // DateFormat tanggalFormat = DateFormat.h('ID_id');
+    return thestring.toString();
+  }
+
   String formatLengkap() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat('EEEE, d MMMM yyyy ', 'ID_id');
@@ -108,9 +123,29 @@ extension DateParsing on DateTime {
     DateFormat tanggalFormat = DateFormat.yMMMd('ID_id');
     return tanggalFormat.format(this);
   }
+
+  String formatMonthYear() {
+    initializeDateFormatting();
+    DateFormat tanggalFormat = DateFormat.yMMMM('ID_id');
+    return tanggalFormat.format(this);
+  }
 }
 
 extension DurationParsing on Duration {
+  String clockDetails() {
+    initializeDateFormatting();
+    StringBuffer thestring = StringBuffer();
+
+    if (inHours > 0) {
+      thestring.write('${inHours}jam ');
+    }
+    if (inMinutes > 0) {
+      thestring.write('${inMinutes % 60}menit ');
+    }
+    thestring.write('${inSeconds % 60}detik');
+    // DateFormat tanggalFormat = DateFormat.h('ID_id');
+    return thestring.toString();
+  }
   // String get clockTimeOnly {
   //   this.
   //   return "$:$minute:$second";

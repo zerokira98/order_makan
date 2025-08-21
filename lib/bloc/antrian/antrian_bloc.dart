@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 
@@ -39,6 +38,9 @@ class AntrianBloc extends Bloc<AntrianEvent, AntrianState> {
       });
     });
     on<OrderFailure>((event, emit) {});
+    on<ClrMsg>((event, emit) {
+      add(InitiateAntrian(msg: null));
+    });
     // delete this method(?)
     on<Delete>((event, emit) async {
       try {

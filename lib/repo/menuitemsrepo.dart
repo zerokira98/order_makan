@@ -130,7 +130,7 @@ class MenuItemRepository implements _MenuItemRepo {
     if ((dbdata).docs.length == 1) {
       return ingredientRef
           .doc(dbdata.docs.single.id)
-          .update({'satuan': data.satuan});
+          .update({'satuan': data.satuan, 'alert': data.alert});
     } else {
       throw Exception('not single : ${(dbdata).docs.length}');
     }

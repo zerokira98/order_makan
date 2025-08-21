@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' hide kIsWasm;
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/tambahedit_dialog.dart';
-
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
@@ -12,7 +12,7 @@ import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 
-class MenuCard extends StatelessWidget {
+class MenuCard extends StatefulWidget {
   final Function() onTap;
   final bool editmode;
   final MenuItems menudata;
@@ -21,104 +21,161 @@ class MenuCard extends StatelessWidget {
       : editmode = editmode ?? false;
 
   @override
+  State<MenuCard> createState() => _MenuCardState();
+}
+
+class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
+  late AnimationController ac;
+  late Animation<double> ca;
+  Tween<double> ani = Tween(begin: 0.0, end: 1.0);
+
+  double opacity = 0.0;
+
+  @override
+  void initState() {
+    ac = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 700))
+      ..addListener(
+        () => print((1000 * (math.sin(ac.value * math.pi * 2).abs()))),
+      );
+    ca = CurvedAnimation(parent: ac, curve: Curves.easeOut).drive(ani);
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: InkWell(
-        onLongPress: () {
-          if (editmode) {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return DeleteMenuDialog(
-                  menudata: menudata,
-                );
-              },
-            );
-          } else {
-            onTap();
-          }
-        },
-        onTap: editmode
-            ? () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      BlocProvider.of<MenueditCubit>(context).initiate(
-                          MenueditState.initial().copyWith(
-                              ingredients: menudata.ingredientItems,
-                              submenu: menudata.submenues));
-                      return TambahmenuDialog(
-                          editmode: true, menudata: menudata);
-                    });
+    return InkWell(
+      onLongPress: () {
+        if (widget.editmode) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return DeleteMenuDialog(
+                menudata: widget.menudata,
+              );
+            },
+          );
+        } else {
+          widget.onTap();
+        }
+      },
+      onTap: widget.editmode
+          ? () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    BlocProvider.of<MenueditCubit>(context).initiate(
+                        MenueditState.initial().copyWith(
+                            ingredients: widget.menudata.ingredientItems,
+                            submenu: widget.menudata.submenues));
+                    return TambahmenuDialog(
+                        editmode: true, menudata: widget.menudata);
+                  });
+            }
+          : () {
+              if (!ac.isAnimating) {
+                ac.forward().then(
+                      (value) => ac.reset(),
+                    );
               }
-            : () {
-                debugPrint(menudata.ingredientItems.toString());
-                BlocProvider.of<UseStrukBloc>(context).add(
-                    AddOrderitems(item: StrukItem.fromMenuItems(menudata)));
-              },
-        child: Container(
-          // width: 12,
-          padding: const EdgeInsets.all(6.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Row(
+              // setState(() {
+              //   opacity = 1.0;
+              // });
+              // debugPrint(widget.menudata.ingredientItems.toString());
+              BlocProvider.of<UseStrukBloc>(context).add(AddOrderitems(
+                  item: StrukItem.fromMenuItems(widget.menudata)));
+            },
+      child: Stack(
+        children: [
+          Card.filled(
+            borderOnForeground: true,
+            // surfaceTintColor: Theme.of(context).primaryColor,
+            color: Theme.of(context).primaryColor.withAlpha(50),
+            // elevation: 2,
+            child: Container(
+              // width: 12,
+              padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 32,
-                      child: Text(
-                        menudata.title.firstUpcase,
-                        // textScaler: TextScaler.linear( 1.2,
-                        style: const TextStyle(fontSize: 14, height: 1.0),
-                        textAlign: TextAlign.left,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 32,
+                          child: Text(
+                            widget.menudata.title.firstUpcase,
+                            textScaler: TextScaler.linear(1.15),
+                            // style: const TextStyle(fontSize: 14, height: 1.0),
+                            textAlign: TextAlign.left,
+                          ),
+                        ),
                       ),
+                    ],
+                  ),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Container(
+                          // height: 94,
+                          // width: 95,
+                          decoration: BoxDecoration(
+                            color: Colors.black12,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: widget.menudata.imgDir.contains('assets') ||
+                                  widget.menudata.imgDir.isEmpty
+                              ? Image.asset(
+                                  widget.menudata.imgDir.isEmpty
+                                      ? 'assets/sate.jpg'
+                                      : widget.menudata.imgDir,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                )
+                              : (!kIsWeb)
+                                  ? Image.file(
+                                      File(
+                                        widget.menudata.imgDir,
+                                      ),
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.asset(
+                                      'assets/sate.jpg',
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    )
+                          // child: Center(child: Text('menu image')),
+                          ),
                     ),
                   ),
+                  Padding(padding: EdgeInsetsGeometry.all(2)),
+                  Text(
+                    'Rp  ${widget.menudata.price.toString().numberFormat()}',
+                    textScaler: TextScaler.linear(1.1),
+                  )
                 ],
               ),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: Container(
-                      // height: 94,
-                      // width: 95,
-                      decoration: BoxDecoration(
-                        color: Colors.black12,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: menudata.imgDir.contains('assets') ||
-                              menudata.imgDir.isEmpty
-                          ? Image.asset(
-                              menudata.imgDir.isEmpty
-                                  ? 'assets/sate.jpg'
-                                  : menudata.imgDir,
-                              height: 80,
-                              fit: BoxFit.cover,
-                            )
-                          : (!kIsWeb)
-                              ? Image.file(
-                                  File(
-                                    menudata.imgDir,
-                                  ),
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.asset(
-                                  'assets/sate.jpg',
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                )
-                      // child: Center(child: Text('menu image')),
-                      ),
-                ),
-              ),
-              // Padding(padding: EdgeInsetsGeometry.all(2)),
-              Text('Rp  ${menudata.price.toString().numberFormat()}')
-            ],
+            ),
           ),
-        ),
+          MatrixTransition(
+            animation: ca,
+            onTransform: (animationValue) => Matrix4.identity()
+              ..translate((1000 * animationValue),
+                  (100 * (math.sin(ac.value * math.pi * 1).abs()))
+                  // ((animationValue + 0.1) * 100) / (animationValue + 0.1),
+                  )
+              ..scale(1 - (animationValue), 1 - (animationValue)),
+            child: FadeTransition(
+              opacity: ca,
+              // opacity: ca.drive(Tween(begin: 1.0, end: 1.0)),
+              child: Container(
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -139,8 +196,9 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
+    return Card.filled(
+      surfaceTintColor: Colors.blue,
+      // elevation: 2,
       child: InkWell(
         onTap: () {
           var ao = BlocProvider.of<TopbarBloc>(context).state.selected;

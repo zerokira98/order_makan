@@ -30,69 +30,77 @@ class _AntrianCardState extends State<AntrianCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        elevation: 2,
-
-        // color: Color.fromARGB(255, 75 + ((diff * 5) >= 150 ? 150 : (diff * 5)),
-        //     120 - ((diff * 2) >= 100 ? 100 : (diff * 2)), 70),
+    return Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(colors: [
+              Color.fromARGB(255, 75 + ((diff * 5) >= 150 ? 150 : (diff * 5)),
+                  120 - ((diff * 2) >= 100 ? 100 : (diff * 2)), 70),
+              Colors.grey
+            ])),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    flex: 2,
-                    child: Text(
-                      'Struk #${widget.e.strukId}\nMeja : ${widget.e.nomorMeja}',
-                      textScaler: TextScaler.linear(1.2),
-                      textAlign: TextAlign.left,
+          child: DefaultTextStyle.merge(
+            style: TextStyle(color: Colors.white),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      flex: 2,
+                      child: Text(
+                        'Struk #${widget.e.strukId}\nMeja : ${widget.e.nomorMeja}',
+                        textScaler: TextScaler.linear(1.2),
+                        textAlign: TextAlign.left,
+                      ),
                     ),
-                  ),
-                  Flexible(child: DateTimer(ordertime: widget.e.ordertime))
-                ],
-              ),
-              Expanded(
-                  child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    child: Wrap(
-                      alignment: WrapAlignment.start,
-                      children: [
-                        for (StrukItem ew in widget.e.orderItems)
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Text('${ew.title} x${ew.count}'),
-                                Text('"${ew.catatan ?? ''}"'),
-                              ],
+                    Flexible(child: DateTimer(ordertime: widget.e.ordertime))
+                  ],
+                ),
+                Expanded(
+                    child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Expanded(
+                      child: Wrap(
+                        alignment: WrapAlignment.start,
+                        children: [
+                          for (StrukItem ew in widget.e.orderItems)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  Text('${ew.title} x${ew.count}'),
+                                  Text('${ew.submenues.map(
+                                        (e) => e.title,
+                                      ).toList()}'),
+                                ],
+                              ),
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              )),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'total: ${widget.e.orderItems.fold(
-                          0,
-                          (previousValue, element) =>
-                              previousValue + (element.count * element.price),
-                        ).numberFormat(currency: true)}',
-                    textAlign: TextAlign.end,
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )),
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'total: ${widget.e.orderItems.fold(
+                            0,
+                            (previousValue, element) =>
+                                previousValue + (element.count * element.price),
+                          ).numberFormat(currency: true)}',
+                      textAlign: TextAlign.end,
+                    ),
+                  ],
+                )
+              ],
+            ),
           ),
         ));
   }

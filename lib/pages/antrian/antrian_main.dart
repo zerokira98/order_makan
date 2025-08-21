@@ -50,17 +50,19 @@ class _AntrianPageState extends State<AntrianPage> {
         ],
       ),
       body: BlocListener<AntrianBloc, AntrianState>(
-        listenWhen: (previous, current) => current.msg != null,
+        listenWhen: (previous, current) => current.msg != previous.msg,
         listener: (context, state) {
           if (mounted) {
-            ScaffoldMessenger.of(context)
-              ..clearSnackBars()
-              ..showSnackBar(SnackBar(
+            ScaffoldMessenger.of(context).clearSnackBars();
+            if (state.msg != null) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(
                       content: Text(
                           "${state.msg?['status'] as String} ${state.msg?['details'] as String}")))
                   .closed
-                  .then((a) => BlocProvider.of<AntrianBloc>(context)
-                      .add(InitiateAntrian()));
+                  .then((a) =>
+                      BlocProvider.of<AntrianBloc>(context).add(ClrMsg()));
+            }
           }
         },
         child: BlocBuilder<AntrianBloc, AntrianState>(
@@ -77,6 +79,8 @@ class _AntrianPageState extends State<AntrianPage> {
               padding: const EdgeInsets.all(8.0),
               child: GridView.count(
                 shrinkWrap: true,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
                 childAspectRatio: 8,
                 crossAxisCount: 1,
                 children: state.antrianStruks.map((e) {

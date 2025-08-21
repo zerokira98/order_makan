@@ -3,12 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:one_clock/one_clock.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
+import 'package:order_makan/bloc/notif/notif_cubit.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/component/menu_card.dart';
 import 'package:order_makan/component/screen_lock.dart';
+import 'package:order_makan/pages/admin_panel/pengeluaran/pengeluaranpage.dart';
+import 'package:order_makan/pages/notif.dart';
 import 'package:order_makan/pages/use_app/struk_panel/struk_panel.dart';
 import 'package:order_makan/component/toptab.dart';
 import 'package:order_makan/helper.dart';
@@ -71,9 +75,8 @@ class _UseMainState extends State<UseMain> {
               builder: (context, snapshot) {
                 var a = snapshot.data?.getString('globalSetting') ?? '{}';
                 var b = jsonDecode(a);
-                return Text('Resto ${b['namaresto']}');
+                return Text('Kafe ${b['namaresto']}');
               },
-              // child: Text('Resto [NAME]')
             ),
             BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
               builder: (context, state) {
@@ -86,133 +89,184 @@ class _UseMainState extends State<UseMain> {
           ],
         ),
         actions: [
+          DigitalClock(),
           const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
-          ElevatedButton(onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AntrianPage(),
-                ));
-          }, child: BlocBuilder<AntrianBloc, AntrianState>(
+          BlocBuilder<NotifCubit, NotifState>(
             builder: (context, state) {
-              return Text('Antrian Order (${state.antrianStruks.length})');
+              return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor:
+                          state.notif.isEmpty ? Colors.grey : Colors.red),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const NotifCenter(),
+                        ));
+                  },
+                  child: Text('!'));
             },
-          )),
+          ),
+          const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
+          BlocBuilder<AntrianBloc, AntrianState>(
+            builder: (context, state) {
+              return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: state.antrianStruks.isEmpty
+                          ? Colors.grey
+                          : Colors.red),
+                  onPressed: state.antrianStruks.isEmpty
+                      ? null
+                      : () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AntrianPage(),
+                              ));
+                        },
+                  child: Text('Antrian Order (${state.antrianStruks.length})'));
+            },
+          ),
           const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
         ],
       ),
-      body: BlocListener<MenuBloc, MenuState>(
-        listenWhen: (previous, current) => current.msg != null,
-        listener: (context, state) {
-          if (state.msg != null) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.msg.toString())));
-            BlocProvider.of<MenuBloc>(context).add(ClearMsg());
-          }
-          // Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => AntrianPage(),
-          //     ));
-        },
-        child: PageView(controller: pageController, children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 7,
-                child: Column(
+      body: Container(
+        decoration: BoxDecoration(border: Border(top: BorderSide())),
+        child: BlocListener<MenuBloc, MenuState>(
+          listenWhen: (previous, current) => current.msg != null,
+          listener: (context, state) {
+            if (state.msg != null) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(state.msg.toString())));
+              BlocProvider.of<MenuBloc>(context).add(ClearMsg());
+            }
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => AntrianPage(),
+            //     ));
+          },
+          child: PageView(
+              scrollBehavior: ScrollBehavior()
+                  .copyWith(physics: NeverScrollableScrollPhysics()),
+              allowImplicitScrolling: false,
+              controller: pageController,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const Row(
-                      children: [
-                        Expanded(child: TopTab()),
-                      ],
-                    ),
-                    const Padding(padding: EdgeInsets.all(2)),
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            BlocBuilder<MenuBloc, MenuState>(
-                              builder: (context, state) {
-                                // if (state.menus.isEmpty) {
-                                //   return const Center(child: Text('empty'));
-                                // }
-                                return Expanded(
-                                  child: GridView.count(
-                                    childAspectRatio: 0.98,
-                                    crossAxisCount: 4,
-                                    children: [
-                                      for (var i = 0;
-                                          i < state.datas.length;
-                                          i++)
-                                        MenuCard(
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) => Dialog(
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      18.0),
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      Text(
-                                                          state.datas[i].title),
-                                                      Text(state.datas[i]
-                                                              .description ??
-                                                          ''),
-                                                      Text(state.datas[i]
-                                                          .ingredientItems
-                                                          .toString()),
-                                                      Text(state
-                                                          .datas[i].submenues
-                                                          .toString()),
-                                                      Row(
-                                                        children: [
-                                                          ElevatedButton(
-                                                              onPressed: () {},
-                                                              child: Text(
-                                                                  'Batal')),
-                                                          ElevatedButton(
-                                                              onPressed: () {},
-                                                              child: Text('Ok'))
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          menudata: state.datas[i],
-                                        )
-                                    ],
+                      flex: 7,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Expanded(child: TopTab()),
+                            ],
+                          ),
+                          // const Padding(padding: EdgeInsets.all(2)),
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border(top: BorderSide())),
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  BlocBuilder<MenuBloc, MenuState>(
+                                    builder: (context, state) {
+                                      // if (state.menus.isEmpty) {
+                                      //   return const Center(child: Text('empty'));
+                                      // }
+                                      return Expanded(
+                                        child: GridView.count(
+                                          childAspectRatio: 0.98,
+                                          crossAxisCount: 4,
+                                          children: [
+                                            for (var i = 0;
+                                                i < state.datas.length;
+                                                i++)
+                                              MenuCard(
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        Dialog(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(18.0),
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Text(state.datas[i]
+                                                                .title),
+                                                            Text(state.datas[i]
+                                                                    .description ??
+                                                                ''),
+                                                            Divider(),
+                                                            Text('Bahan'),
+                                                            for (var e in state
+                                                                .datas[i]
+                                                                .ingredientItems)
+                                                              Text(
+                                                                  "~${e.title} ${e.count}${e.satuan}"),
+                                                            Divider(),
+                                                            Text('submenu'),
+                                                            for (var f in state
+                                                                .datas[i]
+                                                                .submenues)
+                                                              Text(f.title
+                                                                  .toString()),
+                                                            Row(
+                                                              children: [
+                                                                ElevatedButton(
+                                                                    onPressed:
+                                                                        () {},
+                                                                    child: Text(
+                                                                        'Batal')),
+                                                                ElevatedButton(
+                                                                    onPressed:
+                                                                        () {},
+                                                                    child: Text(
+                                                                        'Ok'))
+                                                              ],
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                menudata: state.datas[i],
+                                              )
+                                          ],
+                                        ),
+                                      );
+                                    },
                                   ),
-                                );
-                              },
+                                ],
+                              ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+                    StrukPanel(
+                      pageController: pageController,
+                    )
                   ],
                 ),
-              ),
-              StrukPanel(
-                pageController: pageController,
-              )
-            ],
-          ),
-          CheckoutDialog(
-            pageController: pageController,
-          )
-        ]),
+                CheckoutDialog(
+                  pageController: pageController,
+                )
+              ]),
+        ),
       ),
     );
   }

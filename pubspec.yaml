@@ -52,12 +52,21 @@ dependencies:
   firebase_core: ^3.14.0
   cloud_firestore: ^5.6.9
   flutter_screen_lock: ^9.2.2+2 
-  flutter_thermal_printer: ^1.2.1+1
+  
   flutter_typeahead: ^5.2.0
   month_year_picker: ^0.5.0+1 
   flutter_localizations:
     sdk: flutter
-  simple_numpad: ^1.0.5
+  virtual_keyboard_multi_language: ^1.1.2
+  print_bluetooth_thermal: ^1.1.6
+  image: ^4.5.4
+  esc_pos_utils_plus: ^2.0.4
+  syncfusion_flutter_xlsio: ^30.1.40
+  syncfusion_flutter_charts: ^30.1.40
+  flutter_file_dialog: ^3.0.2
+  open_filex: ^4.7.0
+  currency_text_input_formatter: ^2.3.0
+  one_clock: ^2.0.2
 
 dev_dependencies:
   flutter_test:

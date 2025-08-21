@@ -11,9 +11,33 @@ class UseDrawer extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(58.0),
-            child: const Text('Hello'),
+            child: FutureBuilder(
+              future: SharedPreferences.getInstance(),
+              builder: (context, snapshot) {
+                var a = snapshot.data?.getString('globalSetting') ?? '{}';
+                var b = jsonDecode(a);
+                return Text('Kafe ${b['namaresto']}');
+              },
+            ),
           ),
+          Divider(),
           Expanded(child: Container()),
+          ListTile(
+            title: const Text('Catat Pengeluaran'),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PengeluaranPage(
+                      fromusemain: true,
+                    ),
+                  ));
+              // var a =
+              //     RepositoryProvider.of<KaryawanAuthRepo>(context).currentUser;
+              // debugPrint(a);
+              // BlocProvider.of<KaryawanauthBloc>(context).add(SignOut());
+            },
+          ),
           ListTile(
             title: const Text('Penjualan Hari ini'),
             onTap: () {

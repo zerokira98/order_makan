@@ -20,7 +20,9 @@ class _TopTabState extends State<TopTab> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
+          // border: Border(top: BorderSide())
+          // color: Colors.red
           // color: Theme.of(context).appBarTheme.backgroundColor,
           // boxShadow: [BoxShadow(blurRadius: 4, offset: Offset(-4, 0))],
           ),
@@ -59,7 +61,7 @@ class _TopTabState extends State<TopTab> {
             Container(
               width: double.maxFinite,
               color: Colors.yellow.shade900,
-              child: const Text('Hint: longpress to delete category'),
+              child: const Text('Hint: longpress to delete category/menu'),
             )
         ],
       ),
@@ -121,11 +123,27 @@ class TopBarMenuItem extends StatelessWidget {
         buildWhen: (previous, current) => previous.selected != current.selected,
         builder: (context, state) {
           return AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            color: state.selected == nama
-                ? Theme.of(context).highlightColor
-                : Colors.transparent,
-            margin: const EdgeInsets.symmetric(horizontal: 8),
+            duration: const Duration(milliseconds: 350),
+            decoration: BoxDecoration(
+              // border: state.selected == nama
+              //     ? Border.all(color: Color.fromRGBO(38, 0, 255, 1))
+              //     : Border.all(color: Color.fromRGBO(0, 0, 0, 0)),
+              gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    state.selected == nama
+                        ? Theme.of(context).primaryColorDark
+                        : Colors.transparent,
+                    state.selected == nama
+                        ? Theme.of(context).primaryColor
+                        : Colors.transparent
+                  ]),
+              // color: state.selected == nama
+              //     ? Theme.of(context).primaryColor
+              //     : Colors.transparent,
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             // padding: EdgeInsets.all(8),
             child: InkWell(
               onLongPress: () {
@@ -139,19 +157,16 @@ class TopBarMenuItem extends StatelessWidget {
                       actions: [
                         ElevatedButton(
                             onPressed: () {
+                              // BlocProvider.of<TopbarBloc>(context)
+                              //     .add(DelCat(name: nama));
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel')),
+                        ElevatedButton(
+                            onPressed: () {
                               BlocProvider.of<TopbarBloc>(context)
                                   .add(DelCat(name: nama));
                               Navigator.pop(context);
-                              // var a = await RepositoryProvider.of<MenuItemRepository>(
-                              //         context)
-                              //     .deleteCategory(nama);
-                              // // debugPrint(a);
-                              // if (a < 1) {
-                              //   debugPrint('No record deleted');
-                              // } else {
-                              //   debugPrint('affected records:$a');
-                              //   Navigator.pop(context);
-                              // }
                             },
                             child: const Text('Confirm'))
                       ],
@@ -171,7 +186,13 @@ class TopBarMenuItem extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   nama.firstUpcase,
-                  style: const TextStyle(
+                  style: TextStyle(
+                    color: state.selected == nama
+                        ? Colors.white
+                        : Theme.of(context).textTheme.labelMedium?.color,
+                    // decoration: state.selected == nama
+                    //     ? TextDecoration.underline
+                    //     : null,
                     fontSize: 20,
                   ),
                 ),

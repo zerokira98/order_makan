@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/histori_struk.dart';
+import 'package:order_makan/repo/firestore_kas.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 
 class HistoriPenjualanHarian extends StatelessWidget {
@@ -64,14 +65,16 @@ class HistoriPenjualanHarian extends StatelessWidget {
                                 )
                                 .toString()),
                             Text(data[index]
-                                .orderItems
-                                .fold(
-                                  0,
-                                  (previousValue, element) =>
-                                      previousValue +
-                                      (element.price * element.count),
-                                )
-                                .numberFormat(currency: true))
+                                    .total
+                                    // .orderItems
+                                    // .fold(
+                                    //   0,
+                                    //   (previousValue, element) =>
+                                    //       previousValue +
+                                    //       (element.price * element.count),
+                                    // )
+                                    ?.numberFormat(currency: true) ??
+                                '')
                           ],
                         ),
                       ),
@@ -96,13 +99,44 @@ class HistoriPenjualanHarian extends StatelessWidget {
                         child: Container(
                           decoration:
                               BoxDecoration(color: Colors.grey.withAlpha(125)),
-                          child: Text(
-                            'Total: ${data.fold(
-                                  0,
-                                  (previousValue, element) =>
-                                      previousValue + (element.total!),
-                                ).numberFormat(currency: true)}',
-                            textAlign: TextAlign.center,
+                          child: Column(
+                            children: [
+                              Text(
+                                'Total: ${data.fold(
+                                      0,
+                                      (previousValue, element) =>
+                                          previousValue + (element.total!),
+                                    ).numberFormat(currency: true)}',
+                                textAlign: TextAlign.center,
+                              ),
+                              FutureBuilder(
+                                  future: RepositoryProvider.of<KasRepository>(
+                                          context)
+                                      .getUangLaciHarian(),
+                                  builder: (context, asyncSnapshot) {
+                                    if (asyncSnapshot.hasData) {
+                                      return Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              'Uang laci awal: ${(asyncSnapshot.data?.data()?['uang'] as int?)?.numberFormat(currency: true)}'),
+                                          Padding(
+                                              padding:
+                                                  EdgeInsetsGeometry.symmetric(
+                                                      horizontal: 18)),
+                                          Text('Uang laci akhir: ${(((asyncSnapshot.data?.data()?['uang'] as int?) ?? 0) + data.fold(
+                                                0,
+                                                (previousValue, element) =>
+                                                    previousValue +
+                                                    (element.total!),
+                                              )).numberFormat(currency: true)}'),
+                                        ],
+                                      );
+                                    }
+                                    return CircularProgressIndicator();
+                                  }),
+                            ],
                           ),
                         ),
                       ),

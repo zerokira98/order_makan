@@ -2,13 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class KasRepository {
   final FirebaseFirestore fire;
-  CollectionReference pemasukan;
-  CollectionReference pengeluaran;
+  CollectionReference<Map> pemasukan;
+  CollectionReference<Map> pengeluaran;
   KasRepository({required this.fire})
       : pemasukan = fire.collection('pemasukan'),
         pengeluaran = fire.collection('pengeluaran');
 
-  Future<DocumentSnapshot> getUangLaciHarian(int uang) {
+  Future<DocumentSnapshot<Map>> getUangLaciHarian() {
     var now = DateTime.now();
     return fire
         .collection('laci_harian')
@@ -31,13 +31,27 @@ class KasRepository {
     throw UnimplementedError();
   }
 
-  Future<DocumentSnapshot> tambahPengeluaran(
-      String title, int cost, DateTime date) {
-    throw UnimplementedError();
+  Future<DocumentReference> tambahPengeluaran(
+      String title, int cost, DateTime date, String userid) {
+    Map<String, dynamic> data = {
+      "title": title,
+      "userid": userid,
+      "cost": cost,
+      "date": Timestamp.fromDate(date),
+      "posting_time": Timestamp.fromDate(DateTime.now())
+    };
+    return pengeluaran.add(data);
   }
 
-  Future<DocumentSnapshot> getPengeluaran(
-      {required DateTime before, required DateTime after}) {
-    throw UnimplementedError();
+  Future<QuerySnapshot<Map>> getPengeluaranAll() {
+    return pengeluaran.get();
+  }
+
+  Future<QuerySnapshot<Object?>> getPengeluaran(
+      {required DateTime start, required DateTime end}) {
+    return pengeluaran
+        .where('date', isGreaterThanOrEqualTo: start)
+        .where('date', isLessThanOrEqualTo: end)
+        .get();
   }
 }

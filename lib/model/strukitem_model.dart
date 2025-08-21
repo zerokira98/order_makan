@@ -15,6 +15,7 @@ class StrukItem extends Equatable {
   final String title;
   final String? catatan;
   final int price;
+  final int cardId;
   final String? id;
   final List<IngredientItem> ingredientItems;
   final List<SubMenuItem> submenues;
@@ -22,6 +23,7 @@ class StrukItem extends Equatable {
   const StrukItem({
     this.ingredientItems = const [],
     this.submenues = const [],
+    this.cardId = 0,
     int? count,
     this.id,
     this.catatan,
@@ -33,6 +35,7 @@ class StrukItem extends Equatable {
           {String? title,
           List<IngredientItem>? ingredientItems,
           List<SubMenuItem>? submenues,
+          int? cardId,
           int? price,
           String? id,
           int? count,
@@ -44,6 +47,7 @@ class StrukItem extends Equatable {
           submenues: submenues ?? this.submenues,
           count: count ?? this.count,
           price: price ?? this.price,
+          cardId: cardId ?? this.cardId,
           id: id ?? this.id);
   factory StrukItem.fromMenuItems(MenuItems menu) => StrukItem(
       title: menu.title,

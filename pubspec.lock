@@ -65,14 +65,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.0.0"
-  bluez:
-    dependency: transitive
-    description:
-      name: bluez
-      sha256: "61a7204381925896a374301498f2f5399e59827c6498ae1e924aaa598751b545"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.8.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -257,6 +249,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  currency_text_input_formatter:
+    dependency: "direct main"
+    description:
+      name: currency_text_input_formatter
+      sha256: "7ca90006337241559caea445699b4b32f4e198676728541604fa9521d0d4f75a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.0"
   dart_style:
     dependency: transitive
     description:
@@ -265,14 +265,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
-  dbus:
-    dependency: transitive
-    description:
-      name: dbus
-      sha256: "79e0c23480ff85dc68de79e2cd6334add97e48f7f4865d17686dd6ea81a47e8c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.11"
   equatable:
     dependency: "direct main"
     description:
@@ -282,7 +274,7 @@ packages:
     source: hosted
     version: "2.0.7"
   esc_pos_utils_plus:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: esc_pos_utils_plus
       sha256: "2a22d281cb6f04600ba3ebd607ad8df03a4b2446d814007d22525bab4d50c2ff"
@@ -414,54 +406,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.1.1"
-  flutter_blue_plus:
-    dependency: transitive
+  flutter_file_dialog:
+    dependency: "direct main"
     description:
-      name: flutter_blue_plus
-      sha256: bfae0d24619940516261045d8b3c74b4c80ca82222426e05ffbf7f3ea9dbfb1a
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.35.5"
-  flutter_blue_plus_android:
-    dependency: transitive
-    description:
-      name: flutter_blue_plus_android
-      sha256: "9723dd4ba7dcc3f27f8202e1159a302eb4cdb88ae482bb8e0dd733b82230a258"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.5"
-  flutter_blue_plus_darwin:
-    dependency: transitive
-    description:
-      name: flutter_blue_plus_darwin
-      sha256: f34123795352a9761e321589aa06356d3b53f007f13f7e23e3c940e733259b2d
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.1"
-  flutter_blue_plus_linux:
-    dependency: transitive
-    description:
-      name: flutter_blue_plus_linux
-      sha256: "635443d1d333e3695733fd70e81ee0d87fa41e78aa81844103d2a8a854b0d593"
+      name: flutter_file_dialog
+      sha256: "9344b8f07be6a1b6f9854b723fb0cf84a8094ba94761af1d213589d3cb087488"
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
-  flutter_blue_plus_platform_interface:
-    dependency: transitive
-    description:
-      name: flutter_blue_plus_platform_interface
-      sha256: a4bb70fa6fd09e0be163b004d773bf19e31104e257a4eb846b67f884ddd87de2
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.2"
-  flutter_blue_plus_web:
-    dependency: transitive
-    description:
-      name: flutter_blue_plus_web
-      sha256: "03023c259dbbba1bc5ce0fcd4e88b364f43eec01d45425f393023b9b2722cf4d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.1"
   flutter_keyboard_visibility:
     dependency: transitive
     description:
@@ -544,14 +496,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_thermal_printer:
-    dependency: "direct main"
-    description:
-      name: flutter_thermal_printer
-      sha256: "9c7daa4bbb581103af79ed771d891e01fc84b13d9c19eac65dd4ba7a0ce27839"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.1+1"
   flutter_typeahead:
     dependency: "direct main"
     description:
@@ -622,7 +566,7 @@ packages:
     source: hosted
     version: "4.1.2"
   image:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: image
       sha256: "4e973fcf4caae1a4be2fa0a13157aa38a8f9cb049db6529aa00b4d71abc4d928"
@@ -717,6 +661,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  jiffy:
+    dependency: transitive
+    description:
+      name: jiffy
+      sha256: "9bafbfe6d97587048bf449165e050029e716a12438f54a3d39e7e3a256decdac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.4.3"
   js:
     dependency: transitive
     description:
@@ -829,6 +781,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  one_clock:
+    dependency: "direct main"
+    description:
+      name: one_clock
+      sha256: "8a3aa0e36016c33c7d3be2db50f3f2a8799dcf589e747c02107277fffce937f3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.2"
+  open_filex:
+    dependency: "direct main"
+    description:
+      name: open_filex
+      sha256: "9976da61b6a72302cf3b1efbce259200cd40232643a467aac7370addf94d6900"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.7.0"
   package_config:
     dependency: transitive
     description:
@@ -965,6 +933,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.3"
+  print_bluetooth_thermal:
+    dependency: "direct main"
+    description:
+      name: print_bluetooth_thermal
+      sha256: "74e3face536392562764f5555bf15e02c16de7436e9f7f0cb23a7f749c39691f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.6"
   provider:
     dependency: transitive
     description:
@@ -989,22 +965,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
-  rxdart:
+  quiver:
     dependency: transitive
     description:
-      name: rxdart
-      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
+      name: quiver
+      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
       url: "https://pub.dev"
     source: hosted
-    version: "0.28.0"
-  screenshot:
-    dependency: transitive
-    description:
-      name: screenshot
-      sha256: "63817697a7835e6ce82add4228e15d233b74d42975c143ad8cfe07009fab866b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.0.0"
+    version: "3.2.2"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -1077,14 +1045,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  simple_numpad:
-    dependency: "direct main"
-    description:
-      name: simple_numpad
-      sha256: "329f407399281e2e8bd28d0883c395b7c0dacb8c16062eca88e084f42b58c4be"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.5"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -1146,6 +1106,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  syncfusion_flutter_charts:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_charts
+      sha256: f0487a6315e72cca6726cba1d6a3ca8dd5701f45ec91f2d0e89d02034daa809e
+      url: "https://pub.dev"
+    source: hosted
+    version: "30.1.40"
+  syncfusion_flutter_core:
+    dependency: transitive
+    description:
+      name: syncfusion_flutter_core
+      sha256: "27cbeb650b780d1f3ab254b26ac64e2b06e92e2d64349537b0db3f714ff1e962"
+      url: "https://pub.dev"
+    source: hosted
+    version: "30.1.40"
+  syncfusion_flutter_xlsio:
+    dependency: "direct main"
+    description:
+      name: syncfusion_flutter_xlsio
+      sha256: "0bbae5763a4a6010f39143d8ec14ff72a9787ba21d03309a427007f203867c29"
+      url: "https://pub.dev"
+    source: hosted
+    version: "30.1.40"
+  syncfusion_officecore:
+    dependency: transitive
+    description:
+      name: syncfusion_officecore
+      sha256: "907f8b7a2150e8a7334939199e39478d59d7101c8d43316029829bad7d423915"
+      url: "https://pub.dev"
+    source: hosted
+    version: "30.1.40"
   term_glyph:
     dependency: transitive
     description:
@@ -1186,6 +1178,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  virtual_keyboard_multi_language:
+    dependency: "direct main"
+    description:
+      name: virtual_keyboard_multi_language
+      sha256: dfa79de3a6a885b297146d065ebcd2a576ec837b65ce61d8279b4ee013784035
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   vm_service:
     dependency: transitive
     description:
@@ -1226,14 +1226,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
-  win32:
-    dependency: transitive
-    description:
-      name: win32
-      sha256: "66814138c3562338d05613a6e368ed8cfb237ad6d64a9e9334be3f309acfca03"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.14.0"
   win_ble:
     dependency: transitive
     description:

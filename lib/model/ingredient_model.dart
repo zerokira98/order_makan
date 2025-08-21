@@ -11,8 +11,10 @@ class IngredientItem extends Equatable {
   final String satuan;
   final String? id;
   final int? incrementindex;
+  final int? alert;
   final int count;
   const IngredientItem({
+    this.alert,
     required this.title,
     this.incrementindex,
     required this.satuan,
@@ -21,7 +23,7 @@ class IngredientItem extends Equatable {
   });
 
   @override
-  List<Object?> get props => [title, satuan, id, count, incrementindex];
+  List<Object?> get props => [title, satuan, id, count, incrementindex, alert];
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -29,6 +31,7 @@ class IngredientItem extends Equatable {
       'satuan': satuan,
       'id': id,
       'count': count,
+      'alert': alert,
     };
   }
 
@@ -38,6 +41,7 @@ class IngredientItem extends Equatable {
       satuan: map['satuan'] as String? ?? 'mg',
       id: map['id'] != null ? map['id'] as String : null,
       count: map['count'] as int,
+      alert: map['count'] as int?,
     );
   }
   // factory IngredientItem.fromFirestore(DocumentSnapshot<Map> data) {
@@ -62,6 +66,7 @@ class IngredientItem extends Equatable {
         satuan: data['satuan'] ?? 'mg',
         title: data['title'],
         count: data['count'],
+        alert: data['alert'],
         id: snapshot.id);
   }
 
@@ -69,10 +74,12 @@ class IngredientItem extends Equatable {
     String? title,
     String? satuan,
     Function()? id,
+    Function()? alert,
     int? incrementindex,
     int? count,
   }) {
     return IngredientItem(
+      alert: alert != null ? alert() : this.alert,
       incrementindex: incrementindex ?? this.incrementindex,
       title: title ?? this.title,
       satuan: satuan ?? this.satuan,

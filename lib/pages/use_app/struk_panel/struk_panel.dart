@@ -13,32 +13,67 @@ class StrukPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
         flex: 3,
-        child: Card(
-          elevation: 4,
-          margin: const EdgeInsets.all(6.0),
+        child: Card.outlined(
+          elevation: 8,
+          margin: const EdgeInsets.only(top: 10.0),
           child: Column(children: [
-            Row(
-              children: [
-                Expanded(
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Cart',
-                      textAlign: TextAlign.center,
-                      textScaler: TextScaler.linear(1.2),
+            Padding(
+              padding: EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Text(
+                          'Order Summary',
+                          textAlign: TextAlign.center,
+                          textScaler: TextScaler.linear(1.3),
+                        ),
+                        // Icon(Icons.shopping_cart)
+                      ],
                     ),
                   ),
-                ),
-                IconButton(
-                    onPressed: () {
-                      BlocProvider.of<UseStrukBloc>(context).add(InitiateStruk(
-                          karyawanId: BlocProvider.of<UseStrukBloc>(context)
-                              .state
-                              .karyawanId));
-                    },
-                    icon: Icon(Icons.delete))
-              ],
+                  IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            // backgroundColor: Colors.blueGrey[100],
+                            actions: [
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Colors.red),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Cancel')),
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      foregroundColor: Colors.white,
+                                      backgroundColor: Colors.green),
+                                  onPressed: () {
+                                    BlocProvider.of<UseStrukBloc>(context).add(
+                                        InitiateStruk(
+                                            karyawanId:
+                                                BlocProvider.of<UseStrukBloc>(
+                                                        context)
+                                                    .state
+                                                    .karyawanId));
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Yes')),
+                            ],
+                            title: Text('r u sure?'),
+                            content: Text('clear cart list.'),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.delete))
+                ],
+              ),
             ),
+            Padding(padding: EdgeInsets.all(4)),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
@@ -82,7 +117,14 @@ class StrukPanel extends StatelessWidget {
                       }
 
                       return Container(
-                        color: Colors.red,
+                        decoration: BoxDecoration(
+                          border: Border.symmetric(
+                              vertical: BorderSide(
+                                  width: 8, color: Colors.red.shade600),
+                              horizontal:
+                                  BorderSide(color: Colors.red.shade100)),
+                          color: Colors.red,
+                        ),
                         margin: const EdgeInsets.only(bottom: 10.0),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 4.0),
@@ -91,9 +133,15 @@ class StrukPanel extends StatelessWidget {
                           children: [
                             Text(
                               'Total: Rp${getTotal().numberFormat()} ',
-                              style: TextStyle(fontWeight: FontWeight.w600),
+                              textScaler: TextScaler.linear(1.2),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
                             ),
-                            ElevatedButton(
+                            ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black),
                                 onPressed: () {
                                   BlocProvider.of<UseStrukBloc>(context)
                                       .add(DateUpdate());
@@ -115,7 +163,8 @@ class StrukPanel extends StatelessWidget {
                                     // );
                                   }
                                 },
-                                child: const Text('CheckOut'))
+                                icon: Icon(Icons.navigate_next),
+                                label: const Text('Pembayaran'))
                           ],
                         ),
                       );

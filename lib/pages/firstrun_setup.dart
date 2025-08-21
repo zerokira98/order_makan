@@ -160,7 +160,7 @@ class _SetupPageState extends State<SetupPage> {
                   onEditingComplete: () {
                     FocusScope.of(context).nextFocus();
                   },
-                  decoration: const InputDecoration(label: Text('Nama Resto')),
+                  decoration: const InputDecoration(label: Text('Nama Kafe')),
                 ),
                 ElevatedButton(
                     onPressed: () async {

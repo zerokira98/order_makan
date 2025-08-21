@@ -27,7 +27,7 @@ class _SubMenuInputRowState extends State<SubMenuInputRow> {
     if (widget.submenu.adjustHarga.toString() != adjustHarga.text) {
       adjustHarga.text = widget.submenu.adjustHarga.toString();
     }
-    return Card(
+    return Card.outlined(
       margin: EdgeInsets.all(4),
       child: Stack(
         children: [
@@ -47,20 +47,22 @@ class _SubMenuInputRowState extends State<SubMenuInputRow> {
                                 data: widget.submenu.copyWith(title: value));
                           },
                           decoration:
-                              InputDecoration(label: Text('nama submenu')),
+                              InputDecoration(label: Text('Nama submenu')),
                         )),
+                    Padding(padding: EdgeInsetsGeometry.all(2)),
                     Expanded(
                         flex: 4,
                         child: TextFormField(
                           controller: adjustHarga,
                           validator: numberValidator,
+                          keyboardType: TextInputType.number,
                           onChanged: (value) {
                             BlocProvider.of<MenueditCubit>(context).editSubmenu(
                                 data: widget.submenu.copyWith(
                                     adjustHarga: int.tryParse(value)));
                           },
                           decoration:
-                              InputDecoration(label: Text('adjust harga')),
+                              InputDecoration(label: Text('Adjust harga')),
                         )),
                   ],
                 ),
@@ -214,6 +216,7 @@ class SubmenuIngredientInputRow extends StatelessWidget {
           child: TextFormField(
             autovalidateMode: AutovalidateMode.always,
             validator: numberValidator,
+            keyboardType: TextInputType.number,
             onChanged: (value) {
               BlocProvider.of<MenueditCubit>(context).editSubmenuIngredients(
                   submenu: submenu,

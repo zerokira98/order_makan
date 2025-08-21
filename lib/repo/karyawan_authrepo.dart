@@ -70,35 +70,35 @@ class KaryawanAuthRepo {
     required String email,
     required String password,
   }) async {
-    try {
-      await instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on auth.FirebaseAuthException catch (e) {
-      print(e.toString());
-      // throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
-    } catch (_) {
-      // throw const LogInWithEmailAndPasswordFailure();
-    }
+    // try {
+    await instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    // } on auth.FirebaseAuthException catch (e) {
+    //   print(e.toString());
+    //   // throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
+    // } catch (_) {
+    //   // throw const LogInWithEmailAndPasswordFailure();
+    // }
   }
 
   Future<void> logInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
-    try {
-      await instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on auth.FirebaseAuthException catch (e) {
-      debugPrint(e.toString());
-      // throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
-    } catch (_) {
-      debugPrint(_.toString());
-      // throw const LogInWithEmailAndPasswordFailure();
-    }
+    // try {
+    await instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    // } on auth.FirebaseAuthException catch (e) {
+    //   debugPrint(e.toString());
+    //   // throw LogInWithEmailAndPasswordFailure.fromCode(e.code);
+    // } catch (_) {
+    //   debugPrint(_.toString());
+    //   // throw const LogInWithEmailAndPasswordFailure();
+    // }
   }
 
   Future<void> logOut() async {

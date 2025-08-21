@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:order_makan/helper.dart';
 
 class DateTimer extends StatefulWidget {
   final DateTime ordertime;
@@ -36,7 +37,7 @@ class _DateTimerState extends State<DateTimer> {
   @override
   Widget build(BuildContext context) {
     return Text(
-      now.difference(widget.ordertime).toString().substring(0, 7),
+      now.difference(widget.ordertime).clockDetails(),
       textAlign: TextAlign.end,
     );
   }

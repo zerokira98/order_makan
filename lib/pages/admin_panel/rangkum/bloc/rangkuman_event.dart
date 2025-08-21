@@ -6,6 +6,7 @@ sealed class RangkumanEvent extends Equatable {
   List<Object> get props => [];
 }
 
+///Default to current monthly
 class InitiateRangkuman extends RangkumanEvent {
   final Map? err;
 

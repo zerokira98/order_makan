@@ -13,6 +13,7 @@ class UseStrukState extends Equatable {
   final String karyawanId;
   final int nomorMeja;
   final TipePembayaran tipePembayaran;
+
   final String? strukId;
   final DateTime ordertime;
   final List<StrukItem> orderItems;

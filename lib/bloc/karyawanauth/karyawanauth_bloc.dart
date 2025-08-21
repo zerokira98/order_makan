@@ -18,7 +18,9 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
   ) : super(auth.currentUser.isEmpty
             ? KaryawanauthInitial()
             : KaryawanauthInitial()) {
-    on<InitiateKaryawan>((event, emit) {});
+    on<InitiateKaryawan>((event, emit) {
+      emit(KaryawanUnAuth());
+    });
     on<UserChanged>((event, emit) async {
       if (event.user.isEmpty) {
         emit(KaryawanUnAuth());
@@ -36,9 +38,9 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
             email: event.email, password: event.password);
       } on Exception catch (e) {
         emit(KaryawanUnAuth(errorMsg: e.toString()));
-        debugPrint('error $e');
-        await Future.delayed(const Duration(seconds: 4));
-        emit(KaryawanUnAuth());
+        // debugPrint('error $e');
+        // await Future.delayed(const Duration(seconds: 4));
+        // emit(KaryawanUnAuth());
       }
     });
     on<SignUp>((event, emit) async {
