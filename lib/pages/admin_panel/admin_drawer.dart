@@ -11,6 +11,7 @@ import 'package:order_makan/pages/admin_panel/rangkum/bloc/rangkuman_bloc.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/rangkuman_periodik/rangkuman_periodik.dart';
 import 'package:order_makan/pages/histori_struk.dart';
 import 'package:order_makan/repo/firestore_kas.dart';
+import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,6 +29,8 @@ class AdminDrawer extends StatelessWidget {
             Row(
               children: [],
             ),
+            Divider(),
+            Text('Pengeluaran'),
             ListTile(
                 onTap: () {
                   Navigator.push(
@@ -36,7 +39,7 @@ class AdminDrawer extends StatelessWidget {
                         builder: (context) => const PengeluaranPage(),
                       ));
                 },
-                title: const Text('Catat Pengeluaran')),
+                title: const Text('Catat Pengeluaran Umum')),
             ListTile(
                 onTap: () {
                   Navigator.push(
@@ -65,7 +68,9 @@ class AdminDrawer extends StatelessWidget {
                         builder: (context) => BlocProvider(
                           create: (context) => RangkumanBloc(
                               RepositoryProvider.of<StrukRepository>(context),
-                              RepositoryProvider.of<KasRepository>(context))
+                              RepositoryProvider.of<KasRepository>(context),
+                              RepositoryProvider.of<MenuItemRepository>(
+                                  context))
                             ..add(ChangeFilterRangkuman(
                                 filter: StrukFilter(
                                     start:
@@ -85,7 +90,9 @@ class AdminDrawer extends StatelessWidget {
                         builder: (context) => BlocProvider(
                           create: (context) => RangkumanBloc(
                               RepositoryProvider.of<StrukRepository>(context),
-                              RepositoryProvider.of<KasRepository>(context))
+                              RepositoryProvider.of<KasRepository>(context),
+                              RepositoryProvider.of<MenuItemRepository>(
+                                  context))
                             ..add(ChangeFilterRangkuman(
                                 filter: StrukFilter(
                                     start: DateTime(now.year, now.month),

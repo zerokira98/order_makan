@@ -177,6 +177,14 @@ class MenuItemRepository implements _MenuItemRepo {
     return inputstocksRef.get();
   }
 
+  Future<QuerySnapshot<InputstockModel>> getInputstocksWithFilter(
+      {required DateTime start, required DateTime end}) {
+    return inputstocksRef
+        .where('tanggalbeli', isGreaterThanOrEqualTo: start)
+        .where('tanggalbeli', isLessThanOrEqualTo: end)
+        .get();
+  }
+
   @override
   Future<DocumentReference<MenuItems>> addMenu(MenuItems menu,
       {bool customOrder = false}) async {

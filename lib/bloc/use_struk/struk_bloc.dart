@@ -111,17 +111,30 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       // await repo.sendtoAntrian(state);
       emit(state.copywith(tipePembayaran: event.tipe));
     });
-    on<ChangeMeja>((event, emit) async {
+    on<ChangeAntrian>((event, emit) async {
       // await repo.sendtoAntrian(state);
-      emit(state.copywith(nomorMeja: event.meja));
+      emit(state.copywith(nomorAntrian: event.antrian));
     });
     on<DateUpdate>((event, emit) async {
       // await repo.sendtoAntrian(state);
       emit(state.copywith(ordertime: DateTime.now()));
     });
     on<SendtoDb>((event, emit) async {
-      await repo.sendtoAntrian(state);
-      add(InitiateStruk(karyawanId: state.karyawanId));
+      // var now = DateTime.now();
+      // var todayscount = await repo
+      //     .readStrukwithFilter(StrukFilter(
+      //         start: DateTime(now.year, now.month, now.day),
+      //         end: DateTime(now.year, now.month, now.day)
+      //             .add(Duration(days: 1))))
+      //     .then(
+      //       (value) => value.length,
+      //     );
+      try {
+        await repo.sendtoAntrian(state.copywith(
+            nomorAntrian: (await repo.getTodaysAntrianCount()) + 1));
+        await repo.increaseTodaysAntrianCount();
+        add(InitiateStruk(karyawanId: state.karyawanId));
+      } catch (e) {}
     });
 
     _userSubscription = auth.user.listen((event) {

@@ -5,11 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_year_picker/month_year_picker.dart';
+import 'package:order_makan/model/inputstock_model.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/rangkuman_periodik/dailyvisit_chart.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/rangkuman_periodik/excel_processor.dart';
 import 'package:order_makan/pages/histori_struk.dart';
-import 'package:order_makan/repo/firestore_kas.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/helper.dart';
@@ -31,7 +30,7 @@ class RangkumanPeriodik extends StatelessWidget {
                   onPressed: () {
                     ExcelProcessor().printExcel(state);
                   },
-                  child: Text('Rangkum Excel'));
+                  child: Text('Rangkum Excel(belum)'));
             },
           )
         ],
@@ -76,9 +75,14 @@ class RangkumanPeriodik extends StatelessWidget {
               ),
               Flexible(
                 flex: 1,
-                child: SummaryContainer(
-                  state: state,
-                  isHarian: isHarian,
+                child: Column(
+                  children: [
+                    // FutureBuilder(future: RepositoryProvider.of<SubjectRepository>(context), builder: builder)
+                    SummaryContainer(
+                      state: state,
+                      isHarian: isHarian,
+                    ),
+                  ],
                 ),
               )
             ],
@@ -189,7 +193,6 @@ class _SummaryContainerState extends State<SummaryContainer> {
                               },
                             );
                           } else {
-                            print('clicked');
                             showMonthYearPicker(
                                     context: context,
                                     initialDate:
@@ -223,11 +226,17 @@ class _SummaryContainerState extends State<SummaryContainer> {
                   ),
                 ],
               ),
-              Text('Item counts'),
+              Text(
+                'Item counts',
+                textScaler: TextScaler.linear(1.1),
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
               for (var j = 0; j < peritem.length; j++)
                 Text('${peritemlist[j].key} ${peritemlist[j].value}x'),
               Divider(),
-              Text('Pendapatan dari penjualan '),
+              Text('Pendapatan dari penjualan ',
+                  textScaler: TextScaler.linear(1.1),
+                  style: TextStyle(fontWeight: FontWeight.w500)),
               Text('Total ${totalpendapatan.numberFormat(currency: true)}'),
               Text('Total tunai ${widget.state.struks.where(
                     (element) => element.tipePembayaran == TipePembayaran.tunai,
@@ -244,84 +253,112 @@ class _SummaryContainerState extends State<SummaryContainer> {
                         previousValue + (element.total ?? 0),
                   ).numberFormat(currency: true)}'),
               Divider(),
-              Text('Pengeluaran'),
-              FutureBuilder(
-                future: RepositoryProvider.of<KasRepository>(context)
-                    .getPengeluaran(
-                        start: widget.state.filter.start!,
-                        end: widget.state.filter.end!),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
+              Text('Pengeluaran Umum',
+                  textScaler: TextScaler.linear(1.1),
+                  style: TextStyle(fontWeight: FontWeight.w500)),
+              Column(
+                children: [
+                  for (dynamic e in (widget.state.pengeluaranKas))
+                    Row(
                       children: [
-                        for (dynamic e in (snapshot.data!.docs))
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: Text(e.data()['title'].toString())),
-                              Expanded(
-                                child: Text((e.data()['cost'] as int)
-                                    .numberFormat(currency: true)),
-                              ),
-                              Expanded(
-                                child: Text((e.data()['date'] as Timestamp)
-                                    .toDate()
-                                    .formatLengkap()),
-                              ),
-                            ],
-                          ),
-                        Row(
-                          children: [
-                            Text('Total : '),
-                            Text(snapshot.data!.docs
-                                .fold(
-                                  0,
-                                  (previousValue, element) =>
-                                      previousValue +
-                                      (((element.data() as Map)['cost']
-                                              as int?) ??
-                                          0),
-                                )
-                                .numberFormat(currency: true))
-                          ],
+                        Expanded(child: Text(e.data()['title'].toString())),
+                        Expanded(
+                          child: Text((e.data()['cost'] as int)
+                              .numberFormat(currency: true)),
                         ),
-                        Divider(),
-                        Text('Bersih'),
-                        Row(
-                          children: [
-                            Text(
-                                'Total ${totalpendapatan.numberFormat(currency: true)}'),
-                            Text(" - "),
-                            Text(snapshot.data!.docs
-                                .fold(
-                                  0,
-                                  (previousValue, element) =>
-                                      previousValue +
-                                      (((element.data() as Map)['cost']
-                                              as int?) ??
-                                          0),
-                                )
-                                .numberFormat(currency: true)),
-                            Text(" = "),
-                            Text((totalpendapatan -
-                                    (snapshot.data!.docs.fold(
-                                      0,
-                                      (previousValue, element) =>
-                                          previousValue +
-                                          (((element.data() as Map)['cost']
-                                                  as int?) ??
-                                              0),
-                                    )))
-                                .numberFormatCurrency),
-                          ],
+                        Expanded(
+                          child: Text((e.data()['date'] as Timestamp)
+                              .toDate()
+                              .formatLengkap()),
                         ),
                       ],
-                    );
-                  }
-
-                  return CircularProgressIndicator.adaptive();
-                },
-              )
+                    ),
+                  Row(
+                    children: [
+                      Text('Total : '),
+                      Text(widget.state.pengeluaranKas
+                          .fold(
+                            0,
+                            (previousValue, element) =>
+                                previousValue +
+                                (((element.data() as Map)['cost'] as int?) ??
+                                    0),
+                          )
+                          .numberFormat(currency: true))
+                    ],
+                  ),
+                ],
+              ),
+              Text('Pengeluaran dari Pembelian Bahanbaku',
+                  textScaler: TextScaler.linear(1.1),
+                  style: TextStyle(fontWeight: FontWeight.w500)),
+              Column(children: [
+                for (InputstockModel e in widget.state.pengeluaranInputBahan)
+                  Row(
+                    children: [
+                      Expanded(child: Text(e.title)),
+                      Expanded(
+                          child: Text(e.price.numberFormat(currency: true))),
+                      Expanded(
+                          child: Text(e.tanggalbeli.toDate().formatLengkap())),
+                    ],
+                  ),
+                Row(
+                  children: [
+                    Text('Total : '),
+                    Text(widget.state.pengeluaranInputBahan
+                        .fold(
+                          0.0,
+                          (previousValue, element) =>
+                              previousValue + element.price,
+                        )
+                        .numberFormat(currency: true))
+                  ],
+                ),
+              ]),
+              Divider(),
+              Text('Bersih Periode ini',
+                  textScaler: TextScaler.linear(1.1),
+                  style: TextStyle(fontWeight: FontWeight.w500)),
+              Row(
+                children: [
+                  Text('Total ${totalpendapatan.numberFormat(currency: true)}'),
+                  Text(" - "),
+                  Text(widget.state.pengeluaranKas
+                      .fold(
+                        0,
+                        (previousValue, element) =>
+                            previousValue +
+                            (((element.data() as Map)['cost'] as int?) ?? 0),
+                      )
+                      .numberFormat(currency: true)),
+                  Text(" - "),
+                  Text(widget.state.pengeluaranInputBahan
+                      .fold(
+                        0.0,
+                        (previousValue, element) =>
+                            previousValue + element.price,
+                      )
+                      .numberFormat(currency: true)),
+                  Text(" = "),
+                  Text((totalpendapatan -
+                          (widget.state.pengeluaranKas.fold(
+                            0,
+                            (previousValue, element) =>
+                                previousValue +
+                                (((element.data() as Map)['cost'] as int?) ??
+                                    0),
+                          )) -
+                          (widget.state.pengeluaranInputBahan.fold(
+                            0.0,
+                            (previousValue, element) =>
+                                previousValue + element.price,
+                          )))
+                      .numberFormatCurrency),
+                ],
+              ),
+              Divider(),
+              Text('')
             ],
           ),
         ),

@@ -87,7 +87,25 @@ extension UserParsing on auth.User {
   }
 }
 
+extension DateParsingNullable on DateTime? {
+  DateTime? simpler() {
+    if (this != null) {
+      return DateTime(this!.year, this!.month, this!.day);
+    } else {
+      return null;
+    }
+  }
+
+  String formatBasic() {
+    initializeDateFormatting();
+    DateFormat tanggalFormat = DateFormat.yMMMd('ID_id');
+    return this == null ? "Err: Null Value" : tanggalFormat.format(this!);
+  }
+}
+
 extension DateParsing on DateTime {
+  ///delete hour-minute-seconds from datetime [DateTime(year,month,day)]
+
   String get clockTimeOnly {
     return "$hour:$minute:$second";
   }

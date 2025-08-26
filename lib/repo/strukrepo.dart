@@ -2,7 +2,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
+import 'package:order_makan/helper.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class _StrukRepo {
   FirebaseFirestore db;
@@ -11,7 +13,7 @@ abstract class _StrukRepo {
 
   Future sendtoAntrian(UseStrukState state);
   Future<List<UseStrukState>> getAntrian();
-  Future<int> getAntrianCount();
+  Future<int> getCurrrentAntrianCount();
   Future deleteAntrian(String docId, String reason);
   Future finishAntrian(String strukId) async {}
   // Future sendtoDatabase(StrukState state);
@@ -41,6 +43,17 @@ class StrukRepository extends _StrukRepo {
   late CollectionReference<UseStrukState> strukRef;
   late CollectionReference antrianRefVanilla;
   late CollectionReference strukRefVanilla;
+  Future<int> getTodaysAntrianCount({DateTime? date}) async {
+    var thedate = date == null ? DateTime.now() : date.simpler();
+    var sp = await SharedPreferences.getInstance();
+    return sp.getInt(thedate.formatBasic()) ?? 0;
+  }
+
+  Future<bool> increaseTodaysAntrianCount({DateTime? date}) async {
+    var thedate = date == null ? DateTime.now() : date.simpler();
+    var sp = await SharedPreferences.getInstance();
+    return sp.setInt(thedate.formatBasic(), await getTodaysAntrianCount() + 1);
+  }
 
   Stream<int> getStrukStreamCount() {
     return strukRef.where('title', isNull: false).snapshots().map<int>(
@@ -56,7 +69,7 @@ class StrukRepository extends _StrukRepo {
   }
 
   @override
-  Future<int> getAntrianCount() {
+  Future<int> getCurrrentAntrianCount() {
     return antrianRef.count().get().then(
           (value) => value.count ?? 0,
         );

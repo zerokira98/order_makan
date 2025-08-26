@@ -229,6 +229,7 @@ class DisplayStruk extends StatelessWidget {
                     ],
                   ),
                 ),
+                Text('Nomor Antrian : ${data.nomorAntrian}'),
                 Text('Id : ${data.strukId}'),
                 FutureBuilder(
                   future: RepositoryProvider.of<KaryawanAuthRepo>(context)
@@ -260,18 +261,18 @@ class DisplayStruk extends StatelessWidget {
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 12.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                        'Nomor meja : ${data.nomorMeja == 0 ? 'Tanpa Meja' : data.nomorMeja}',
-                        textAlign: TextAlign.end,
-                      )),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 12.0),
+                //   child: Row(
+                //     children: [
+                //       Expanded(
+                //           child: Text(
+                //         'Nomor antrian : ${data.nomorAntrian == 0 ? 'Tanpa Antrian' : data.nomorAntrian}',
+                //         textAlign: TextAlign.end,
+                //       )),
+                //     ],
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
                   child: Row(
@@ -472,7 +473,7 @@ class StrukPrint {
         ));
 
     bytes += generator.feed(2);
-    bytes += generator.text('No. meja: ${data.nomorMeja}',
+    bytes += generator.text('No. antrian: ${data.nomorAntrian}',
         styles: const PosStyles(
           align: PosAlign.left,
           fontType: PosFontType.fontB,

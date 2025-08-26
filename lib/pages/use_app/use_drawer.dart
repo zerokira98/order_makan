@@ -23,7 +23,7 @@ class UseDrawer extends StatelessWidget {
           Divider(),
           Expanded(child: Container()),
           ListTile(
-            title: const Text('Catat Pengeluaran'),
+            title: const Text('Catat Pengeluaran Umum'),
             onTap: () {
               Navigator.push(
                   context,

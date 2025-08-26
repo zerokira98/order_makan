@@ -8,7 +8,7 @@ part of 'struk_state.dart';
 
 UseStrukState _$UseStrukStateFromJson(Map<String, dynamic> json) =>
     UseStrukState(
-      nomorMeja: (json['nomorMeja'] as num?)?.toInt() ?? 0,
+      nomorAntrian: (json['nomorAntrian'] as num?)?.toInt() ?? 0,
       tipePembayaran: $enumDecodeNullable(
               _$TipePembayaranEnumMap, json['tipePembayaran']) ??
           TipePembayaran.tunai,
@@ -29,7 +29,7 @@ UseStrukState _$UseStrukStateFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$UseStrukStateToJson(UseStrukState instance) =>
     <String, dynamic>{
       'karyawanId': instance.karyawanId,
-      'nomorMeja': instance.nomorMeja,
+      'nomorAntrian': instance.nomorAntrian,
       'tipePembayaran': _$TipePembayaranEnumMap[instance.tipePembayaran]!,
       'strukId': instance.strukId,
       'ordertime': instance.ordertime.toIso8601String(),

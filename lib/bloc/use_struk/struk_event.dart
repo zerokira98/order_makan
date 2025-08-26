@@ -41,9 +41,9 @@ class ChangePembayaran extends UseStrukEvent {
   ChangePembayaran({required this.tipe});
 }
 
-class ChangeMeja extends UseStrukEvent {
-  final int meja;
-  ChangeMeja({required this.meja});
+class ChangeAntrian extends UseStrukEvent {
+  final int antrian;
+  ChangeAntrian({required this.antrian});
 }
 
 class DecreaseCount extends UseStrukEvent {

@@ -21,7 +21,7 @@ class HistoriPenjualanHarian extends StatelessWidget {
                 end: DateTime(now.year, now.month, now.day + 1))),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            debugPrint(snapshot.data.toString());
+            // debugPrint(snapshot.data.toString());
             var data = snapshot.data;
             return RefreshIndicator(
               onRefresh: () {
@@ -51,6 +51,9 @@ class HistoriPenjualanHarian extends StatelessWidget {
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            Expanded(
+                                child: Text(
+                                    "Nomor Antrian: ${data[index].nomorAntrian}")),
                             Text(data[index].ordertime.formatLengkap()),
                             Text(data[index].ordertime.clockOnly()),
                           ],
@@ -58,12 +61,11 @@ class HistoriPenjualanHarian extends StatelessWidget {
                         subtitle: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(data[index]
-                                .orderItems
-                                .map(
-                                  (e) => e.title + e.count.toString(),
-                                )
-                                .toString()),
+                            Text(data[index].orderItems.map(
+                              (e) {
+                                return "${e.title}${e.submenues.isEmpty ? '' : '*'} ${e.count}x";
+                              },
+                            ).toString()),
                             Text(data[index]
                                     .total
                                     // .orderItems

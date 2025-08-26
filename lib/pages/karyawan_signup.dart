@@ -52,18 +52,27 @@ class _KaryawanSignupPageState extends State<KaryawanSignupPage> {
                   TextFormField(
                     controller: username,
                     validator: usernameValidator,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(label: Text('Username')),
                   ),
                   TextFormField(
                     controller: email,
                     validator: validateEmail,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     decoration: const InputDecoration(label: Text('Email')),
                   ),
                   TextFormField(
                     controller: password,
                     obscureText: obsecure,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                     decoration: InputDecoration(
                         label: const Text('Password'),
                         suffixIcon: IconButton(

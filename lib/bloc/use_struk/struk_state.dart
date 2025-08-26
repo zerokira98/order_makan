@@ -11,7 +11,7 @@ enum TipePembayaran { tunai, qris }
 @JsonSerializable(explicitToJson: true)
 class UseStrukState extends Equatable {
   final String karyawanId;
-  final int nomorMeja;
+  final int nomorAntrian;
   final TipePembayaran tipePembayaran;
 
   final String? strukId;
@@ -23,7 +23,7 @@ class UseStrukState extends Equatable {
   final String? deleteReason;
 
   UseStrukState({
-    this.nomorMeja = 0,
+    this.nomorAntrian = 0,
     this.tipePembayaran = TipePembayaran.tunai,
     required this.karyawanId,
     this.strukId,
@@ -50,7 +50,7 @@ class UseStrukState extends Equatable {
           String? deleteReason,
           int? total,
           int? waktuTunggu,
-          int? nomorMeja,
+          int? nomorAntrian,
           TipePembayaran? tipePembayaran,
           String? strukId,
           StrukError? error,
@@ -60,7 +60,7 @@ class UseStrukState extends Equatable {
         waktuTunggu: waktuTunggu ?? this.waktuTunggu,
         deleteReason: deleteReason ?? this.deleteReason,
         tipePembayaran: tipePembayaran ?? this.tipePembayaran,
-        nomorMeja: nomorMeja ?? this.nomorMeja,
+        nomorAntrian: nomorAntrian ?? this.nomorAntrian,
         karyawanId: karyawanId ?? this.karyawanId,
         strukId: strukId ?? this.strukId,
         error: error ?? this.error,
@@ -82,7 +82,7 @@ class UseStrukState extends Equatable {
   @override
   List<Object?> get props => [
         karyawanId,
-        nomorMeja,
+        nomorAntrian,
         tipePembayaran,
         strukId,
         ordertime,
@@ -123,7 +123,7 @@ UseStrukState _$StrukStateFromFirestore(
     total: data['total_harga'],
     karyawanId: data['karyawanId'] as String,
     strukId: doc.id,
-    nomorMeja: (data['nomorMeja'] as num?)?.toInt() ?? 0,
+    nomorAntrian: (data['nomorAntrian'] as num?)?.toInt() ?? 0,
     tipePembayaran:
         $enumDecodeNullable(_$TipePembayaranEnumMap, data['tipePembayaran']) ??
             TipePembayaran.tunai,
@@ -141,7 +141,7 @@ Map<String, dynamic> _$StrukStateToFirestore(UseStrukState instance) =>
     <String, dynamic>{
       'custom_order': null,
       'karyawanId': instance.karyawanId,
-      'nomorMeja': instance.nomorMeja,
+      'nomorAntrian': instance.nomorAntrian,
       'tipePembayaran': instance.tipePembayaran.name,
       // 'strukId': instance.strukId,
       'ordertime': Timestamp.fromDate(instance.ordertime),

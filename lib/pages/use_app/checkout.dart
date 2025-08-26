@@ -174,56 +174,59 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Text('Nomor meja: '),
-                                      BlocBuilder<UseStrukBloc, UseStrukState>(
-                                        builder: (context, state) {
-                                          return DropdownButton<int>(
-                                            menuMaxHeight: 280,
-                                            alignment: Alignment.center,
-                                            items: [
-                                              const DropdownMenuItem(
-                                                value: 0,
-                                                child: Text('Tanpa meja'),
-                                              ),
-                                              for (var i = 1; i <= 25; i++)
-                                                DropdownMenuItem(
-                                                  value: i,
-                                                  child: Text(
-                                                    '$i',
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                ),
-                                            ],
-                                            value: state.nomorMeja,
-                                            onChanged: (value) {
-                                              BlocProvider.of<UseStrukBloc>(
-                                                      context)
-                                                  .add(ChangeMeja(
-                                                      meja: value ?? 0));
-                                              // setState(() {
-                                              //   val = value ?? 0;
-                                              // });
-                                            },
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  const Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 12)),
+                                  //     Column(
+                                  //       crossAxisAlignment:
+                                  //           CrossAxisAlignment.start,
+                                  //       mainAxisSize: MainAxisSize.min,
+                                  //       children: [
+                                  //         const Text('Nomor antrian: '),
+                                  //         BlocBuilder<UseStrukBloc, UseStrukState>(
+                                  //           builder: (context, state) {
+                                  //             return DropdownButton<int>(
+                                  //               menuMaxHeight: 280,
+                                  //               alignment: Alignment.center,
+                                  //               items: [
+                                  //                 const DropdownMenuItem(
+                                  //                   value: 0,
+                                  //                   child: Text('Tanpa antrian'),
+                                  //                 ),
+                                  //                 for (var i = 1; i <= 25; i++)
+                                  //                   DropdownMenuItem(
+                                  //                     value: i,
+                                  //                     child: Text(
+                                  //                       '$i',
+                                  //                       textAlign: TextAlign.center,
+                                  //                     ),
+                                  //                   ),
+                                  //               ],
+                                  //               value: state.nomorAntrian,
+                                  //               onChanged: (value) {
+                                  //                 BlocProvider.of<UseStrukBloc>(
+                                  //                         context)
+                                  //                     .add(ChangeAntrian(
+                                  //                         antrian: value ?? 0));
+                                  //                 // setState(() {
+                                  //                 //   val = value ?? 0;
+                                  //                 // });
+                                  //               },
+                                  //             );
+                                  //           },
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //     const Padding(
+                                  //         padding:
+                                  //             EdgeInsets.symmetric(horizontal: 12)),
                                   Expanded(
                                     flex: 1,
-                                    child: TextFormField(
-                                      controller: uang,
-                                      inputFormatters: [telo],
-                                      decoration: const InputDecoration(
-                                          label: Text('Uang')),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: TextFormField(
+                                        controller: uang,
+                                        inputFormatters: [telo],
+                                        decoration: const InputDecoration(
+                                            label: Text('Uang')),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -244,7 +247,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                                       Expanded(
                                         child: InkWell(
                                           onTap: () {
-                                            uang.text = '0';
+                                            uang.text = telo.formatDouble(0.0);
                                             BlocProvider.of<UseStrukBloc>(
                                                     context)
                                                 .add(ChangePembayaran(
@@ -273,17 +276,24 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                                                   groupValue:
                                                       state.tipePembayaran,
                                                   onChanged: (value) {
-                                                    if (value != null) {
-                                                      uang.text = '0';
-                                                      BlocProvider.of<
-                                                                  UseStrukBloc>(
-                                                              context)
-                                                          .add(ChangePembayaran(
-                                                              tipe: value));
-                                                    }
+                                                    // if (value != null) {
+                                                    //   uang.text = '0';
+                                                    //   BlocProvider.of<
+                                                    //               UseStrukBloc>(
+                                                    //           context)
+                                                    //       .add(ChangePembayaran(
+                                                    //           tipe: value));
+                                                    // }
                                                   },
                                                 ),
-                                                Text('Tunai')
+                                                Text('Tunai'),
+                                                Expanded(child: SizedBox()),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child:
+                                                      Icon(Icons.attach_money),
+                                                )
                                               ],
                                             ),
                                           ),
@@ -294,7 +304,9 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                                       Expanded(
                                         child: InkWell(
                                           onTap: () {
-                                            uang.text = total(state).toString();
+                                            uang.text = telo.formatString(
+                                                total(state).toString());
+                                            setState(() {});
                                             BlocProvider.of<UseStrukBloc>(
                                                     context)
                                                 .add(ChangePembayaran(
@@ -322,18 +334,24 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                                                   groupValue:
                                                       state.tipePembayaran,
                                                   onChanged: (value) {
-                                                    if (value != null) {
-                                                      uang.text = total(state)
-                                                          .toString();
-                                                      BlocProvider.of<
-                                                                  UseStrukBloc>(
-                                                              context)
-                                                          .add(ChangePembayaran(
-                                                              tipe: value));
-                                                    }
+                                                    // if (value != null) {
+                                                    //   uang.text = total(state)
+                                                    //       .toString();
+                                                    //   BlocProvider.of<
+                                                    //               UseStrukBloc>(
+                                                    //           context)
+                                                    //       .add(ChangePembayaran(
+                                                    //           tipe: value));
+                                                    // }
                                                   },
                                                 ),
-                                                Text('Qris')
+                                                Text('Qris'),
+                                                Expanded(child: SizedBox()),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Icon(Icons.qr_code_2),
+                                                )
                                               ],
                                             ),
                                           ),
@@ -380,11 +398,10 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                                   Padding(padding: EdgeInsetsGeometry.all(4)),
                                   ElevatedButton(
                                       onPressed: () async {
-                                        if (((telo.getDouble()) -
-                                                    total(state)) <
-                                                0 ||
-                                            state.tipePembayaran ==
-                                                TipePembayaran.qris) {
+                                        print(
+                                            (telo.getDouble() - total(state)));
+                                        if (((telo.getDouble() - total(state)) <
+                                            0.0)) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
                                                   content:
