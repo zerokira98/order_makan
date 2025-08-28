@@ -175,14 +175,21 @@ class SubmenuIngredientInputRow extends StatelessWidget {
             builder: (context, controller, focusNode) => TextFormField(
                 controller: controller,
                 focusNode: focusNode,
+                autovalidateMode: AutovalidateMode.always,
+                validator: (value) {
+                  if (data.id == null) {
+                    return 'Please Select';
+                  }
+                  return usernameValidator(value);
+                },
                 onChanged: (value) {
                   BlocProvider.of<MenueditCubit>(context)
                       .editSubmenuIngredients(
                           submenu: submenu,
-                          data: data.copyWith(title: value, id: null));
+                          data: data.copyWith(title: value, id: () => null));
                 },
                 decoration: InputDecoration(
-                  label: Text('Ingredient Name'),
+                  label: Text('Select Ingredient'),
                 )),
             itemBuilder: (context, value) {
               return ListTile(

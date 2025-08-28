@@ -15,186 +15,199 @@ class InputBeliBahanbaku extends StatefulWidget {
 class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Pembelian Bahanbaku'),
-        actions: [
-          IconButton.outlined(
-              onPressed: () {
-                setState(() {});
-              },
-              icon: Icon(Icons.refresh))
-        ],
-      ),
-      body: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: Column(
-              children: [
-                Text('List Pembelian Bahanbaku'),
-                Expanded(
-                  child: FutureBuilder(
-                    future: RepositoryProvider.of<MenuItemRepository>(context)
-                        .getInputstocks(),
-                    builder: (context, snapshot) {
-                      debugPrint(snapshot.data?.docs.toString());
-                      if (snapshot.data == null ||
-                          (snapshot.data?.docs.isEmpty ?? false)) {
-                        return Center(
-                          child: Text('Empty'),
-                        );
-                      }
-                      return ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          var thedata = snapshot.data!.docs[index].data();
-                          return ListTile(
-                            title: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(thedata.title.toString()),
-                                Text(thedata.asIngredient.title.toString()),
-                              ],
-                            ),
-                            subtitle: Row(
-                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(thedata.price
-                                      .numberFormat(currency: true)),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    thedata.tanggalbeli.toDate().formatBasic(),
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    thedata.count.numberFormat() +
-                                        thedata.asIngredient.satuan,
-                                    textAlign: TextAlign.end,
-                                  ),
-                                ),
-                              ],
-                            ),
+    return BlocListener<InputbeliformCubit, InputbeliformState>(
+      listenWhen: (previous, current) =>
+          current == InputbeliformState.initial(),
+      listener: (context, state) {
+        setState(() {});
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Pembelian Bahanbaku'),
+          actions: [
+            IconButton.outlined(
+                onPressed: () {
+                  setState(() {});
+                },
+                icon: Icon(Icons.refresh))
+          ],
+        ),
+        body: Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Column(
+                children: [
+                  Text('List Pembelian Bahanbaku'),
+                  Expanded(
+                    child: FutureBuilder(
+                      future: RepositoryProvider.of<MenuItemRepository>(context)
+                          .getInputstocks(),
+                      builder: (context, snapshot) {
+                        debugPrint(snapshot.data?.docs.toString());
+                        if (snapshot.data == null ||
+                            (snapshot.data?.docs.isEmpty ?? false)) {
+                          return Center(
+                            child: Text('Empty'),
                           );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          VerticalDivider(),
-          Expanded(
-            flex: 1,
-            child: Column(
-              children: [
-                Text('List Stock Bahanbaku'),
-                Expanded(
-                  child: FutureBuilder(
-                    future: RepositoryProvider.of<MenuItemRepository>(context)
-                        .getIngredients(),
-                    builder: (context, snapshot) {
-                      debugPrint(snapshot.data.toString());
-                      if (snapshot.data == null ||
-                          (snapshot.data?.isEmpty ?? false)) {
-                        return Center(
-                          child: Text('Empty'),
+                        }
+                        return ListView.builder(
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            var thedata = snapshot.data!.docs[index].data();
+                            return ListTile(
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(thedata.title.toString()),
+                                  Text(thedata.asIngredient.title.toString()),
+                                ],
+                              ),
+                              subtitle: Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(thedata.price
+                                        .numberFormat(currency: true)),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      thedata.tanggalbeli
+                                          .toDate()
+                                          .formatBasic(),
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      thedata.count.numberFormat() +
+                                          thedata.asIngredient.satuan,
+                                      textAlign: TextAlign.end,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         );
-                      }
-                      return ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          var thedata = snapshot.data![index];
-                          return ListTile(
-                            title: Text(thedata.title.toString()),
-                            onTap: () => showDialog(
-                                context: context,
-                                builder: (context) {
-                                  TextEditingController alert =
-                                      TextEditingController(
-                                          text:
-                                              thedata.alert?.toString() ?? '0');
-                                  TextEditingController satuandialog =
-                                      TextEditingController(
-                                          text: thedata.satuan);
-                                  return Dialog(
-                                    insetPadding: EdgeInsets.all(24),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(18.0),
-                                      child: SizedBox(
-                                        width: 300,
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: TextFormField(
-                                                controller: alert,
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                validator: numberValidator,
-                                                decoration: InputDecoration(
-                                                    label: Text(
-                                                        'Alert when less than')),
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            VerticalDivider(),
+            Expanded(
+              flex: 1,
+              child: Column(
+                children: [
+                  Text('List Stock Bahanbaku'),
+                  Expanded(
+                    child: FutureBuilder(
+                      future: RepositoryProvider.of<MenuItemRepository>(context)
+                          .getIngredients(),
+                      builder: (context, snapshot) {
+                        debugPrint(snapshot.data.toString());
+                        if (snapshot.data == null ||
+                            (snapshot.data?.isEmpty ?? false)) {
+                          return Center(
+                            child: Text('Empty'),
+                          );
+                        }
+                        return ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            var thedata = snapshot.data![index];
+                            return ListTile(
+                              title: Text(thedata.title.toString()),
+                              onTap: () => showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    TextEditingController alert =
+                                        TextEditingController(
+                                            text: thedata.alert?.toString() ??
+                                                '0');
+                                    TextEditingController satuandialog =
+                                        TextEditingController(
+                                            text: thedata.satuan);
+                                    return Dialog(
+                                      insetPadding: EdgeInsets.all(24),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(18.0),
+                                        child: SizedBox(
+                                          width: 300,
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextFormField(
+                                                  controller: alert,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  validator: numberValidator,
+                                                  decoration: InputDecoration(
+                                                      label: Text(
+                                                          'Alert when less than')),
+                                                ),
                                               ),
-                                            ),
-                                            Expanded(
-                                              child: TextFormField(
-                                                validator: numberValidator,
-                                                keyboardType:
-                                                    TextInputType.number,
-                                                controller: satuandialog,
-                                                decoration: InputDecoration(
-                                                    label: Text('Satuan')),
+                                              Expanded(
+                                                child: TextFormField(
+                                                  validator: numberValidator,
+                                                  keyboardType:
+                                                      TextInputType.number,
+                                                  controller: satuandialog,
+                                                  decoration: InputDecoration(
+                                                      label: Text('Satuan')),
+                                                ),
                                               ),
-                                            ),
-                                            IconButton(
-                                                onPressed: () {
-                                                  RepositoryProvider.of<
-                                                              MenuItemRepository>(
-                                                          context)
-                                                      .editIngredientsSatuan(
-                                                          thedata.copyWith(
-                                                        satuan:
-                                                            satuandialog.text,
-                                                        alert: () => int.parse(
-                                                            alert.text),
-                                                      ))
-                                                      .then(
-                                                        (value) =>
-                                                            Navigator.pop(
-                                                                context),
-                                                      );
-                                                },
-                                                icon: Icon(Icons.save))
-                                          ],
+                                              IconButton(
+                                                  onPressed: () {
+                                                    RepositoryProvider.of<
+                                                                MenuItemRepository>(
+                                                            context)
+                                                        .editIngredientsSatuan(
+                                                            thedata.copyWith(
+                                                          satuan:
+                                                              satuandialog.text,
+                                                          alert: () =>
+                                                              int.parse(
+                                                                  alert.text),
+                                                        ))
+                                                        .then(
+                                                          (value) =>
+                                                              Navigator.pop(
+                                                                  context),
+                                                        );
+                                                  },
+                                                  icon: Icon(Icons.save))
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                }),
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Stock: ${thedata.count.numberFormat()}'),
-                                Text('satuan: ${thedata.satuan}'),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
+                                    );
+                                  }),
+                              subtitle: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                      'Stock: ${thedata.count.numberFormat()}'),
+                                  Text('satuan: ${thedata.satuan}'),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                InputBahanbakuField(
-                    BlocProvider.of<InputbeliformCubit>(context).state),
-              ],
+                  InputBahanbakuField(
+                      BlocProvider.of<InputbeliformCubit>(context).state),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -284,6 +297,10 @@ class InputBahanbakuField extends StatelessWidget {
                                             id: () => null)));
                                   },
                                   decoration: InputDecoration(
+                                    suffix:
+                                        thecubit.state.ingredientItem.id == null
+                                            ? Icon(Icons.sd_card_alert_outlined)
+                                            : Icon(Icons.check),
                                     label: Text('Untuk bahan baku:'),
                                   )),
                           itemBuilder: (context, value) {
@@ -350,7 +367,8 @@ class InputBahanbakuField extends StatelessWidget {
                           },
                           validator: (value) =>
                               value!.isEmpty ? 'cant empty' : null,
-                          decoration: InputDecoration(label: Text('Nama Item')),
+                          decoration:
+                              InputDecoration(label: Text('Nama/Merk Item')),
                         ),
                       ),
                       Padding(padding: EdgeInsetsGeometry.all(8)),

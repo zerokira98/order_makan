@@ -113,8 +113,6 @@ class _SummaryContainerState extends State<SummaryContainer> {
   @override
   void initState() {
     var initdate = widget.state.filter.start;
-    // DateTime(widget.state.filter.start?.year ?? now.year,
-    //     widget.state.filter.start?.month ?? now.month);
     dtc.text = widget.isHarian
         ? initdate!.formatLengkap()
         : initdate!.formatMonthYear();

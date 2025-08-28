@@ -66,6 +66,11 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                 // debugPrint(state);
                 return ElevatedButton(
                     onPressed: () {
+                      if ((formkey.currentState?.validate() ?? false) ==
+                          false) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('There\'s invalid data')));
+                      }
                       if (formkey.currentState?.validate() ?? false) {
                         int? hargaInt = int.tryParse(hargaC.text);
                         if (namaMenuC.text.length > 3 && hargaInt != null) {
@@ -492,6 +497,7 @@ class _IngredientInputRowState extends State<IngredientInputRow> {
             flex: 1,
             child: TextFormField(
               autovalidateMode: AutovalidateMode.always,
+              enabled: false,
               // validator: (value) {
               //   if (int.tryParse(value ?? '') == null) return 'not number';
               // },
@@ -524,13 +530,19 @@ class _NamaInput extends StatelessWidget {
       builder: (context, controller, focusNode) => TextFormField(
           controller: controller,
           focusNode: focusNode,
-          validator: usernameValidator,
+          autovalidateMode: AutovalidateMode.always,
+          validator: (value) {
+            if (data.id == null) {
+              return 'Please select';
+            }
+            return usernameValidator(value);
+          },
           onChanged: (value) {
             BlocProvider.of<MenueditCubit>(context).editIngredients(
                 data: data.copyWith(title: value, id: () => null));
           },
           decoration: InputDecoration(
-            label: Text('Ingredient Name'),
+            label: Text('Select Ingredient'),
           )),
       itemBuilder: (context, value) {
         return ListTile(
