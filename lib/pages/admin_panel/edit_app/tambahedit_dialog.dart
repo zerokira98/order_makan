@@ -55,7 +55,18 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
-        BlocProvider.of<MenueditCubit>(context).clear();
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              actions: [
+                ElevatedButton(onPressed: () {}, child: Text('Cancel')),
+                ElevatedButton(onPressed: () {}, child: Text('Close')),
+              ],
+            );
+          },
+        );
+        // BlocProvider.of<MenueditCubit>(context).clear();
       },
       child: Scaffold(
         appBar: AppBar(
