@@ -34,8 +34,8 @@ class _AntrianCardState extends State<AntrianCard> {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             gradient: LinearGradient(colors: [
-              Color.fromARGB(255, 75 + ((diff * 5) >= 150 ? 150 : (diff * 5)),
-                  120 - ((diff * 2) >= 100 ? 100 : (diff * 2)), 70),
+              Color.fromARGB(255, 75 + ((diff * 4) >= 150 ? 150 : (diff * 4)),
+                  130 - ((diff * 2) >= 100 ? 100 : (diff * 2)), 70),
               Colors.grey
             ])),
         child: Padding(
@@ -90,7 +90,7 @@ class _AntrianCardState extends State<AntrianCard> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      'total: ${widget.e.orderItems.fold(
+                      'Total: ${widget.e.orderItems.fold(
                             0,
                             (previousValue, element) =>
                                 previousValue + (element.count * element.price),

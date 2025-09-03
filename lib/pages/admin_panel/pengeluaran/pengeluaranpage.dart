@@ -57,10 +57,11 @@ class PengeluaranInputForm extends StatelessWidget {
                           await RepositoryProvider.of<KasRepository>(context)
                               .getPengeluaranAll();
                       List<String> b = a.docs
-                          .map((e) =>
-                              (e.data()['title'] as String).contains(search)
-                                  ? (e.data()['title'] as String)
-                                  : null)
+                          .map((e) => (e.data()['title'] as String)
+                                  .toLowerCase()
+                                  .contains(search.toLowerCase())
+                              ? (e.data()['title'] as String)
+                              : null)
                           .nonNulls
                           .toList();
                       return b;

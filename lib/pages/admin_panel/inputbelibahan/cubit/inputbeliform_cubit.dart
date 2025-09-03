@@ -26,7 +26,10 @@ class InputbeliformCubit extends Cubit<InputbeliformState> {
   void sendtoDB() async {
     String? ingredientId;
     if (state.ingredientItem.id == null) {
-      ingredientId = await repo.addIngredients(state.ingredientItem).then(
+      ingredientId = await repo
+          .addIngredients(state.ingredientItem
+              .copyWith(title: state.ingredientItem.title.trim().toLowerCase()))
+          .then(
             (value) => value.id,
           );
     } else {

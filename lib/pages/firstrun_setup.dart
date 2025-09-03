@@ -41,6 +41,7 @@ class _SetupPageState extends State<SetupPage> {
           return PopScope(
             canPop: false,
             child: KeyLock(
+              showCancel: false,
               tendigits: '392785',
               title: 'First Started',
               //content: Text('Hello'),

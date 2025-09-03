@@ -5,7 +5,12 @@ import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 class KeyLock extends StatelessWidget {
   final String tendigits;
   final String title;
-  KeyLock({super.key, required this.tendigits, required this.title});
+  final bool showCancel;
+  KeyLock(
+      {super.key,
+      required this.tendigits,
+      required this.title,
+      this.showCancel = true});
 
   final InputController ic = InputController();
 
@@ -18,7 +23,7 @@ class KeyLock extends StatelessWidget {
       autofocus: true,
       onKeyEvent: (key) {
         if (key is! KeyDownEvent) return;
-        if (key.logicalKey == LogicalKeyboardKey.goBack) {
+        if (key.logicalKey == LogicalKeyboardKey.goBack && showCancel) {
           return Navigator.of(context).pop(false);
         }
         if (key.logicalKey == LogicalKeyboardKey.backspace) {
@@ -31,8 +36,10 @@ class KeyLock extends StatelessWidget {
       child: ScreenLock(
         title: Text(title),
         correctString: tendigits,
+        cancelButton: !showCancel ? SizedBox() : null,
         inputController: ic,
-        onCancelled: () => Navigator.of(context).pop(false),
+        onCancelled:
+            !showCancel ? null : () => Navigator.of(context).pop(false),
         onUnlocked: () => Navigator.of(context).pop(true),
       ),
     );

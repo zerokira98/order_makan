@@ -241,7 +241,7 @@ class _OrderTileState extends State<OrderTile>
                                                     1 ==
                                                 index
                                             ? Text(
-                                                '${((state.orderItems[widget.index].price * state.orderItems[widget.index].count) + state.orderItems[widget.index].submenues.fold(0.0, (prevValue, ele) => prevValue + (ele.adjustHarga * state.orderItems[widget.index].count))).numberFormat(currency: false)}',
+                                                ((state.orderItems[widget.index].price * state.orderItems[widget.index].count) + state.orderItems[widget.index].submenues.fold(0.0, (prevValue, ele) => prevValue + (ele.adjustHarga * state.orderItems[widget.index].count))).numberFormat(currency: false),
                                                 textAlign: TextAlign.end,
                                               )
                                             : SizedBox(),

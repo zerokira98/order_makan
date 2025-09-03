@@ -147,6 +147,18 @@ class _SummaryContainerState extends State<SummaryContainer> {
       0,
       (previousValue, element) => previousValue + (element.total ?? 0),
     );
+    Map groupIngredient = {};
+    for (var element in widget.state.struks) {
+        for (var element2 in element.orderItems) {
+            for (var element3 in element2.ingredientItems) {
+                groupIngredient.update(
+                  element3.id,
+                  (value) => value + (element3.count * element2.count),
+                  ifAbsent: () => element3.count * element2.count,
+                );
+              }
+          }
+      }
     return Card.filled(
       color: Colors.blue.shade100,
       child: Container(
@@ -356,7 +368,11 @@ class _SummaryContainerState extends State<SummaryContainer> {
                 ],
               ),
               Divider(),
-              Text('')
+              Text('Bahan baku'),
+              Text('Expected usage:'),
+              Text(groupIngredient.toString()),
+              Text('Expected in stock:'),
+              Text('(Stock InputPage)'),
             ],
           ),
         ),

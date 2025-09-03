@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:order_makan/model/ingredient_model.dart';
 import 'package:order_makan/model/inputstock_model.dart';
-import 'package:order_makan/model/kategori_model.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 
 abstract class _MenuItemRepo {

@@ -14,6 +14,7 @@ import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
 import 'package:order_makan/firebase_options.dart';
+import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
 import 'package:order_makan/pages/admin_panel/inputbelibahan/cubit/inputbeliform_cubit.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
 import 'package:order_makan/pages/firstrun_setup.dart';
@@ -132,6 +133,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
+        routes: {'/adminpanel': (context) => AdminPanel()},
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           MonthYearPickerLocalizations.delegate,

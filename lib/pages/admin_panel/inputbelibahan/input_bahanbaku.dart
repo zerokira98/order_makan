@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:intl/intl.dart';
+import 'package:month_year_picker/month_year_picker.dart';
 import 'package:order_makan/helper.dart';
+import 'package:order_makan/model/inputstock_model.dart';
 import 'package:order_makan/pages/admin_panel/inputbelibahan/cubit/inputbeliform_cubit.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 
@@ -13,6 +18,21 @@ class InputBeliBahanbaku extends StatefulWidget {
 }
 
 class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
+  late Future<QuerySnapshot<InputstockModel>> thefuture;
+  var date = DateTime.now();
+  @override
+  void initState() {
+    thefuture = futuremet();
+    super.initState();
+  }
+
+  Future<QuerySnapshot<InputstockModel>> futuremet() {
+    return RepositoryProvider.of<MenuItemRepository>(context)
+        .getInputstocksWithFilter(
+            start: DateTime(date.year, date.month),
+            end: DateTime(date.year, date.month + 1));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<InputbeliformCubit, InputbeliformState>(
@@ -38,11 +58,37 @@ class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
               flex: 1,
               child: Column(
                 children: [
-                  Text('List Pembelian Bahanbaku'),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Text('List Pembelian Bahanbaku'),
+                        Expanded(child: SizedBox()),
+                        ElevatedButton(
+                            onPressed: () {
+                              showMonthYearPicker(
+                                      context: context,
+                                      initialDate: date,
+                                      firstDate: DateTime(2023),
+                                      lastDate: DateTime.now())
+                                  .then(
+                                (value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      date = value;
+                                      thefuture = futuremet();
+                                    });
+                                  }
+                                },
+                              );
+                            },
+                            child: Text(DateFormat.MMMM('id_ID').format(date))),
+                      ],
+                    ),
+                  ),
                   Expanded(
                     child: FutureBuilder(
-                      future: RepositoryProvider.of<MenuItemRepository>(context)
-                          .getInputstocks(),
+                      future: thefuture,
                       builder: (context, snapshot) {
                         debugPrint(snapshot.data?.docs.toString());
                         if (snapshot.data == null ||
@@ -120,7 +166,7 @@ class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
                           itemBuilder: (context, index) {
                             var thedata = snapshot.data![index];
                             return ListTile(
-                              title: Text(thedata.title.toString()),
+                              title: Text(thedata.title.toString().firstUpcase),
                               onTap: () => showDialog(
                                   context: context,
                                   builder: (context) {
@@ -187,12 +233,14 @@ class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
                                     );
                                   }),
                               subtitle: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                // mainAxisAlignment:
+                                //     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                       'Stock: ${thedata.count.numberFormat()}'),
-                                  Text('satuan: ${thedata.satuan}'),
+                                  Text(thedata.satuan),
+                                  Expanded(child: SizedBox()),
+                                  Text('Alert:${thedata.alert}'),
                                 ],
                               ),
                             );
@@ -232,6 +280,8 @@ class InputBahanbakuField extends StatelessWidget {
         harga = TextEditingController(text: state.harga.toString()),
         tempatbeli = TextEditingController(text: state.tempatbeli);
 
+  final telo = CurrencyTextInputFormatter.simpleCurrency(
+      decimalDigits: 0, locale: 'id_ID');
   @override
   Widget build(BuildContext context) {
     var thecubit = context.watch<InputbeliformCubit>();
@@ -321,7 +371,8 @@ class InputBahanbakuField extends StatelessWidget {
                                   (value) => value
                                       .where(
                                         (element) =>
-                                            (element.title).contains(search),
+                                            (element.title.toLowerCase())
+                                                .contains(search.toLowerCase()),
                                       )
                                       .toList(),
                                 );
@@ -399,7 +450,10 @@ class InputBahanbakuField extends StatelessWidget {
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: numberValidator,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(label: Text('Count')),
+                          decoration: InputDecoration(
+                              label: Text('Count'),
+                              suffix:
+                                  Text(thecubit.state.ingredientItem.satuan)),
                         ),
                       ),
                       Padding(padding: EdgeInsetsGeometry.all(8)),
@@ -408,11 +462,15 @@ class InputBahanbakuField extends StatelessWidget {
                           controller: harga,
                           onChanged: (value) {
                             thecubit.changeData(thecubit.state
-                                .copyWith(harga: int.tryParse(value)));
+                                .copyWith(harga: telo.getDouble().round()));
                           },
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: numberValidator,
+                          validator: (value) {
+                            return numberValidator(
+                                telo.getUnformattedValue().round().toString());
+                          },
                           keyboardType: TextInputType.number,
+                          inputFormatters: [telo],
                           decoration: InputDecoration(label: Text('Harga')),
                         ),
                       ),

@@ -68,6 +68,7 @@ class UseDrawer extends StatelessWidget {
                         return Navigator.push(
                             context,
                             MaterialPageRoute(
+                              settings: RouteSettings(name: "/adminpanel"),
                               builder: (context) => const AdminPanel(),
                             ));
                       }

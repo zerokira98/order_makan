@@ -67,6 +67,8 @@ dependencies:
   open_filex: ^4.7.0
   currency_text_input_formatter: ^2.3.0
   one_clock: ^2.0.2
+  flutter_image_compress: ^2.4.0
+  firebase_storage: ^12.4.10
 
 dev_dependencies:
   flutter_test:

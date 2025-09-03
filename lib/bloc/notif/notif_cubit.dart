@@ -24,7 +24,7 @@ class NotifCubit extends Cubit<NotifState> {
     return super.close();
   }
 
-  initiate() async {
+  Future<void> initiate() async {
     List<IngredientItem> notif = [];
 
     var ingredients = await menurepo.getIngredients();

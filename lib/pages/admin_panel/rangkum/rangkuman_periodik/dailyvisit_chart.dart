@@ -17,7 +17,6 @@ class DailyVisitChart extends StatelessWidget {
       (index) =>
           MyChartData(min: 0, weekday: 1, day: index + 1, max: 0, avg: 0),
     );
-    print(data);
     for (var element in struks) {
       perday[element.ordertime.day] = {
         'count': ((perday[element.ordertime.day]?['count'] as int?) ?? 0) + 1,

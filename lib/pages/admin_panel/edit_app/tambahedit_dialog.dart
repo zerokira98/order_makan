@@ -7,10 +7,12 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart' as t;
+import 'package:order_makan/fileservice.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/ingredient_model.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
+import 'package:order_makan/pages/admin_panel/edit_app/imagepicker_widget.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/submenu.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:path/path.dart' as p;
@@ -51,21 +53,46 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
     super.initState();
   }
 
+  Future popDialog(BuildContext ctx) async {
+    return showDialog<bool?>(
+      animationStyle: AnimationStyle(duration: Duration.zero),
+      context: ctx,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Alert'),
+          content: Text('Any changes won\'t be saved.'),
+          actions: [
+            ElevatedButton(onPressed: () {}, child: Text('Cancel')),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.popUntil(
+                    context,
+                    ModalRoute.withName('/adminpanel'),
+                  );
+                },
+                child: Text('Close')),
+          ],
+        );
+      },
+    );
+  }
+
+  String imgdirUpdater(String updatedImgdir) {
+    setState(() {
+      imgdir = updatedImgdir;
+    });
+    return imgdir;
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              actions: [
-                ElevatedButton(onPressed: () {}, child: Text('Cancel')),
-                ElevatedButton(onPressed: () {}, child: Text('Close')),
-              ],
-            );
-          },
-        );
+        if (didPop == false) {
+          popDialog(context);
+        }
+
         // BlocProvider.of<MenueditCubit>(context).clear();
       },
       child: Scaffold(
@@ -105,23 +132,6 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                           );
 
                           if (widget.editmode) {
-                            if (!kIsWeb) {
-                              if (imgdir.isNotEmpty) {
-                                var pickedfile = File(imgdir);
-                                getApplicationDocumentsDirectory()
-                                    .then((value) {
-                                  var copytodir = File(p.join(value.path,
-                                      'imgres/${p.basename(imgdir)}'));
-                                  debugPrint(copytodir.path);
-                                  copytodir
-                                      .create(recursive: true)
-                                      .then((value) {
-                                    value.writeAsBytesSync(
-                                        pickedfile.readAsBytesSync());
-                                  });
-                                });
-                              }
-                            } else if (kIsWasm) {}
                             BlocProvider.of<MenuBloc>(context).add(EditMenu(
                                 menuitem.copywith(id: widget.menudata!.id)));
                             BlocProvider.of<t.TopbarBloc>(context)
@@ -145,8 +155,8 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
             ),
             Padding(padding: EdgeInsetsGeometry.all(8)),
             ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
+                onPressed: () async {
+                  popDialog(context);
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red, foregroundColor: Colors.white),
@@ -202,44 +212,8 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                                         label: Text('Harga')),
                                   )),
                               const Padding(padding: EdgeInsets.all(4)),
-                              Expanded(
-                                child: (imgdir.isEmpty)
-                                    ? ElevatedButton.icon(
-                                        onPressed: () async {
-                                          var a = await ImagePicker().pickImage(
-                                              source: ImageSource.gallery);
-                                          if (a != null) {
-                                            setState(() {
-                                              imgdir = a.path;
-                                            });
-                                          }
-                                        },
-                                        icon: const Icon(
-                                            Icons.camera_alt_outlined),
-                                        label: const Text('Gambar'))
-                                    : SizedBox(
-                                        height: 110,
-                                        child: InkWell(
-                                          onTap: () async {
-                                            var a = await ImagePicker()
-                                                .pickImage(
-                                                    source:
-                                                        ImageSource.gallery);
-                                            if (a != null) {
-                                              setState(() {
-                                                imgdir = a.path;
-                                              });
-                                            }
-                                          },
-                                          child: (!kIsWasm || !kIsWeb)
-                                              ? const Icon(
-                                                  Icons.camera_alt_outlined)
-                                              : imgdir.contains('assets')
-                                                  ? Image.asset(imgdir)
-                                                  : Image.file(File(imgdir)),
-                                        ),
-                                      ),
-                              ),
+                              ImagepickerWidget(imgdir,
+                                  imgdirUpdater: imgdirUpdater),
 
                               // Text('imgField: img'),
                             ],
@@ -343,9 +317,7 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                                                 index < state.ingredients.length
                                                     ? Row(
                                                         children: [
-                                                          Text((index + 1)
-                                                                  .toString() +
-                                                              '.'),
+                                                          Text('${index + 1}.'),
                                                           Expanded(
                                                             child:
                                                                 IngredientInputRow(
@@ -590,7 +562,7 @@ class _NamaInput extends StatelessWidget {
 class _CountInput extends StatelessWidget {
   final IngredientItem data;
   final TextEditingController count;
-  const _CountInput({super.key, required this.data, required this.count});
+  const _CountInput({required this.data, required this.count});
 
   @override
   Widget build(BuildContext context) {

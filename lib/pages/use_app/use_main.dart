@@ -179,73 +179,90 @@ class _UseMainState extends State<UseMain> {
                                 children: [
                                   BlocBuilder<MenuBloc, MenuState>(
                                     builder: (context, state) {
-                                      // if (state.menus.isEmpty) {
-                                      //   return const Center(child: Text('empty'));
-                                      // }
                                       return Expanded(
-                                        child: GridView.count(
-                                          childAspectRatio: 0.98,
-                                          crossAxisCount: 4,
-                                          children: [
-                                            for (var i = 0;
-                                                i < state.datas.length;
-                                                i++)
-                                              MenuCard(
-                                                onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (context) =>
-                                                        Dialog(
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(18.0),
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            Text(state.datas[i]
-                                                                .title),
-                                                            Text(state.datas[i]
-                                                                    .description ??
-                                                                ''),
-                                                            Divider(),
-                                                            Text('Bahan'),
-                                                            for (var e in state
-                                                                .datas[i]
-                                                                .ingredientItems)
-                                                              Text(
-                                                                  "~${e.title} ${e.count}${e.satuan}"),
-                                                            Divider(),
-                                                            Text('submenu'),
-                                                            for (var f in state
-                                                                .datas[i]
-                                                                .submenues)
-                                                              Text(f.title
-                                                                  .toString()),
-                                                            Row(
-                                                              children: [
-                                                                ElevatedButton(
-                                                                    onPressed:
-                                                                        () {},
-                                                                    child: Text(
-                                                                        'Batal')),
-                                                                ElevatedButton(
-                                                                    onPressed:
-                                                                        () {},
-                                                                    child: Text(
-                                                                        'Ok'))
-                                                              ],
-                                                            )
-                                                          ],
+                                        child: AnimatedSwitcher(
+                                          switchInCurve: Curves.easeInOut,
+                                          switchOutCurve: Curves.easeInOut,
+                                          duration: Durations.long1,
+                                          transitionBuilder:
+                                              (child, animation) =>
+                                                  FadeTransition(
+                                            opacity: animation,
+                                            child: SlideTransition(
+                                                position: Tween<Offset>(
+                                                        begin: Offset(0, 0.1),
+                                                        end: Offset(0, 0))
+                                                    .animate(animation),
+                                                child: child),
+                                          ),
+                                          child: GridView.count(
+                                            key: UniqueKey(),
+                                            childAspectRatio: 0.98,
+                                            crossAxisCount: 4,
+                                            children: [
+                                              for (var i = 0;
+                                                  i < state.datas.length;
+                                                  i++)
+                                                MenuCard(
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) =>
+                                                          Dialog(
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(18.0),
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              Text(state
+                                                                  .datas[i]
+                                                                  .title),
+                                                              Text(state
+                                                                      .datas[i]
+                                                                      .description ??
+                                                                  ''),
+                                                              Divider(),
+                                                              Text('Bahan'),
+                                                              for (var e in state
+                                                                  .datas[i]
+                                                                  .ingredientItems)
+                                                                Text(
+                                                                    "~${e.title} ${e.count}${e.satuan}"),
+                                                              Divider(),
+                                                              Text('submenu'),
+                                                              for (var f in state
+                                                                  .datas[i]
+                                                                  .submenues)
+                                                                Text(f.title
+                                                                    .toString()),
+                                                              Row(
+                                                                children: [
+                                                                  ElevatedButton(
+                                                                      onPressed:
+                                                                          () {},
+                                                                      child: Text(
+                                                                          'Batal')),
+                                                                  ElevatedButton(
+                                                                      onPressed:
+                                                                          () {},
+                                                                      child: Text(
+                                                                          'Ok'))
+                                                                ],
+                                                              )
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
-                                                menudata: state.datas[i],
-                                              )
-                                          ],
+                                                    );
+                                                  },
+                                                  menudata: state.datas[i],
+                                                )
+                                            ],
+                                          ),
                                         ),
                                       );
                                     },

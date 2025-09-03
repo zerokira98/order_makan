@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart' hide kIsWasm;
+import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/tambahedit_dialog.dart';
@@ -31,20 +31,38 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
 
   double opacity = 0.0;
 
+  num? posminwidth = 0.0;
+
+  final GlobalKey _keyRed = GlobalKey();
+
   @override
   void initState() {
     ac = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 700))
       ..addListener(
-        () => print((1000 * (math.sin(ac.value * math.pi * 2).abs()))),
+        () => debugPrint(
+            (1000 * (math.sin(ac.value * math.pi * 2).abs())).toString()),
       );
     ca = CurvedAnimation(parent: ac, curve: Curves.easeOut).drive(ani);
-
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      setpos();
+    });
     super.initState();
+  }
+
+  void setpos() {
+    final renderBoxRed = _keyRed.currentContext
+        ?.findRenderObject()
+        ?.getTransformTo(null)
+        .getTranslation();
+    final positionRed = renderBoxRed?.x;
+    posminwidth = positionRed;
   }
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
+    var height = MediaQuery.sizeOf(context).width;
     return InkWell(
       onLongPress: () {
         if (widget.editmode) {
@@ -133,19 +151,27 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
                                   height: 80,
                                   fit: BoxFit.cover,
                                 )
-                              : (!kIsWeb)
-                                  ? Image.file(
-                                      File(
-                                        widget.menudata.imgDir,
-                                      ),
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Image.asset(
-                                      'assets/sate.jpg',
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                    )
+                              : Image.network(
+                                  widget.menudata.imgDir,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) {
+                                      return child;
+                                    }
+                                    return CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null);
+                                  },
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                )
+
                           // child: Center(child: Text('menu image')),
                           ),
                     ),
@@ -160,10 +186,12 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
             ),
           ),
           MatrixTransition(
+            key: _keyRed,
             animation: ca,
             onTransform: (animationValue) => Matrix4.identity()
-              ..translate((1000 * animationValue),
-                  (100 * (math.sin(ac.value * math.pi * 1).abs()))
+              ..translate(
+                  ((width * 0.75 - (posminwidth ?? 0)) * animationValue),
+                  ((height / 6) * (math.sin(ac.value * math.pi * 1).abs()))
                   // ((animationValue + 0.1) * 100) / (animationValue + 0.1),
                   )
               ..scale(1 - (animationValue), 1 - (animationValue)),

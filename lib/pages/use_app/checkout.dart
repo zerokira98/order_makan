@@ -445,9 +445,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                             VirtualKeyboardKeyType.Action) {
                           switch (key.action) {
                             case VirtualKeyboardKeyAction.Backspace:
-                              print('bakspec');
                               var vals = telo.getDouble().round().toString();
-                              print(vals);
                               uang.text = telo.formatString(
                                   vals.substring(0, vals.length - 1));
                               break;

@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -19,13 +20,17 @@ class _SubMenuInputRowState extends State<SubMenuInputRow> {
   TextEditingController title = TextEditingController();
 
   TextEditingController adjustHarga = TextEditingController();
+  var telo = CurrencyTextInputFormatter.simpleCurrency(
+      decimalDigits: 0, locale: 'id_ID');
   @override
   Widget build(BuildContext context) {
     if (widget.submenu.title != title.text) {
       title.text = widget.submenu.title;
     }
-    if (widget.submenu.adjustHarga.toString() != adjustHarga.text) {
-      adjustHarga.text = widget.submenu.adjustHarga.toString();
+    if (telo.formatDouble(widget.submenu.adjustHarga.toDouble()) !=
+        adjustHarga.text) {
+      adjustHarga.text =
+          telo.formatDouble(widget.submenu.adjustHarga.toDouble());
     }
     return Card.outlined(
       margin: EdgeInsets.all(4),
@@ -54,12 +59,14 @@ class _SubMenuInputRowState extends State<SubMenuInputRow> {
                         flex: 4,
                         child: TextFormField(
                           controller: adjustHarga,
-                          validator: numberValidator,
+                          inputFormatters: [telo],
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           keyboardType: TextInputType.number,
                           onChanged: (value) {
                             BlocProvider.of<MenueditCubit>(context).editSubmenu(
                                 data: widget.submenu.copyWith(
-                                    adjustHarga: int.tryParse(value)));
+                                    adjustHarga:
+                                        telo.getUnformattedValue().toInt()));
                           },
                           decoration:
                               InputDecoration(label: Text('Adjust harga')),

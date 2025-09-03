@@ -19,7 +19,7 @@ import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import '../helper.dart' as x;
 
 class HistoriStruk extends StatefulWidget {
-  HistoriStruk({super.key});
+  const HistoriStruk({super.key});
 
   @override
   State<HistoriStruk> createState() => _HistoriStrukState();
@@ -198,250 +198,254 @@ class DisplayStruk extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.sizeOf(context).width;
     return BlocListener<AntrianBloc, AntrianState>(
       listenWhen: (previous, current) => previous.msg != current.msg,
       listener: (context, state) {
         Navigator.pop(context);
       },
-      child: Dialog(
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                        'Struk',
-                        textAlign: TextAlign.center,
-                        textScaler: TextScaler.linear(1.5),
-                      )),
-                      InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(Icons.close))
-                    ],
-                  ),
-                ),
-                Text('Nomor Antrian : ${data.nomorAntrian}'),
-                Text('Id : ${data.strukId}'),
-                FutureBuilder(
-                  future: RepositoryProvider.of<KaryawanAuthRepo>(context)
-                      .getAllKaryawan(data.karyawanId),
-                  builder: (context, snapshot) {
-                    if (!(snapshot.connectionState == ConnectionState.done)) {
-                      return CircularProgressIndicator();
-                    }
-                    return snapshot.hasData
-                        ? Text(snapshot.data['name'])
-                        : Text('Id : ${data.karyawanId}');
-                  },
-                ),
-                // Text(data.karyawanId),
-                Row(
-                  children: [
-                    Text(data.ordertime.formatLengkap()),
-                    Text(data.ordertime.clockOnly()),
-                  ],
-                ),
-                Padding(padding: EdgeInsetsGeometry.all(12)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: StrukDataTable(
-                        data: data,
-                      ),
+      child: Padding(
+        padding: EdgeInsetsGeometry.symmetric(horizontal: width / 6),
+        child: Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(12.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          'Struk',
+                          textAlign: TextAlign.center,
+                          textScaler: TextScaler.linear(1.7),
+                        )),
+                        InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(Icons.close))
+                      ],
                     ),
-                  ],
-                ),
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 12.0),
-                //   child: Row(
-                //     children: [
-                //       Expanded(
-                //           child: Text(
-                //         'Nomor antrian : ${data.nomorAntrian == 0 ? 'Tanpa Antrian' : data.nomorAntrian}',
-                //         textAlign: TextAlign.end,
-                //       )),
-                //     ],
-                //   ),
-                // ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                        'Pembayaran : ${data.tipePembayaran}',
-                        textAlign: TextAlign.end,
-                      )),
-                    ],
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                        'Total : ${data.orderItems.fold(
-                              0,
-                              (previousValue, element) =>
-                                  previousValue +
-                                  (element.count * element.price) +
-                                  element.submenues.fold(
-                                    0,
-                                    (prevValue, ele) =>
-                                        prevValue +
-                                        (ele.adjustHarga * element.count),
-                                  ),
-                            ).numberFormatCurrency}',
-                        textAlign: TextAlign.end,
-                      )),
-                    ],
+                  Text('Nomor Antrian : ${data.nomorAntrian}'),
+                  Text('Id : ${data.strukId}'),
+                  FutureBuilder(
+                    future: RepositoryProvider.of<KaryawanAuthRepo>(context)
+                        .getAllKaryawan(data.karyawanId),
+                    builder: (context, snapshot) {
+                      if (!(snapshot.connectionState == ConnectionState.done)) {
+                        return CircularProgressIndicator();
+                      }
+                      return snapshot.hasData
+                          ? Text(snapshot.data['name'])
+                          : Text('Id : ${data.karyawanId}');
+                    },
                   ),
-                ), // BlocBuilder<AntrianBloc, AntrianState>(
-                //   builder: (context, state) {
-                //     return Text(state.antrianStruks.toString());
-                //   },
-                // ),
-                // Expanded(child: Container()),
-                if (viewonly == false)
+                  // Text(data.karyawanId),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      MenuAnchor(
-                        menuChildren: [
-                          SubmenuButton(menuChildren: [
-                            MenuItemButton(
-                              child: Text('Salah Input'),
-                              onPressed: () {
-                                BlocProvider.of<AntrianBloc>(context)
-                                    .add(Delete(data, reason: 'Salah Input'));
-                                Navigator.pop(context);
-                              },
-                            ),
-                            MenuItemButton(
-                              child: Text('Lain-lain'),
-                              onPressed: () {
-                                BlocProvider.of<AntrianBloc>(context)
-                                    .add(Delete(data, reason: 'Lain-lain'));
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ], child: Text('Belum Dibuat')),
-                          SubmenuButton(menuChildren: [
-                            MenuItemButton(
-                              child: Text('Salah Input'),
-                              onPressed: () {},
-                            ),
-                            MenuItemButton(
-                              child: Text('Batal beli,uang kembali'),
-                              onPressed: () {},
-                            ),
-                            MenuItemButton(
-                              child: Text('data3'),
-                              onPressed: () {},
-                            )
-                          ], child: Text('Sudah/sedang Dibuat')),
-                        ],
-                        builder: (context, controller, child) => ElevatedButton(
+                      Text(data.ordertime.formatLengkap()),
+                      Text(data.ordertime.clockOnly()),
+                    ],
+                  ),
+                  Padding(padding: EdgeInsetsGeometry.all(12)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: StrukDataTable(
+                          data: data,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(top: 12.0),
+                  //   child: Row(
+                  //     children: [
+                  //       Expanded(
+                  //           child: Text(
+                  //         'Nomor antrian : ${data.nomorAntrian == 0 ? 'Tanpa Antrian' : data.nomorAntrian}',
+                  //         textAlign: TextAlign.end,
+                  //       )),
+                  //     ],
+                  //   ),
+                  // ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          'Pembayaran : ${data.tipePembayaran}',
+                          textAlign: TextAlign.end,
+                        )),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          'Total : ${data.orderItems.fold(
+                                0,
+                                (previousValue, element) =>
+                                    previousValue +
+                                    (element.count * element.price) +
+                                    element.submenues.fold(
+                                      0,
+                                      (prevValue, ele) =>
+                                          prevValue +
+                                          (ele.adjustHarga * element.count),
+                                    ),
+                              ).numberFormatCurrency}',
+                          textAlign: TextAlign.end,
+                        )),
+                      ],
+                    ),
+                  ), // BlocBuilder<AntrianBloc, AntrianState>(
+                  //   builder: (context, state) {
+                  //     return Text(state.antrianStruks.toString());
+                  //   },
+                  // ),
+                  // Expanded(child: Container()),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white),
+                          onPressed: () async {
+                            if (await PrintBluetoothThermal.connectionStatus) {
+                              var ticket =
+                                  await StrukPrint.printStruk(data, context);
+
+                              await PrintBluetoothThermal.writeBytes(ticket);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text('no connection to printer')));
+                            }
+                          },
+                          icon: Icon(Icons.print_rounded),
+                          label: Text('Print')),
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
+                              backgroundColor: Colors.blue.shade900),
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PrintWidgetSetting(),
+                              )),
+                          child: Icon(Icons.settings)),
+                    ],
+                  ),
+                  if (viewonly == false)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        MenuAnchor(
+                          menuChildren: [
+                            SubmenuButton(menuChildren: [
+                              MenuItemButton(
+                                child: Text('Salah Input'),
+                                onPressed: () {
+                                  BlocProvider.of<AntrianBloc>(context)
+                                      .add(Delete(data, reason: 'Salah Input'));
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              MenuItemButton(
+                                child: Text('Lain-lain'),
+                                onPressed: () {
+                                  BlocProvider.of<AntrianBloc>(context)
+                                      .add(Delete(data, reason: 'Lain-lain'));
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ], child: Text('Belum Dibuat')),
+                            SubmenuButton(menuChildren: [
+                              MenuItemButton(
+                                child: Text('Salah Input'),
+                                onPressed: () {},
+                              ),
+                              MenuItemButton(
+                                child: Text('Batal beli,uang kembali'),
+                                onPressed: () {},
+                              ),
+                              MenuItemButton(
+                                child: Text('data3'),
+                                onPressed: () {},
+                              )
+                            ], child: Text('Sudah/sedang Dibuat')),
+                          ],
+                          builder: (context, controller, child) =>
+                              ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStatePropertyAll(Colors.red),
+                                    foregroundColor:
+                                        WidgetStatePropertyAll(Colors.white),
+                                  ),
+                                  onPressed: () {
+                                    if (controller.isOpen) {
+                                      controller.close();
+                                    } else {
+                                      controller.open();
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    BlocProvider.of<AntrianBloc>(context)
+                                        .add(Delete(data, reason: ''));
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('Batalkan Pesanan.')),
+                        ),
+
+                        // GestureDetector(
+                        //   onLongPressStart: (details) => debugPrint(details),
+                        //   child:
+                        // ),
+                        // PrintWidget(
+                        //   theData: data,
+                        // ),
+                        // ElevatedButton.icon(
+                        //   style: ButtonStyle(
+                        //     backgroundColor: WidgetStatePropertyAll(Colors.blue),
+                        //     foregroundColor: WidgetStatePropertyAll(Colors.white),
+                        //   ),
+                        //   onPressed: () {},
+                        //   label: Text('Print'),
+                        //   icon: Icon(Icons.print_outlined),
+                        // ),
+                        ElevatedButton(
                             style: ButtonStyle(
                               backgroundColor:
-                                  WidgetStatePropertyAll(Colors.red),
+                                  WidgetStatePropertyAll(Colors.green),
                               foregroundColor:
                                   WidgetStatePropertyAll(Colors.white),
                             ),
                             onPressed: () {
-                              if (controller.isOpen) {
-                                controller.close();
-                              } else {
-                                controller.open();
-                              }
-                            },
-                            onLongPress: () {
                               BlocProvider.of<AntrianBloc>(context)
-                                  .add(Delete(data, reason: ''));
-                              Navigator.pop(context);
+                                  .add(OrderFinish(data.strukId!));
+
+                              //change to pop on listener
                             },
-                            child: Text('Batalkan Pesanan.')),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  foregroundColor: Colors.white),
-                              onPressed: () async {
-                                if (await PrintBluetoothThermal
-                                    .connectionStatus) {
-                                  var ticket = await StrukPrint.printStruk(
-                                      data, context);
-
-                                  await PrintBluetoothThermal.writeBytes(
-                                      ticket);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              'no connection to printer')));
-                                }
-                              },
-                              icon: Icon(Icons.print_rounded),
-                              label: Text('Print')),
-                          ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  visualDensity: VisualDensity.compact,
-                                  backgroundColor: Colors.blue.shade900),
-                              onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PrintWidgetSetting(),
-                                  )),
-                              child: Icon(Icons.settings)),
-                        ],
-                      ),
-                      // GestureDetector(
-                      //   onLongPressStart: (details) => debugPrint(details),
-                      //   child:
-                      // ),
-                      // PrintWidget(
-                      //   theData: data,
-                      // ),
-                      // ElevatedButton.icon(
-                      //   style: ButtonStyle(
-                      //     backgroundColor: WidgetStatePropertyAll(Colors.blue),
-                      //     foregroundColor: WidgetStatePropertyAll(Colors.white),
-                      //   ),
-                      //   onPressed: () {},
-                      //   label: Text('Print'),
-                      //   icon: Icon(Icons.print_outlined),
-                      // ),
-                      ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor:
-                                WidgetStatePropertyAll(Colors.green),
-                            foregroundColor:
-                                WidgetStatePropertyAll(Colors.white),
-                          ),
-                          onPressed: () {
-                            BlocProvider.of<AntrianBloc>(context)
-                                .add(OrderFinish(data.strukId!));
-
-                            //change to pop on listener
-                          },
-                          child: Text('Selesaikan Pesanan.')),
-                    ],
-                  )
-              ],
+                            child: Text('Selesaikan Pesanan.')),
+                      ],
+                    )
+                ],
+              ),
             ),
           ),
         ),
@@ -473,8 +477,14 @@ class StrukPrint {
         ));
 
     bytes += generator.feed(2);
-    bytes += generator.text('No. antrian: ${data.nomorAntrian}',
+    bytes += generator.text('No. antrian:',
         styles: const PosStyles(
+          align: PosAlign.center,
+        ));
+    bytes += generator.text('${data.nomorAntrian}',
+        styles: const PosStyles(
+          width: PosTextSize.size6,
+          height: PosTextSize.size6,
           align: PosAlign.left,
           fontType: PosFontType.fontB,
         ));

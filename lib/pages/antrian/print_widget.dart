@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
-import 'package:image/image.dart' as img;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -308,7 +306,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
       _progress = false;
     });
 
-    if (listResult.length == 0) {
+    if (listResult.isEmpty) {
       _msj =
           "There are no bluetoohs linked, go to settings and link the printer";
     } else {

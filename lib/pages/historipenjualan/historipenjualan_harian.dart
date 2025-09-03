@@ -35,18 +35,22 @@ class HistoriPenjualanHarian extends StatelessWidget {
                         onTap: () {
                           showDialog(
                               context: context,
-                              builder: (context) => Dialog.fullscreen(
-                                    child: Scaffold(
-                                      appBar: AppBar(
-                                        title: Text('Details'),
-                                      ),
-                                      body: Center(
-                                        child: SingleChildScrollView(
-                                            child: StrukDataTable(
-                                                data: data[index])),
-                                      ),
-                                    ),
+                              builder: (context) => DisplayStruk(
+                                    data: data[index],
+                                    viewonly: true,
                                   ));
+                          // Dialog.fullscreen(
+                          //       child: Scaffold(
+                          //         appBar: AppBar(
+                          //           title: Text('Details'),
+                          //         ),
+                          //         body: Center(
+                          //           child: SingleChildScrollView(
+                          //               child: StrukDataTable(
+                          //                   data: data[index])),
+                          //         ),
+                          //       ),
+                          //     ));
                         },
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
