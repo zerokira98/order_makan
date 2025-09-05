@@ -33,6 +33,7 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
 
   num? posminwidth = 0.0;
 
+  double top = 0.0;
   final GlobalKey _keyRed = GlobalKey();
 
   @override
@@ -45,6 +46,11 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
       );
     ca = CurvedAnimation(parent: ac, curve: Curves.easeOut).drive(ani);
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Durations.long1, () {
+        setState(() {
+          top = 38.0;
+        });
+      });
       setpos();
     });
     super.initState();
@@ -107,80 +113,121 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
       child: Stack(
         children: [
           Card.filled(
+            elevation: 2,
             borderOnForeground: true,
-            // surfaceTintColor: Theme.of(context).primaryColor,
-            color: Theme.of(context).primaryColor.withAlpha(50),
-            // elevation: 2,
+            color: Theme.of(context).primaryColor,
             child: Container(
-              // width: 12,
-              padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SizedBox(
-                          height: 32,
-                          child: Text(
-                            widget.menudata.title.firstUpcase,
-                            textScaler: TextScaler.linear(1.15),
-                            // style: const TextStyle(fontSize: 14, height: 1.0),
-                            textAlign: TextAlign.left,
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          top: 0.0,
+                          left: 0.0,
+                          right: 0.0,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  alignment: Alignment.centerLeft,
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  height: 36,
+                                  child: Text(
+                                    widget.menudata.title.firstUpcase,
+                                    textScaler: TextScaler.linear(1.1),
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        wordSpacing: 0.0,
+                                        letterSpacing: 0.0,
+                                        height: 1.0),
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: Container(
-                          // height: 94,
-                          // width: 95,
-                          decoration: BoxDecoration(
-                            color: Colors.black12,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: widget.menudata.imgDir.contains('assets') ||
-                                  widget.menudata.imgDir.isEmpty
-                              ? Image.asset(
-                                  widget.menudata.imgDir.isEmpty
-                                      ? 'assets/sate.jpg'
-                                      : widget.menudata.imgDir,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.network(
-                                  widget.menudata.imgDir,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) {
-                                      return child;
-                                    }
-                                    return CircularProgressIndicator(
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null);
-                                  },
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                )
+                        AnimatedPositioned(
+                          curve: Curves.easeInOut,
+                          duration: Durations.long1,
+                          top: top,
+                          bottom: 0.0,
+                          left: 0,
+                          right: 0,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black12,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: widget.menudata.imgDir
+                                            .contains('assets') ||
+                                        widget.menudata.imgDir.isEmpty
+                                    ? Image.asset(
+                                        widget.menudata.imgDir.isEmpty
+                                            ? 'assets/sate.jpg'
+                                            : widget.menudata.imgDir,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.topCenter,
+                                      )
+                                    : Image.network(
+                                        widget.menudata.imgDir,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return CircularProgressIndicator(
+                                              value: loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                          .cumulativeBytesLoaded /
+                                                      loadingProgress
+                                                          .expectedTotalBytes!
+                                                  : null);
+                                        },
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      )
 
-                          // child: Center(child: Text('menu image')),
+                                // child: Center(child: Text('menu image')),
+                                ),
                           ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8)),
+                              color: Colors.black45,
+                            ),
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              'Rp  ${widget.menudata.price.toString().numberFormat()}',
+                              textAlign: TextAlign.end,
+                              style: TextStyle(color: Colors.white),
+                              textScaler: TextScaler.linear(1.1),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                  Padding(padding: EdgeInsetsGeometry.all(2)),
-                  Text(
-                    'Rp  ${widget.menudata.price.toString().numberFormat()}',
-                    textScaler: TextScaler.linear(1.1),
-                  )
+                  // Padding(padding: EdgeInsetsGeometry.all(2)),
+                  // Text(
+                  //   'Rp  ${widget.menudata.price.toString().numberFormat()}',
+                  //   textScaler: TextScaler.linear(1.1),
+                  // )
                 ],
               ),
             ),
@@ -226,7 +273,7 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
   Widget build(BuildContext context) {
     return Card.filled(
       surfaceTintColor: Colors.blue,
-      // elevation: 2,
+      elevation: 2,
       child: InkWell(
         onTap: () {
           var ao = BlocProvider.of<TopbarBloc>(context).state.selected;
@@ -254,7 +301,7 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
                       height: 32,
                       child: Text(
                         'Tambah menu',
-                        // textScaler: TextScaler.linear( 1.2,
+                        textScaler: TextScaler.linear(1.2),
                         style: TextStyle(fontSize: 14, height: 1.0),
                         textAlign: TextAlign.left,
                       ),
@@ -274,7 +321,7 @@ class _EmptyMenuCardState extends State<EmptyMenuCard> {
                     ),
                     child: const Center(
                       child: Icon(
-                        Icons.add,
+                        Icons.image_search_outlined,
                         size: 48,
                         color: Colors.white54,
                       ),

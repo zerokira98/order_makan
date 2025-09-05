@@ -30,7 +30,10 @@ class AdminDrawer extends StatelessWidget {
               children: [],
             ),
             Divider(),
-            Text('Pengeluaran'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text('Pengeluaran'),
+            ),
             ListTile(
                 onTap: () {
                   Navigator.push(
@@ -50,7 +53,10 @@ class AdminDrawer extends StatelessWidget {
                 },
                 title: const Text('Pembelian Bahanbaku')),
             Divider(),
-            Text('Rangkuman'),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text('Rangkuman'),
+            ),
             ListTile(
                 onTap: () {
                   Navigator.push(

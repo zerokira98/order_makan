@@ -65,10 +65,12 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
             ElevatedButton(onPressed: () {}, child: Text('Cancel')),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.popUntil(
-                    context,
-                    ModalRoute.withName('/adminpanel'),
-                  );
+                  Navigator.pop(context, true);
+                  // Navigator.popUntil(
+                  //   context,
+                  //   (route) => route.settings.,
+                  //   // ModalRoute.withName('/adminpanel'),
+                  // );
                 },
                 child: Text('Close')),
           ],
@@ -88,9 +90,15 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop == false) {
-          popDialog(context);
+          await popDialog(context).then(
+            (value) {
+              if (value && mounted) {
+                Navigator.pop(context);
+              }
+            },
+          );
         }
 
         // BlocProvider.of<MenueditCubit>(context).clear();
@@ -156,7 +164,13 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
             Padding(padding: EdgeInsetsGeometry.all(8)),
             ElevatedButton(
                 onPressed: () async {
-                  popDialog(context);
+                  await popDialog(context).then(
+                    (value) {
+                      if (value && mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red, foregroundColor: Colors.white),

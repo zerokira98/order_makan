@@ -102,13 +102,14 @@ void main() async {
                   RepositoryProvider.of<MenuItemRepository>(context),
                 )..add(m.Init())),
       ],
-      child: const MyApp(),
+      child: MyApp(),
     ),
   ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final backgroundcolor = Color(0xfffcf6e8);
 
   // This widget is the root of your application.
   @override
@@ -133,7 +134,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
-        routes: {'/adminpanel': (context) => AdminPanel()},
+        // routes: {'/adminpanel': (context) => AdminPanel()},
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           MonthYearPickerLocalizations.delegate,
@@ -142,7 +143,12 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.system,
         darkTheme: ThemeData.dark(useMaterial3: true),
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          scaffoldBackgroundColor: backgroundcolor,
+          appBarTheme: AppBarTheme.of(context)
+              .copyWith(backgroundColor: backgroundcolor),
+          cardColor: backgroundcolor,
+          cardTheme: CardTheme.of(context).copyWith(color: backgroundcolor),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           useMaterial3: true,
         ),
         home: StatefulBuilder(builder: (context, setstate) {

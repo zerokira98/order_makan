@@ -19,52 +19,44 @@ class _TopTabState extends State<TopTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          // border: Border(top: BorderSide())
-          // color: Colors.red
-          // color: Theme.of(context).appBarTheme.backgroundColor,
-          // boxShadow: [BoxShadow(blurRadius: 4, offset: Offset(-4, 0))],
-          ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BlocBuilder<TopbarBloc, TopbarState>(
-              // future: RepositoryProvider.of<MenuItemRepository>(context)
-              //     .getCategories(),
-              builder: (context, state) {
-            if (state.categories.isEmpty) {
-              return widget.edit ? AddCategoryButton() : const Text('EMPTY');
-            }
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: List.generate(
-                    state.categories.length + 2,
-                    (index) => index < state.categories.length + 1
-                        ? index == 0
-                            ? const TopBarMenuItem(
-                                nama: '[ALL]',
-                              )
-                            : TopBarMenuItem(
-                                nama: state.categories[index - 1],
-                                editmode: widget.edit,
-                              )
-                        : widget.edit
-                            ? AddCategoryButton()
-                            : const SizedBox()),
-              ),
-            );
-          }),
-          if (widget.edit)
-            Container(
-              width: double.maxFinite,
-              color: Colors.yellow.shade900,
-              child: const Text('Hint: longpress to delete category/menu'),
-            )
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BlocBuilder<TopbarBloc, TopbarState>(
+            // future: RepositoryProvider.of<MenuItemRepository>(context)
+            //     .getCategories(),
+            builder: (context, state) {
+          if (state.categories.isEmpty) {
+            return widget.edit ? AddCategoryButton() : const Text('EMPTY');
+          }
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: List.generate(
+                  state.categories.length + 2,
+                  (index) => index < state.categories.length + 1
+                      ? index == 0
+                          ? const TopBarMenuItem(
+                              nama: '[ALL]',
+                            )
+                          : TopBarMenuItem(
+                              nama: state.categories[index - 1],
+                              editmode: widget.edit,
+                            )
+                      : widget.edit
+                          ? AddCategoryButton()
+                          : const SizedBox()),
+            ),
+          );
+        }),
+        if (widget.edit)
+          Container(
+            width: double.maxFinite,
+            color: Colors.yellow.shade900,
+            child: const Text('Hint: longpress to delete category/menu'),
+          )
+      ],
     );
   }
 }
@@ -125,19 +117,16 @@ class TopBarMenuItem extends StatelessWidget {
           return AnimatedContainer(
             duration: const Duration(milliseconds: 350),
             decoration: BoxDecoration(
-              // border: state.selected == nama
-              //     ? Border.all(color: Color.fromRGBO(38, 0, 255, 1))
-              //     : Border.all(color: Color.fromRGBO(0, 0, 0, 0)),
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
                     state.selected == nama
-                        ? Theme.of(context).primaryColorDark
-                        : Colors.transparent,
+                        ? Theme.of(context).primaryColor.withAlpha(180)
+                        : Theme.of(context).scaffoldBackgroundColor,
                     state.selected == nama
                         ? Theme.of(context).primaryColor
-                        : Colors.transparent
+                        : Theme.of(context).scaffoldBackgroundColor
                   ]),
               // color: state.selected == nama
               //     ? Theme.of(context).primaryColor

@@ -25,7 +25,7 @@ class _AdminPanelState extends State<AdminPanel> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MyApp(),
+                    builder: (context) => MyApp(),
                   ),
                   (route) => false,
                 );

@@ -122,10 +122,15 @@ class StrukPanel extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border.symmetric(
                                 vertical: BorderSide(
-                                    width: 8, color: Colors.red.shade600),
+                                    width: 8,
+                                    color: Color.lerp(
+                                            Theme.of(context).primaryColor,
+                                            Colors.black,
+                                            0.1) ??
+                                        Theme.of(context).primaryColor),
                                 horizontal:
                                     BorderSide(color: Colors.red.shade100)),
-                            color: Colors.red,
+                            color: Theme.of(context).primaryColor,
                           ),
                           margin: const EdgeInsets.only(bottom: 10.0),
                           padding: const EdgeInsets.symmetric(

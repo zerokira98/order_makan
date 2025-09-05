@@ -6,18 +6,30 @@ class UseDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Color(0xfffcf6e8),
       child: SafeArea(
           child: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(58.0),
-            child: FutureBuilder(
-              future: SharedPreferences.getInstance(),
-              builder: (context, snapshot) {
-                var a = snapshot.data?.getString('globalSetting') ?? '{}';
-                var b = jsonDecode(a);
-                return Text('Kafe ${b['namaresto']}');
-              },
+          Container(
+            height: 180,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Container(
+                    alignment: Alignment.bottomCenter,
+                    child: FutureBuilder(
+                      future: SharedPreferences.getInstance(),
+                      builder: (context, snapshot) {
+                        var a =
+                            snapshot.data?.getString('globalSetting') ?? '{}';
+                        var b = jsonDecode(a);
+                        return Text('Kafe ${b['namaresto']}');
+                      },
+                    ),
+                  ),
+                ),
+                Positioned.fill(child: Image.asset('assets/koffie.jpg'))
+              ],
             ),
           ),
           Divider(),

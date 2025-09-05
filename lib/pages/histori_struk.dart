@@ -325,10 +325,15 @@ class DisplayStruk extends StatelessWidget {
                               foregroundColor: Colors.white),
                           onPressed: () async {
                             if (await PrintBluetoothThermal.connectionStatus) {
-                              var ticket =
-                                  await StrukPrint.printStruk(data, context);
+                              try {
+                                var ticket =
+                                    await StrukPrint.printStruk(data, context);
 
-                              await PrintBluetoothThermal.writeBytes(ticket);
+                                await PrintBluetoothThermal.writeBytes(ticket);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('error: $e')));
+                              }
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -466,7 +471,7 @@ class StrukPrint {
     //bytes += generator.setGlobalFont(PosFontType.fontA);
     bytes += generator.reset();
 
-    bytes += generator.text('Nama Toko',
+    bytes += generator.text('Koffie Pare',
         styles: const PosStyles(
             align: PosAlign.center,
             width: PosTextSize.size2,
@@ -476,18 +481,20 @@ class StrukPrint {
           align: PosAlign.center,
         ));
 
-    bytes += generator.feed(2);
+    bytes += generator.emptyLines(2);
     bytes += generator.text('No. antrian:',
         styles: const PosStyles(
           align: PosAlign.center,
         ));
     bytes += generator.text('${data.nomorAntrian}',
         styles: const PosStyles(
-          width: PosTextSize.size6,
-          height: PosTextSize.size6,
-          align: PosAlign.left,
+          width: PosTextSize.size2,
+          height: PosTextSize.size2,
+          align: PosAlign.center,
           fontType: PosFontType.fontB,
         ));
+
+    bytes += generator.emptyLines(1);
     bytes += generator.text('Id: ${data.strukId}',
         styles: const PosStyles(
           align: PosAlign.left,
@@ -501,7 +508,7 @@ class StrukPrint {
     bytes += generator.row([
       PosColumn(
         text: data.ordertime.formatLengkap(),
-        width: 6,
+        width: 9,
         styles:
             const PosStyles(align: PosAlign.left, fontType: PosFontType.fontB),
       ),
@@ -512,7 +519,7 @@ class StrukPrint {
             const PosStyles(align: PosAlign.right, fontType: PosFontType.fontB),
       ),
     ]);
-    bytes += generator.feed(2);
+    bytes += generator.emptyLines(1);
     for (var i = 0; i < data.orderItems.length; i++) {
       bytes += generator.row([
         PosColumn(
@@ -529,7 +536,7 @@ class StrukPrint {
         PosColumn(
           text: (data.orderItems[i].price * data.orderItems[i].count)
               .numberFormat(),
-          width: 3,
+          width: 4,
           styles: const PosStyles(align: PosAlign.right),
         ),
       ]);
@@ -556,7 +563,7 @@ class StrukPrint {
         ]);
       }
     }
-    bytes += generator.feed(1);
+    bytes += generator.emptyLines(1);
     bytes += generator.text(
         'Total : ${data.orderItems.fold(
               0,
@@ -574,14 +581,14 @@ class StrukPrint {
             fontType: PosFontType.fontA,
             width: PosTextSize.size1,
             height: PosTextSize.size1));
-    bytes += generator.feed(2);
+    bytes += generator.emptyLines(2);
     bytes += generator.text('Terimakasi',
         styles: const PosStyles(
           align: PosAlign.center,
         ));
 
     bytes += generator.qrcode('instagram.com/groom_barbershop_pare');
-    bytes += generator.feed(3);
+    bytes += generator.emptyLines(3);
     return bytes;
   }
 }

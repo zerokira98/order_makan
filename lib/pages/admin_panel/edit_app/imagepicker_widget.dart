@@ -5,9 +5,10 @@ import 'package:path/path.dart' as p;
 
 class ImagepickerWidget extends StatefulWidget {
   final String imgdir;
+  final String menuname;
   final String Function(String a) imgdirUpdater;
   const ImagepickerWidget(this.imgdir,
-      {required this.imgdirUpdater, super.key});
+      {this.menuname = '', required this.imgdirUpdater, super.key});
 
   @override
   State<ImagepickerWidget> createState() => _ImagepickerWidgetState();
@@ -22,14 +23,10 @@ class _ImagepickerWidgetState extends State<ImagepickerWidget> {
     super.initState();
   }
 
-  Future<String?> uploadFile(XFile a) async {
-    // var savedir = await getApplicationDocumentsDirectory();
+  Future<String?> uploadFile(XFile a, String menuname) async {
     var compressedData = await FileService.imageCompress(await a.readAsBytes());
-    // var createdfile = await File(p.join(savedir.path, p.basename(a.path)))
-    //     .writeAsBytes(compressedData);
-    //    return createdfile;
     return (await FileService.menuimageUpload(
-            compressedData, p.basename(a.path)))
+            compressedData, (menuname + p.basename(a.path))))
         ?.getDownloadURL();
   }
 
@@ -47,7 +44,7 @@ class _ImagepickerWidgetState extends State<ImagepickerWidget> {
                   setState(() {
                     loading = true;
                   });
-                  var dlUrl = await uploadFile(a);
+                  var dlUrl = await uploadFile(a, widget.menuname);
                   setState(() {
                     loading = false;
                     imgdir = dlUrl ?? '';
@@ -71,7 +68,7 @@ class _ImagepickerWidgetState extends State<ImagepickerWidget> {
                         setState(() {
                           loading = true;
                         });
-                        var dlUrl = await uploadFile(a);
+                        var dlUrl = await uploadFile(a, widget.menuname);
                         setState(() {
                           loading = false;
                           imgdir = dlUrl ?? '';

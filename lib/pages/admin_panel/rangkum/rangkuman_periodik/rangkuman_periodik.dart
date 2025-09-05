@@ -75,14 +75,15 @@ class RangkumanPeriodik extends StatelessWidget {
               ),
               Flexible(
                 flex: 1,
-                child: Column(
-                  children: [
-                    // FutureBuilder(future: RepositoryProvider.of<SubjectRepository>(context), builder: builder)
-                    SummaryContainer(
-                      state: state,
-                      isHarian: isHarian,
-                    ),
-                  ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      SummaryContainer(
+                        state: state,
+                        isHarian: isHarian,
+                      ),
+                    ],
+                  ),
                 ),
               )
             ],
@@ -149,232 +150,225 @@ class _SummaryContainerState extends State<SummaryContainer> {
     );
     Map groupIngredient = {};
     for (var element in widget.state.struks) {
-        for (var element2 in element.orderItems) {
-            for (var element3 in element2.ingredientItems) {
-                groupIngredient.update(
-                  element3.id,
-                  (value) => value + (element3.count * element2.count),
-                  ifAbsent: () => element3.count * element2.count,
-                );
-              }
-          }
+      for (var element2 in element.orderItems) {
+        for (var element3 in element2.ingredientItems) {
+          groupIngredient.update(
+            element3.id,
+            (value) => value + (element3.count * element2.count),
+            ifAbsent: () => element3.count * element2.count,
+          );
+        }
       }
+    }
     return Card.filled(
       color: Colors.blue.shade100,
       child: Container(
         // height: 60,
         padding: EdgeInsets.all(12),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text('Pilih Tanggal : '),
-                  Flexible(
-                    child: InkWell(
-                      onTap: () {},
-                      child: TextField(
-                        controller: dtc,
-                        readOnly: true,
-                        // enabled: false,
-                        onTap: () {
-                          if (widget.isHarian) {
-                            showDatePicker(
-                                    context: context,
-                                    firstDate: DateTime(2023),
-                                    lastDate: DateTime.now())
-                                .then(
-                              (value) {
-                                if (value != null) {
-                                  dtc.text = value.formatLengkap();
-                                  BlocProvider.of<RangkumanBloc>(context).add(
-                                      ChangeFilterRangkuman(
-                                          filter: widget.state.filter.copywith(
-                                              start: DateTime(
-                                                  value.year, value.month),
-                                              end: DateTime(value.year,
-                                                  value.month + 1))));
-                                  // setState(() {
-                                  // BlocProvider.of<SubjectBloc>(context)
-                                  // selecteddate = value;
-                                  // });
-                                }
-                              },
-                            );
-                          } else {
-                            showMonthYearPicker(
-                                    context: context,
-                                    initialDate:
-                                        widget.state.filter.start ?? now,
-                                    firstDate: DateTime(2023),
-                                    lastDate: DateTime.now())
-                                .then(
-                              (value) {
-                                if (value != null) {
-                                  dtc.text = value.formatMonthYear();
-                                  BlocProvider.of<RangkumanBloc>(context).add(
-                                      ChangeFilterRangkuman(
-                                          filter: widget.state.filter.copywith(
-                                              start: DateTime(
-                                                  value.year, value.month),
-                                              end: DateTime(value.year,
-                                                  value.month + 1))));
-                                  // setState(() {
-                                  // BlocProvider.of<SubjectBloc>(context)
-                                  // selecteddate = value;
-                                  // });
-                                }
-                              },
-                            );
-                          }
-                        },
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(), label: Text('Bulan')),
-                      ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text('Pilih Tanggal : '),
+                Flexible(
+                  child: InkWell(
+                    onTap: () {},
+                    child: TextField(
+                      controller: dtc,
+                      readOnly: true,
+                      // enabled: false,
+                      onTap: () {
+                        if (widget.isHarian) {
+                          showDatePicker(
+                                  context: context,
+                                  firstDate: DateTime(2023),
+                                  lastDate: DateTime.now())
+                              .then(
+                            (value) {
+                              if (value != null) {
+                                dtc.text = value.formatLengkap();
+                                BlocProvider.of<RangkumanBloc>(context).add(
+                                    ChangeFilterRangkuman(
+                                        filter: widget.state.filter.copywith(
+                                            start: DateTime(
+                                                value.year, value.month),
+                                            end: DateTime(
+                                                value.year, value.month + 1))));
+                                // setState(() {
+                                // BlocProvider.of<SubjectBloc>(context)
+                                // selecteddate = value;
+                                // });
+                              }
+                            },
+                          );
+                        } else {
+                          showMonthYearPicker(
+                                  context: context,
+                                  initialDate: widget.state.filter.start ?? now,
+                                  firstDate: DateTime(2023),
+                                  lastDate: DateTime.now())
+                              .then(
+                            (value) {
+                              if (value != null) {
+                                dtc.text = value.formatMonthYear();
+                                BlocProvider.of<RangkumanBloc>(context).add(
+                                    ChangeFilterRangkuman(
+                                        filter: widget.state.filter.copywith(
+                                            start: DateTime(
+                                                value.year, value.month),
+                                            end: DateTime(
+                                                value.year, value.month + 1))));
+                                // setState(() {
+                                // BlocProvider.of<SubjectBloc>(context)
+                                // selecteddate = value;
+                                // });
+                              }
+                            },
+                          );
+                        }
+                      },
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(), label: Text('Bulan')),
                     ),
                   ),
-                ],
-              ),
-              Text(
-                'Item counts',
+                ),
+              ],
+            ),
+            Text(
+              'Item counts',
+              textScaler: TextScaler.linear(1.1),
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            for (var j = 0; j < peritem.length; j++)
+              Text('${peritemlist[j].key} ${peritemlist[j].value}x'),
+            Divider(),
+            Text('Pendapatan dari penjualan ',
                 textScaler: TextScaler.linear(1.1),
-                style: TextStyle(fontWeight: FontWeight.w500),
-              ),
-              for (var j = 0; j < peritem.length; j++)
-                Text('${peritemlist[j].key} ${peritemlist[j].value}x'),
-              Divider(),
-              Text('Pendapatan dari penjualan ',
-                  textScaler: TextScaler.linear(1.1),
-                  style: TextStyle(fontWeight: FontWeight.w500)),
-              Text('Total ${totalpendapatan.numberFormat(currency: true)}'),
-              Text('Total tunai ${widget.state.struks.where(
-                    (element) => element.tipePembayaran == TipePembayaran.tunai,
-                  ).fold(
-                    0,
-                    (previousValue, element) =>
-                        previousValue + (element.total ?? 0),
-                  ).numberFormat(currency: true)}'),
-              Text('Total qris${widget.state.struks.where(
-                    (element) => element.tipePembayaran == TipePembayaran.qris,
-                  ).fold(
-                    0,
-                    (previousValue, element) =>
-                        previousValue + (element.total ?? 0),
-                  ).numberFormat(currency: true)}'),
-              Divider(),
-              Text('Pengeluaran Umum',
-                  textScaler: TextScaler.linear(1.1),
-                  style: TextStyle(fontWeight: FontWeight.w500)),
-              Column(
-                children: [
-                  for (dynamic e in (widget.state.pengeluaranKas))
-                    Row(
-                      children: [
-                        Expanded(child: Text(e.data()['title'].toString())),
-                        Expanded(
-                          child: Text((e.data()['cost'] as int)
-                              .numberFormat(currency: true)),
-                        ),
-                        Expanded(
-                          child: Text((e.data()['date'] as Timestamp)
-                              .toDate()
-                              .formatLengkap()),
-                        ),
-                      ],
-                    ),
+                style: TextStyle(fontWeight: FontWeight.w500)),
+            Text('Total ${totalpendapatan.numberFormat(currency: true)}'),
+            Text('Total tunai ${widget.state.struks.where(
+                  (element) => element.tipePembayaran == TipePembayaran.tunai,
+                ).fold(
+                  0,
+                  (previousValue, element) =>
+                      previousValue + (element.total ?? 0),
+                ).numberFormat(currency: true)}'),
+            Text('Total qris${widget.state.struks.where(
+                  (element) => element.tipePembayaran == TipePembayaran.qris,
+                ).fold(
+                  0,
+                  (previousValue, element) =>
+                      previousValue + (element.total ?? 0),
+                ).numberFormat(currency: true)}'),
+            Divider(),
+            Text('Pengeluaran Umum',
+                textScaler: TextScaler.linear(1.1),
+                style: TextStyle(fontWeight: FontWeight.w500)),
+            Column(
+              children: [
+                for (dynamic e in (widget.state.pengeluaranKas))
                   Row(
                     children: [
-                      Text('Total : '),
-                      Text(widget.state.pengeluaranKas
-                          .fold(
-                            0,
-                            (previousValue, element) =>
-                                previousValue +
-                                (((element.data() as Map)['cost'] as int?) ??
-                                    0),
-                          )
-                          .numberFormat(currency: true))
-                    ],
-                  ),
-                ],
-              ),
-              Text('Pengeluaran dari Pembelian Bahanbaku',
-                  textScaler: TextScaler.linear(1.1),
-                  style: TextStyle(fontWeight: FontWeight.w500)),
-              Column(children: [
-                for (InputstockModel e in widget.state.pengeluaranInputBahan)
-                  Row(
-                    children: [
-                      Expanded(child: Text(e.title)),
+                      Expanded(child: Text(e.data()['title'].toString())),
                       Expanded(
-                          child: Text(e.price.numberFormat(currency: true))),
+                        child: Text((e.data()['cost'] as int)
+                            .numberFormat(currency: true)),
+                      ),
                       Expanded(
-                          child: Text(e.tanggalbeli.toDate().formatLengkap())),
+                        child: Text((e.data()['date'] as Timestamp)
+                            .toDate()
+                            .formatLengkap()),
+                      ),
                     ],
                   ),
                 Row(
                   children: [
                     Text('Total : '),
-                    Text(widget.state.pengeluaranInputBahan
+                    Text(widget.state.pengeluaranKas
                         .fold(
-                          0.0,
+                          0,
                           (previousValue, element) =>
-                              previousValue + element.price,
+                              previousValue +
+                              (((element.data() as Map)['cost'] as int?) ?? 0),
                         )
                         .numberFormat(currency: true))
                   ],
                 ),
-              ]),
-              Divider(),
-              Text('Bersih Periode ini',
-                  textScaler: TextScaler.linear(1.1),
-                  style: TextStyle(fontWeight: FontWeight.w500)),
+              ],
+            ),
+            Text('Pengeluaran dari Pembelian Bahanbaku',
+                textScaler: TextScaler.linear(1.1),
+                style: TextStyle(fontWeight: FontWeight.w500)),
+            Column(children: [
+              for (InputstockModel e in widget.state.pengeluaranInputBahan)
+                Row(
+                  children: [
+                    Expanded(child: Text(e.title)),
+                    Expanded(child: Text(e.price.numberFormat(currency: true))),
+                    Expanded(
+                        child: Text(e.tanggalbeli.toDate().formatLengkap())),
+                  ],
+                ),
               Row(
                 children: [
-                  Text('Total ${totalpendapatan.numberFormat(currency: true)}'),
-                  Text(" - "),
-                  Text(widget.state.pengeluaranKas
-                      .fold(
-                        0,
-                        (previousValue, element) =>
-                            previousValue +
-                            (((element.data() as Map)['cost'] as int?) ?? 0),
-                      )
-                      .numberFormat(currency: true)),
-                  Text(" - "),
+                  Text('Total : '),
                   Text(widget.state.pengeluaranInputBahan
                       .fold(
                         0.0,
                         (previousValue, element) =>
                             previousValue + element.price,
                       )
-                      .numberFormat(currency: true)),
-                  Text(" = "),
-                  Text((totalpendapatan -
-                          (widget.state.pengeluaranKas.fold(
-                            0,
-                            (previousValue, element) =>
-                                previousValue +
-                                (((element.data() as Map)['cost'] as int?) ??
-                                    0),
-                          )) -
-                          (widget.state.pengeluaranInputBahan.fold(
-                            0.0,
-                            (previousValue, element) =>
-                                previousValue + element.price,
-                          )))
-                      .numberFormatCurrency),
+                      .numberFormat(currency: true))
                 ],
               ),
-              Divider(),
-              Text('Bahan baku'),
-              Text('Expected usage:'),
-              Text(groupIngredient.toString()),
-              Text('Expected in stock:'),
-              Text('(Stock InputPage)'),
-            ],
-          ),
+            ]),
+            Divider(),
+            Text('Bersih Periode ini',
+                textScaler: TextScaler.linear(1.1),
+                style: TextStyle(fontWeight: FontWeight.w500)),
+            Row(
+              children: [
+                Text('Total ${totalpendapatan.numberFormat(currency: true)}'),
+                Text(" - "),
+                Text(widget.state.pengeluaranKas
+                    .fold(
+                      0,
+                      (previousValue, element) =>
+                          previousValue +
+                          (((element.data() as Map)['cost'] as int?) ?? 0),
+                    )
+                    .numberFormat(currency: true)),
+                Text(" - "),
+                Text(widget.state.pengeluaranInputBahan
+                    .fold(
+                      0.0,
+                      (previousValue, element) => previousValue + element.price,
+                    )
+                    .numberFormat(currency: true)),
+                Text(" = "),
+                Text((totalpendapatan -
+                        (widget.state.pengeluaranKas.fold(
+                          0,
+                          (previousValue, element) =>
+                              previousValue +
+                              (((element.data() as Map)['cost'] as int?) ?? 0),
+                        )) -
+                        (widget.state.pengeluaranInputBahan.fold(
+                          0.0,
+                          (previousValue, element) =>
+                              previousValue + element.price,
+                        )))
+                    .numberFormatCurrency),
+              ],
+            ),
+            Divider(),
+            Text('Bahan baku'),
+            Text('Expected usage:'),
+            Text(groupIngredient.toString()),
+            Text('Expected in stock:'),
+            Text('(Stock InputPage)'),
+          ],
         ),
       ),
     );
