@@ -93,336 +93,295 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                 return Column(
                   children: [
                     Expanded(
-                      child: Card(
-                        elevation: 2,
-                        margin: EdgeInsets.all(8),
-                        child: Container(
-                          padding: const EdgeInsets.all(18.0),
-                          width: MediaQuery.sizeOf(context).width * 0.8,
-                          child: Column(
-                            // mainAxisSize: MainAxisSize.max,
-                            // mainAxisAlignment: MainAxisAlignment.center,
-                            // crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              FutureBuilder(
-                                  future: SharedPreferences.getInstance().then(
-                                    (value) {
-                                      var a =
-                                          value.getString('globalSetting') ??
-                                              '{}';
-                                      var b = jsonDecode(a);
-                                      return '${b['namaresto']}';
-                                    },
-                                  ),
-                                  builder: (context, asyncSnapshot) {
-                                    return Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Kafe ${asyncSnapshot.data}',
-                                        textScaler: TextScaler.linear(1.8),
-                                      ),
-                                    );
-                                  }),
-                              const Padding(padding: EdgeInsets.all(18.0)),
-                              Row(
-                                children: [
-                                  Text(
-                                    ((BlocProvider.of<KaryawanauthBloc>(context)
-                                            .state as KaryawanAuthenticated)
-                                        .user
-                                        .namaKaryawan),
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(bottom: 8.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                      child: SingleChildScrollView(
+                        reverse: true,
+                        child: Card.outlined(
+                          elevation: 3,
+                          margin: EdgeInsets.all(8),
+                          child: Container(
+                            padding: const EdgeInsets.all(18.0),
+                            width: MediaQuery.sizeOf(context).width * 0.8,
+                            child: Column(
+                              // mainAxisSize: MainAxisSize.max,
+                              // mainAxisAlignment: MainAxisAlignment.center,
+                              // crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                FutureBuilder(
+                                    future:
+                                        SharedPreferences.getInstance().then(
+                                      (value) {
+                                        var a =
+                                            value.getString('globalSetting') ??
+                                                '{}';
+                                        var b = jsonDecode(a);
+                                        return '${b['namaresto']}';
+                                      },
+                                    ),
+                                    builder: (context, asyncSnapshot) {
+                                      return Padding(
+                                        padding: EdgeInsets.all(4.0),
+                                        child: Text(
+                                          'Koffie Coffeeshop',
+                                          textScaler: TextScaler.linear(1.8),
+                                        ),
+                                      );
+                                    }),
+                                const Padding(padding: EdgeInsets.all(8.0)),
+                                Row(
                                   children: [
                                     Text(
-                                      state.ordertime.formatLengkap(),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                    Text(
-                                      state.ordertime.clockOnly(),
+                                      ((BlocProvider.of<KaryawanauthBloc>(
+                                                  context)
+                                              .state as KaryawanAuthenticated)
+                                          .user
+                                          .namaKaryawan),
                                       textAlign: TextAlign.left,
                                     ),
                                   ],
                                 ),
-                              ),
-                              Expanded(
-                                child: Scrollbar(
-                                  // thumbVisibility: true,
-                                  child: SingleChildScrollView(
-                                      controller: tablesc,
-                                      child: StrukDataTable(data: state)),
-                                ),
-                              ),
-
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                      'Total : Rp${total(state).toString().numberFormat()}'),
-                                ],
-                              ),
-
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  //     Column(
-                                  //       crossAxisAlignment:
-                                  //           CrossAxisAlignment.start,
-                                  //       mainAxisSize: MainAxisSize.min,
-                                  //       children: [
-                                  //         const Text('Nomor antrian: '),
-                                  //         BlocBuilder<UseStrukBloc, UseStrukState>(
-                                  //           builder: (context, state) {
-                                  //             return DropdownButton<int>(
-                                  //               menuMaxHeight: 280,
-                                  //               alignment: Alignment.center,
-                                  //               items: [
-                                  //                 const DropdownMenuItem(
-                                  //                   value: 0,
-                                  //                   child: Text('Tanpa antrian'),
-                                  //                 ),
-                                  //                 for (var i = 1; i <= 25; i++)
-                                  //                   DropdownMenuItem(
-                                  //                     value: i,
-                                  //                     child: Text(
-                                  //                       '$i',
-                                  //                       textAlign: TextAlign.center,
-                                  //                     ),
-                                  //                   ),
-                                  //               ],
-                                  //               value: state.nomorAntrian,
-                                  //               onChanged: (value) {
-                                  //                 BlocProvider.of<UseStrukBloc>(
-                                  //                         context)
-                                  //                     .add(ChangeAntrian(
-                                  //                         antrian: value ?? 0));
-                                  //                 // setState(() {
-                                  //                 //   val = value ?? 0;
-                                  //                 // });
-                                  //               },
-                                  //             );
-                                  //           },
-                                  //         ),
-                                  //       ],
-                                  //     ),
-                                  //     const Padding(
-                                  //         padding:
-                                  //             EdgeInsets.symmetric(horizontal: 12)),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: TextFormField(
-                                        controller: uang,
-                                        inputFormatters: [telo],
-                                        decoration: const InputDecoration(
-                                            label: Text('Uang')),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              // Row(
-                              //   mainAxisAlignment: MainAxisAlignment.end,
-                              //   children: [
-                              //     Text('Diskon : Rp ${diskon.toString().numberFormat()}'),
-                              //   ],
-                              // ),
-                              BlocBuilder<UseStrukBloc, UseStrukState>(
-                                buildWhen: (previous, current) =>
-                                    previous.tipePembayaran !=
-                                    current.tipePembayaran,
-                                builder: (context, state) {
-                                  return Row(
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Expanded(
-                                        child: InkWell(
-                                          onTap: () {
-                                            uang.text = telo.formatDouble(0.0);
-                                            BlocProvider.of<UseStrukBloc>(
-                                                    context)
-                                                .add(ChangePembayaran(
-                                                    tipe:
-                                                        TipePembayaran.tunai));
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    width:
-                                                        state.tipePembayaran ==
-                                                                TipePembayaran
-                                                                    .tunai
-                                                            ? 3
-                                                            : 1,
-                                                    color: Theme.of(context)
-                                                        .buttonTheme
-                                                        .colorScheme!
-                                                        .primary),
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0)),
-                                            child: Row(
-                                              children: [
-                                                Radio(
-                                                  value: TipePembayaran.tunai,
-                                                  groupValue:
-                                                      state.tipePembayaran,
-                                                  onChanged: (value) {
-                                                    // if (value != null) {
-                                                    //   uang.text = '0';
-                                                    //   BlocProvider.of<
-                                                    //               UseStrukBloc>(
-                                                    //           context)
-                                                    //       .add(ChangePembayaran(
-                                                    //           tipe: value));
-                                                    // }
-                                                  },
-                                                ),
-                                                Text('Tunai'),
-                                                Expanded(child: SizedBox()),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child:
-                                                      Icon(Icons.attach_money),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                      Text(
+                                        state.ordertime.formatLengkap(),
+                                        textAlign: TextAlign.left,
                                       ),
-                                      Padding(
-                                          padding: EdgeInsetsGeometry.all(2)),
-                                      Expanded(
-                                        child: InkWell(
-                                          onTap: () {
-                                            uang.text = telo.formatString(
-                                                total(state).toString());
-                                            setState(() {});
-                                            BlocProvider.of<UseStrukBloc>(
-                                                    context)
-                                                .add(ChangePembayaran(
-                                                    tipe: TipePembayaran.qris));
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                border: Border.all(
-                                                    width:
-                                                        state.tipePembayaran ==
-                                                                TipePembayaran
-                                                                    .qris
-                                                            ? 3
-                                                            : 1,
-                                                    color: Theme.of(context)
-                                                        .buttonTheme
-                                                        .colorScheme!
-                                                        .primary),
-                                                borderRadius:
-                                                    BorderRadius.circular(8.0)),
-                                            child: Row(
-                                              children: [
-                                                Radio(
-                                                  value: TipePembayaran.qris,
-                                                  groupValue:
-                                                      state.tipePembayaran,
-                                                  onChanged: (value) {
-                                                    // if (value != null) {
-                                                    //   uang.text = total(state)
-                                                    //       .toString();
-                                                    //   BlocProvider.of<
-                                                    //               UseStrukBloc>(
-                                                    //           context)
-                                                    //       .add(ChangePembayaran(
-                                                    //           tipe: value));
-                                                    // }
-                                                  },
-                                                ),
-                                                Text('Qris'),
-                                                Expanded(child: SizedBox()),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Icon(Icons.qr_code_2),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                                      Text(
+                                        state.ordertime.clockOnly(),
+                                        textAlign: TextAlign.left,
                                       ),
                                     ],
-                                  );
-                                },
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Total : Rp${(total(state) - diskon).toString().numberFormat()}',
-                                    textScaler: TextScaler.linear(1.25),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500),
                                   ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'Kembalian : Rp${((telo.getDouble()) - total(state)).numberFormat()}',
-                                    textScaler: TextScaler.linear(1.25),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  ElevatedButton.icon(
-                                      onPressed: () async {
-                                        // debugPrint(state.orderItems.single.ingredientItems);
-                                        widget.pageController.animateToPage(0,
-                                            duration: Durations.extralong1,
-                                            curve: Curves.easeInOut);
-                                      },
-                                      icon: Icon(Icons.arrow_back),
-                                      label: const Text('Batal')),
-                                  Padding(padding: EdgeInsetsGeometry.all(4)),
-                                  ElevatedButton(
-                                      onPressed: () async {
-                                        print(
-                                            (telo.getDouble() - total(state)));
-                                        if (((telo.getDouble() - total(state)) <
-                                            0.0)) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                                  content:
-                                                      Text('kembalian minus')));
-                                          return;
-                                        }
-                                        // debugPrint(state.orderItems.single.ingredientItems);
-                                        try {
-                                          BlocProvider.of<UseStrukBloc>(context)
-                                              .add(SendtoDb());
-                                          BlocProvider.of<AntrianBloc>(context)
-                                              .add(InitiateAntrian());
-                                        } catch (e) {
-                                          debugPrint(e.toString());
-                                        }
-                                      },
-                                      child: const Text('Chekout!'))
-                                ],
-                              ),
-                              // Text(widget.theData.toString()),
-                            ],
+                                ),
+                                StrukDataTable(data: state),
+
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                        'Total : Rp${total(state).toString().numberFormat()}'),
+                                  ],
+                                ),
+
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: uang,
+                                          inputFormatters: [telo],
+                                          decoration: const InputDecoration(
+                                              label: Text('Uang')),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                BlocBuilder<UseStrukBloc, UseStrukState>(
+                                  buildWhen: (previous, current) =>
+                                      previous.tipePembayaran !=
+                                      current.tipePembayaran,
+                                  builder: (context, state) {
+                                    return Row(
+                                      children: [
+                                        Expanded(
+                                          child: InkWell(
+                                            onTap: () {
+                                              uang.text =
+                                                  telo.formatDouble(0.0);
+                                              BlocProvider.of<UseStrukBloc>(
+                                                      context)
+                                                  .add(ChangePembayaran(
+                                                      tipe: TipePembayaran
+                                                          .tunai));
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      width:
+                                                          state.tipePembayaran ==
+                                                                  TipePembayaran
+                                                                      .tunai
+                                                              ? 3
+                                                              : 1,
+                                                      color: Theme.of(context)
+                                                          .buttonTheme
+                                                          .colorScheme!
+                                                          .primary),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0)),
+                                              child: Row(
+                                                children: [
+                                                  Radio(
+                                                    value: TipePembayaran.tunai,
+                                                    groupValue:
+                                                        state.tipePembayaran,
+                                                    onChanged: (value) {
+                                                      // if (value != null) {
+                                                      //   uang.text = '0';
+                                                      //   BlocProvider.of<
+                                                      //               UseStrukBloc>(
+                                                      //           context)
+                                                      //       .add(ChangePembayaran(
+                                                      //           tipe: value));
+                                                      // }
+                                                    },
+                                                  ),
+                                                  Text('Tunai'),
+                                                  Expanded(child: SizedBox()),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Icon(
+                                                        Icons.attach_money),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                            padding: EdgeInsetsGeometry.all(2)),
+                                        Expanded(
+                                          child: InkWell(
+                                            onTap: () {
+                                              uang.text = telo.formatString(
+                                                  total(state).toString());
+                                              setState(() {});
+                                              BlocProvider.of<UseStrukBloc>(
+                                                      context)
+                                                  .add(ChangePembayaran(
+                                                      tipe:
+                                                          TipePembayaran.qris));
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      width:
+                                                          state.tipePembayaran ==
+                                                                  TipePembayaran
+                                                                      .qris
+                                                              ? 3
+                                                              : 1,
+                                                      color: Theme.of(context)
+                                                          .buttonTheme
+                                                          .colorScheme!
+                                                          .primary),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          8.0)),
+                                              child: Row(
+                                                children: [
+                                                  Radio(
+                                                    value: TipePembayaran.qris,
+                                                    groupValue:
+                                                        state.tipePembayaran,
+                                                    onChanged: (value) {
+                                                      // if (value != null) {
+                                                      //   uang.text = total(state)
+                                                      //       .toString();
+                                                      //   BlocProvider.of<
+                                                      //               UseStrukBloc>(
+                                                      //           context)
+                                                      //       .add(ChangePembayaran(
+                                                      //           tipe: value));
+                                                      // }
+                                                    },
+                                                  ),
+                                                  Text('Qris'),
+                                                  Expanded(child: SizedBox()),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child:
+                                                        Icon(Icons.qr_code_2),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Total : Rp${(total(state) - diskon).toString().numberFormat()}',
+                                      textScaler: TextScaler.linear(1.25),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      'Kembalian : Rp${((telo.getDouble()) - total(state)).numberFormat()}',
+                                      textScaler: TextScaler.linear(1.25),
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    ElevatedButton.icon(
+                                        onPressed: () async {
+                                          // debugPrint(state.orderItems.single.ingredientItems);
+                                          widget.pageController.animateToPage(0,
+                                              duration: Durations.extralong1,
+                                              curve: Curves.easeInOut);
+                                        },
+                                        icon: Icon(Icons.arrow_back),
+                                        label: const Text('Batal')),
+                                    Padding(padding: EdgeInsetsGeometry.all(4)),
+                                    ElevatedButton(
+                                        onPressed: () async {
+                                          print((telo.getDouble() -
+                                              total(state)));
+                                          if (((telo.getDouble() -
+                                                  total(state)) <
+                                              0.0)) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        'kembalian minus')));
+                                            return;
+                                          }
+                                          // debugPrint(state.orderItems.single.ingredientItems);
+                                          try {
+                                            BlocProvider.of<UseStrukBloc>(
+                                                    context)
+                                                .add(SendtoDb());
+                                            BlocProvider.of<AntrianBloc>(
+                                                    context)
+                                                .add(InitiateAntrian());
+                                          } catch (e) {
+                                            debugPrint(e.toString());
+                                          }
+                                        },
+                                        child: const Text('Chekout!'))
+                                  ],
+                                ),
+                                // Text(widget.theData.toString()),
+                              ],
+                            ),
                           ),
                         ),
                       ),

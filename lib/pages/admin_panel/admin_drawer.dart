@@ -182,78 +182,78 @@ class AdminDrawer extends StatelessWidget {
                   // Navigator.pop(context);
                 },
                 title: Text('Set Uang Laci Hari ini')),
-            ListTile(
-                onTap: () async {
-                  var datatext = await SharedPreferences.getInstance().then(
-                    (value) {
-                      try {
-                        var a = value.getString('globalSetting') ?? '{}';
-                        print(a);
-                        var b = jsonDecode(a);
-                        return '${b['namaresto']}';
-                      } catch (e) {
-                        return '';
-                      }
-                    },
-                  );
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        final FocusNode focusNode = FocusNode();
-                        var tct =
-                            TextEditingController(text: datatext.toString());
-                        focusNode.requestFocus();
-                        return Dialog(
-                          child: Padding(
-                            padding: const EdgeInsets.all(18.0),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 120,
-                                  child: TextFormField(
-                                    controller: tct,
-                                    validator: usernameValidator,
-                                    onFieldSubmitted: (value) {
-                                      debugPrint(value);
-                                    },
-                                    focusNode: focusNode,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                        label: Text('Nama resto')),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                    onPressed: () async {
-                                      var sp =
-                                          await SharedPreferences.getInstance();
-                                      await sp
-                                          .setString(
-                                              'globalSetting',
-                                              jsonEncode(
-                                                  {'namaresto': tct.text}))
-                                          .then(
-                                        (value) {
-                                          if (value) {
-                                            Navigator.pop(context);
-                                          } else {
-                                            debugPrint('error');
-                                          }
-                                        },
-                                      );
-                                    },
-                                    child: Text('set'))
-                              ],
-                            ),
-                          ),
-                        );
-                      });
-                  // setState(() {
-                  //   selectedIndex = 0;
-                  // });
-                  // Navigator.pop(context);
-                },
-                title: Text('Ganti Nama Resto/Kafe')),
+            // ListTile(
+            //     onTap: () async {
+            //       var datatext = await SharedPreferences.getInstance().then(
+            //         (value) {
+            //           try {
+            //             var a = value.getString('globalSetting') ?? '{}';
+            //             print(a);
+            //             var b = jsonDecode(a);
+            //             return '${b['namaresto']}';
+            //           } catch (e) {
+            //             return '';
+            //           }
+            //         },
+            //       );
+            //       showDialog(
+            //           context: context,
+            //           builder: (context) {
+            //             final FocusNode focusNode = FocusNode();
+            //             var tct =
+            //                 TextEditingController(text: datatext.toString());
+            //             focusNode.requestFocus();
+            //             return Dialog(
+            //               child: Padding(
+            //                 padding: const EdgeInsets.all(18.0),
+            //                 child: Row(
+            //                   mainAxisSize: MainAxisSize.min,
+            //                   children: [
+            //                     SizedBox(
+            //                       width: 120,
+            //                       child: TextFormField(
+            //                         controller: tct,
+            //                         validator: usernameValidator,
+            //                         onFieldSubmitted: (value) {
+            //                           debugPrint(value);
+            //                         },
+            //                         focusNode: focusNode,
+            //                         keyboardType: TextInputType.name,
+            //                         decoration: InputDecoration(
+            //                             label: Text('Nama resto')),
+            //                       ),
+            //                     ),
+            //                     ElevatedButton(
+            //                         onPressed: () async {
+            //                           var sp =
+            //                               await SharedPreferences.getInstance();
+            //                           await sp
+            //                               .setString(
+            //                                   'globalSetting',
+            //                                   jsonEncode(
+            //                                       {'namaresto': tct.text}))
+            //                               .then(
+            //                             (value) {
+            //                               if (value) {
+            //                                 Navigator.pop(context);
+            //                               } else {
+            //                                 debugPrint('error');
+            //                               }
+            //                             },
+            //                           );
+            //                         },
+            //                         child: Text('set'))
+            //                   ],
+            //                 ),
+            //               ),
+            //             );
+            //           });
+            //       // setState(() {
+            //       //   selectedIndex = 0;
+            //       // });
+            //       // Navigator.pop(context);
+            //     },
+            //     title: Text('Ganti Nama Resto/Kafe')),
             ListTile(
                 onTap: () {
                   Navigator.push(

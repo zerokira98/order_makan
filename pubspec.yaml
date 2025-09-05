@@ -69,6 +69,8 @@ dependencies:
   one_clock: ^2.0.2
   flutter_image_compress: ^2.4.0
   firebase_storage: ^12.4.10
+  flutter_launcher_icons: ^0.14.4
+  rename_app: ^1.6.5
 
 dev_dependencies:
   flutter_test:
@@ -101,6 +103,7 @@ flutter:
     - assets/nasi.jpg
     - assets/es_teh.jpg
     - assets/koffie.jpg
+    - assets/qr/qr.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

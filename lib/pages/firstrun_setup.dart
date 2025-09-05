@@ -28,7 +28,7 @@ class _SetupPageState extends State<SetupPage> {
   final TextEditingController passworda = TextEditingController(text: '');
   final TextEditingController passworda2 = TextEditingController(text: '');
 
-  final TextEditingController namaResto = TextEditingController(text: '');
+  // final TextEditingController namaResto = TextEditingController(text: '');
   bool obsecure1 = true;
   bool obsecure2 = true;
   GlobalKey<FormState> a = GlobalKey();
@@ -148,30 +148,30 @@ class _SetupPageState extends State<SetupPage> {
                               ? Icons.visibility
                               : Icons.visibility_off))),
                 ),
-                TextFormField(
-                  validator: (value) {
-                    if (value!.length < 3) {
-                      return 'At least 3';
-                    }
-                    return null;
-                    //
-                  },
-                  controller: namaResto,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  onEditingComplete: () {
-                    FocusScope.of(context).nextFocus();
-                  },
-                  decoration: const InputDecoration(label: Text('Nama Kafe')),
-                ),
+                // TextFormField(
+                //   validator: (value) {
+                //     if (value!.length < 3) {
+                //       return 'At least 3';
+                //     }
+                //     return null;
+                //     //
+                //   },
+                //   controller: namaResto,
+                //   autovalidateMode: AutovalidateMode.onUserInteraction,
+                //   onEditingComplete: () {
+                //     FocusScope.of(context).nextFocus();
+                //   },
+                //   decoration: const InputDecoration(label: Text('Nama Kafe')),
+                // ),
                 ElevatedButton(
                     onPressed: () async {
                       try {
                         if (a.currentState?.validate() ?? false) {
                           var sharedpref =
                               await SharedPreferences.getInstance();
-                          Map d = {
-                            'namaresto': namaResto.text,
-                          };
+                          // Map d = {
+                          //   'namaresto': namaResto.text,
+                          // };
                           var auth =
                               RepositoryProvider.of<FirebaseAuth>(context);
                           var store =
@@ -221,8 +221,8 @@ class _SetupPageState extends State<SetupPage> {
                           );
                           // BlocProvider.of<KaryawanauthBloc>(context).add(SignUpAdmin());
                           // await sharedpref.setString('adminCred', jsonEncode(c));
-                          await sharedpref.setString(
-                              'globalSetting', jsonEncode(d));
+                          // await sharedpref.setString(
+                          //     'globalSetting', jsonEncode(d));
                           // b.setStringList('adminCred', []);
 
                           ///set default menu

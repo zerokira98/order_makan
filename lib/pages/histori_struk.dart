@@ -3,7 +3,9 @@
 
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image/image.dart' as i;
 import 'package:month_year_picker/month_year_picker.dart';
 // import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
 // import 'package:flutter_thermal_printer/utils/printer.dart';
@@ -465,23 +467,30 @@ class StrukPrint {
     List<int> bytes = [];
     // Using default profile
     final profile = await CapabilityProfile.load();
+    final ByteData imgdata = await rootBundle.load('assets/qr/qr.jpeg');
+    final Uint8List bytesImg = imgdata.buffer.asUint8List();
+    final image = i.decodeImage(bytesImg);
     final generator = Generator(PaperSize.mm58, profile);
     var datakaryawan = await RepositoryProvider.of<KaryawanAuthRepo>(context)
         .getAllKaryawan(data.karyawanId);
     //bytes += generator.setGlobalFont(PosFontType.fontA);
     bytes += generator.reset();
 
-    bytes += generator.text('Koffie Pare',
+    bytes += generator.text('Koffie Coffeeshop',
         styles: const PosStyles(
             align: PosAlign.center,
-            width: PosTextSize.size2,
+            width: PosTextSize.size1,
             height: PosTextSize.size2));
-    bytes += generator.text('Jl. Gajahmada no.xx',
+    bytes += generator.text('Jl. Brawijaya 140',
+        styles: const PosStyles(
+          align: PosAlign.center,
+        ));
+    bytes += generator.text('Kampung Inggris',
         styles: const PosStyles(
           align: PosAlign.center,
         ));
 
-    bytes += generator.emptyLines(2);
+    bytes += generator.emptyLines(1);
     bytes += generator.text('No. antrian:',
         styles: const PosStyles(
           align: PosAlign.center,
@@ -587,7 +596,22 @@ class StrukPrint {
           align: PosAlign.center,
         ));
 
-    bytes += generator.qrcode('instagram.com/groom_barbershop_pare');
+    bytes += image != null
+        ? generator.image(image)
+        : generator.qrcode('https://www.instagram.com/koffiepare/');
+
+    // bytes += generator.qrcode('https://www.instagram.com/koffiepare/');
+    // bytes += generator.qrcode('https://www.tiktok.com/@koffie.pare');
+    // bytes += generator.row([
+    //   PosColumn(
+    //     text: '-${e.title}',
+    //     width: 6,
+    //     styles: const PosStyles(
+    //       align: PosAlign.left,
+    //       fontType: PosFontType.fontB,
+    //     ),
+    //   ),
+    // ]);
     bytes += generator.emptyLines(3);
     return bytes;
   }

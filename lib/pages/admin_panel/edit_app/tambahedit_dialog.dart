@@ -62,7 +62,11 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
           title: Text('Alert'),
           content: Text('Any changes won\'t be saved.'),
           actions: [
-            ElevatedButton(onPressed: () {}, child: Text('Cancel')),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel')),
             ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context, true);

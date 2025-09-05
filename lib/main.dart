@@ -140,7 +140,7 @@ class MyApp extends StatelessWidget {
           MonthYearPickerLocalizations.delegate,
         ],
         title: 'Flutter Demo',
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.light,
         darkTheme: ThemeData.dark(useMaterial3: true),
         theme: ThemeData(
           scaffoldBackgroundColor: backgroundcolor,

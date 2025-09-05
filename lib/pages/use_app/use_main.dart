@@ -75,13 +75,13 @@ class _UseMainState extends State<UseMain> {
               builder: (context, snapshot) {
                 var a = snapshot.data?.getString('globalSetting') ?? '{}';
                 var b = jsonDecode(a);
-                return Text('Kafe ${b['namaresto']}');
+                return Text('Koffie Coffeeshop');
               },
             ),
             BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
               builder: (context, state) {
                 return Text(
-                  'Senin, 32 Januari 2023 ${(state as KaryawanAuthenticated).user.namaKaryawan}',
+                  '${DateTime.now().formatLengkap()} ${(state as KaryawanAuthenticated).user.namaKaryawan}',
                   style: TextStyle(fontSize: 10),
                 );
               },
@@ -183,7 +183,7 @@ class _UseMainState extends State<UseMain> {
                                         child: AnimatedSwitcher(
                                           switchInCurve: Curves.easeInOut,
                                           switchOutCurve: Curves.easeInOut,
-                                          duration: Durations.long1,
+                                          duration: Durations.medium2,
                                           transitionBuilder:
                                               (child, animation) =>
                                                   FadeTransition(

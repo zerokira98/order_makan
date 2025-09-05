@@ -37,6 +37,21 @@ class _ImagepickerWidgetState extends State<ImagepickerWidget> {
 
           ///new image
           ? ElevatedButton.icon(
+              onLongPress: () async {
+                XFile? a =
+                    await ImagePicker().pickImage(source: ImageSource.camera);
+                if (a != null) {
+                  setState(() {
+                    loading = true;
+                  });
+                  var dlUrl = await uploadFile(a, widget.menuname);
+                  setState(() {
+                    loading = false;
+                    imgdir = dlUrl ?? '';
+                  });
+                  widget.imgdirUpdater(dlUrl ?? '');
+                }
+              },
               onPressed: () async {
                 XFile? a =
                     await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -61,6 +76,21 @@ class _ImagepickerWidgetState extends State<ImagepickerWidget> {
               : SizedBox(
                   height: 110,
                   child: InkWell(
+                    onLongPress: () async {
+                      XFile? a = await ImagePicker()
+                          .pickImage(source: ImageSource.camera);
+                      if (a != null) {
+                        setState(() {
+                          loading = true;
+                        });
+                        var dlUrl = await uploadFile(a, widget.menuname);
+                        setState(() {
+                          loading = false;
+                          imgdir = dlUrl ?? '';
+                        });
+                        widget.imgdirUpdater(dlUrl ?? '');
+                      }
+                    },
                     onTap: () async {
                       var a = await ImagePicker()
                           .pickImage(source: ImageSource.gallery);

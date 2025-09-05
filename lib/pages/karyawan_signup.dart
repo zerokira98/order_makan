@@ -116,7 +116,22 @@ class _KaryawanSignupPageState extends State<KaryawanSignupPage> {
                               }
                             }
                           : null,
-                      child: const Text('Signup'))
+                      child: const Text('Signup')),
+                  ElevatedButton(
+                      onPressed: () async {
+                        var sharedpref = await SharedPreferences.getInstance();
+                        if (widget.firstTime) {
+                          await sharedpref.setInt('firstStart', 2);
+                        }
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyApp(),
+                          ),
+                          (route) => false,
+                        );
+                      },
+                      child: Text('Skip'))
                 ],
               ),
             )),

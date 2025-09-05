@@ -32,6 +32,7 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
   double opacity = 0.0;
 
   num? posminwidth = 0.0;
+  num? posminheight = 0.0;
 
   double top = 0.0;
   final GlobalKey _keyRed = GlobalKey();
@@ -46,7 +47,7 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
       );
     ca = CurvedAnimation(parent: ac, curve: Curves.easeOut).drive(ani);
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(Durations.long1, () {
+      Future.delayed(Durations.short1, () {
         setState(() {
           top = 38.0;
         });
@@ -62,13 +63,15 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
         ?.getTransformTo(null)
         .getTranslation();
     final positionRed = renderBoxRed?.x;
+    final positionBlue = renderBoxRed?.y;
     posminwidth = positionRed;
+    posminheight = positionBlue;
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.sizeOf(context).width;
-    var height = MediaQuery.sizeOf(context).width;
+    var height = MediaQuery.sizeOf(context).height;
     return InkWell(
       onLongPress: () {
         if (widget.editmode) {
@@ -152,7 +155,7 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
                         ),
                         AnimatedPositioned(
                           curve: Curves.easeInOut,
-                          duration: Durations.long1,
+                          duration: Durations.medium2,
                           top: top,
                           bottom: 0.0,
                           left: 0,
@@ -238,7 +241,8 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
             onTransform: (animationValue) => Matrix4.identity()
               ..translate(
                   ((width * 0.75 - (posminwidth ?? 0)) * animationValue),
-                  ((height / 6) * (math.sin(ac.value * math.pi * 1).abs()))
+                  ((height / 3 - (posminheight ?? 0)) *
+                      (math.sin(ac.value * math.pi * 1).abs()))
                   // ((animationValue + 0.1) * 100) / (animationValue + 0.1),
                   )
               ..scale(1 - (animationValue), 1 - (animationValue)),
@@ -247,6 +251,11 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
               // opacity: ca.drive(Tween(begin: 1.0, end: 1.0)),
               child: Container(
                 color: Colors.black,
+                padding:
+                    EdgeInsets.all(8.0).add(EdgeInsetsGeometry.only(top: 18)),
+                child: Container(
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),

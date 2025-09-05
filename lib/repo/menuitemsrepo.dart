@@ -100,6 +100,7 @@ class MenuItemRepository implements _MenuItemRepo {
   Future<List<MenuItems>> getMenusByCategory(String category) {
     return menuRef
         .where('categories', arrayContains: category)
+        .orderBy('title')
         .get()
         .then((value) => value.docs
             .map(

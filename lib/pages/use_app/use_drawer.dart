@@ -14,20 +14,20 @@ class UseDrawer extends StatelessWidget {
             height: 180,
             child: Stack(
               children: [
-                Positioned.fill(
-                  child: Container(
-                    alignment: Alignment.bottomCenter,
-                    child: FutureBuilder(
-                      future: SharedPreferences.getInstance(),
-                      builder: (context, snapshot) {
-                        var a =
-                            snapshot.data?.getString('globalSetting') ?? '{}';
-                        var b = jsonDecode(a);
-                        return Text('Kafe ${b['namaresto']}');
-                      },
-                    ),
-                  ),
-                ),
+                // Positioned.fill(
+                //   child: Container(
+                //     alignment: Alignment.bottomCenter,
+                //     child: FutureBuilder(
+                //       future: SharedPreferences.getInstance(),
+                //       builder: (context, snapshot) {
+                //         var a =
+                //             snapshot.data?.getString('globalSetting') ?? '{}';
+                //         var b = jsonDecode(a);
+                //         return Text('Kafe ${b['namaresto']}');
+                //       },
+                //     ),
+                //   ),
+                // ),
                 Positioned.fill(child: Image.asset('assets/koffie.jpg'))
               ],
             ),
