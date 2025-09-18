@@ -30,7 +30,7 @@ class RangkumanPeriodik extends StatelessWidget {
                   onPressed: () {
                     ExcelProcessor().printExcel(state);
                   },
-                  child: Text('Rangkum Excel(belum)'));
+                  child: Text('Rangkum Excel'));
             },
           )
         ],

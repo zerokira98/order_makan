@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:order_makan/helper.dart';
@@ -11,8 +13,19 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
   MenuItemRepository repo;
   MenuBloc(this.repo) : super(const MenuState(datas: [])) {
     on<Init>((event, emit) async {
-      var a = await repo.getAllMenus();
-      emit(MenuState(datas: a).copywith(msg: () => event.msg));
+      Map<String, List<MenuItems>> groupbyletter = {};
+      await repo.getAllMenus().then(
+        (a) {
+          for (var e in a) {
+            groupbyletter[e.title[0]] = (groupbyletter[e.title[0]] ?? []) + [e];
+          }
+          groupbyletter.forEach(
+            (key, value) => print(key + value.toString()),
+          );
+
+          emit(MenuState(datas: a).copywith(msg: () => event.msg));
+        },
+      );
     });
     on<ClearMsg>((event, emit) async {
       add(Init(msg: null));

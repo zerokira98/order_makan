@@ -4,6 +4,7 @@ import 'package:order_makan/bloc/menu/menu_bloc.dart';
 
 import 'package:order_makan/component/menu_card.dart';
 import 'package:order_makan/component/toptab.dart';
+import 'package:order_makan/pages/admin_panel/admin_drawer.dart';
 
 class EditMain extends StatelessWidget {
   const EditMain({super.key});
@@ -17,6 +18,7 @@ class EditMain extends StatelessWidget {
       // ),
       body: Row(
         children: [
+          Expanded(flex: 3, child: AdminDrawer()),
           Expanded(
             flex: 7,
             child: Column(
@@ -50,11 +52,11 @@ class EditMain extends StatelessWidget {
               ],
             ),
           ),
-          const Expanded(
-              flex: 3,
-              child: Center(
-                child: Text('struk edit not available'),
-              ))
+          // const Expanded(
+          //     flex: 3,
+          //     child: Center(
+          //       child: Text('struk edit not available'),
+          //     ))
         ],
       ),
     );

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class _StrukRepo {
   FirebaseFirestore db;
@@ -43,16 +42,42 @@ class StrukRepository extends _StrukRepo {
   late CollectionReference<UseStrukState> strukRef;
   late CollectionReference antrianRefVanilla;
   late CollectionReference strukRefVanilla;
-  Future<int> getTodaysAntrianCount({DateTime? date}) async {
-    var thedate = date == null ? DateTime.now() : date.simpler();
-    var sp = await SharedPreferences.getInstance();
-    return sp.getInt(thedate.formatBasic()) ?? 0;
+
+  ///just use increaseTodaysAntrianCount
+  Future<int> getTodaysAntrianCount({DateTime? date}) {
+    var antriancountref = db
+        .collection('antriancount_perdate')
+        .doc((date ?? DateTime.now()).formatBasic());
+    return antriancountref.get(GetOptions(source: Source.cache)).then(
+      (value) {
+        print('telo');
+        return (value.data()?['count'] as int?) ?? 0;
+      },
+    ).onError(
+      (error, stackTrace) {
+        print('telo error');
+        throw error!;
+      },
+    );
+    // var thedate = date == null ? DateTime.now() : date.simpler();
+    // var sp = await SharedPreferences.getInstance();
+    // return sp.getInt(thedate.formatBasic()) ?? 0;
   }
 
-  Future<bool> increaseTodaysAntrianCount({DateTime? date}) async {
-    var thedate = date == null ? DateTime.now() : date.simpler();
-    var sp = await SharedPreferences.getInstance();
-    return sp.setInt(thedate.formatBasic(), await getTodaysAntrianCount() + 1);
+  Future<int> increaseTodaysAntrianCount({DateTime? date}) async {
+    // var thedate = date == null ? DateTime.now() : date.simpler();
+    var antriancountref = db
+        .collection('antriancount_perdate')
+        .doc((date ?? DateTime.now()).formatBasic());
+    antriancountref
+        .set({'count': FieldValue.increment(1)}, SetOptions(merge: true)).then(
+      (value) => true,
+    );
+    return antriancountref.get().then(
+          (value) => value.data()!['count'] as int,
+        );
+    // var sp = await SharedPreferences.getInstance();
+    // return sp.setInt(thedate.formatBasic(), await getTodaysAntrianCount() + 1);
   }
 
   Stream<int> getStrukStreamCount() {

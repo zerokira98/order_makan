@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' hide kIsWasm;
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
@@ -40,11 +40,12 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
   @override
   void initState() {
     ac = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 700))
-      ..addListener(
-        () => debugPrint(
-            (1000 * (math.sin(ac.value * math.pi * 2).abs())).toString()),
-      );
+        vsync: this, duration: const Duration(milliseconds: 700));
+    // ..addListener(
+    //   () =>
+    //    debugPrint(
+    //       (1000 * (math.sin(ac.value * math.pi * 2).abs())).toString()),
+    // );
     ca = CurvedAnimation(parent: ac, curve: Curves.easeOut).drive(ani);
     SchedulerBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Durations.short1, () {
@@ -119,120 +120,122 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
             elevation: 2,
             borderOnForeground: true,
             color: Theme.of(context).primaryColor,
-            child: Container(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          top: 0.0,
-                          left: 0.0,
-                          right: 0.0,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  padding: EdgeInsets.symmetric(horizontal: 8),
-                                  height: 36,
-                                  child: Text(
-                                    widget.menudata.title.firstUpcase,
-                                    textScaler: TextScaler.linear(1.1),
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                        wordSpacing: 0.0,
-                                        letterSpacing: 0.0,
-                                        height: 1.0),
-                                    textAlign: TextAlign.left,
-                                  ),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 0.0,
+                        left: 0.0,
+                        right: 0.0,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                height: 36,
+                                child: Text(
+                                  widget.menudata.title
+                                      .split(' ')
+                                      .map((word) => word.firstUpcase)
+                                      .join(' '),
+                                  textScaler: TextScaler.linear(1.1),
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      wordSpacing: 0.0,
+                                      letterSpacing: 0.0,
+                                      height: 1.0),
+                                  textAlign: TextAlign.left,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        AnimatedPositioned(
-                          curve: Curves.easeInOut,
-                          duration: Durations.medium2,
-                          top: top,
-                          bottom: 0.0,
-                          left: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black12,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: widget.menudata.imgDir
-                                            .contains('assets') ||
-                                        widget.menudata.imgDir.isEmpty
-                                    ? Image.asset(
-                                        widget.menudata.imgDir.isEmpty
-                                            ? 'assets/sate.jpg'
-                                            : widget.menudata.imgDir,
-                                        height: 80,
-                                        fit: BoxFit.cover,
-                                        alignment: Alignment.topCenter,
-                                      )
-                                    : Image.network(
-                                        widget.menudata.imgDir,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          }
-                                          return CircularProgressIndicator(
-                                              value: loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      loadingProgress
-                                                          .expectedTotalBytes!
-                                                  : null);
-                                        },
-                                        height: 80,
-                                        fit: BoxFit.cover,
-                                      )
-
-                                // child: Center(child: Text('menu image')),
-                                ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          right: 0,
+                      ),
+                      AnimatedPositioned(
+                        curve: Curves.easeInOut,
+                        duration: Durations.medium2,
+                        top: top,
+                        bottom: 0.0,
+                        left: 0,
+                        right: 0,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(8),
-                                  bottomRight: Radius.circular(8)),
-                              color: Colors.black45,
-                            ),
-                            padding: EdgeInsets.all(8),
-                            child: Text(
-                              'Rp  ${widget.menudata.price.toString().numberFormat()}',
-                              textAlign: TextAlign.end,
-                              style: TextStyle(color: Colors.white),
-                              textScaler: TextScaler.linear(1.1),
-                            ),
+                              decoration: BoxDecoration(
+                                color: Colors.black12,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: widget.menudata.imgDir
+                                          .contains('assets') ||
+                                      widget.menudata.imgDir.isEmpty
+                                  ? Image.asset(
+                                      widget.menudata.imgDir.isEmpty
+                                          ? 'assets/sate.jpg'
+                                          : widget.menudata.imgDir,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.topCenter,
+                                    )
+                                  : Image(
+                                      image: CachedNetworkImageProvider(
+                                          widget.menudata.imgDir),
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return CircularProgressIndicator(
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null);
+                                      },
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    )
+
+                              // child: Center(child: Text('menu image')),
+                              ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(8),
+                                bottomRight: Radius.circular(8)),
+                            color: Colors.black45,
                           ),
-                        )
-                      ],
-                    ),
+                          padding: EdgeInsets.all(8),
+                          child: Text(
+                            'Rp  ${widget.menudata.price.toString().numberFormat()}',
+                            textAlign: TextAlign.end,
+                            style: TextStyle(color: Colors.white),
+                            textScaler: TextScaler.linear(1.1),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                  // Padding(padding: EdgeInsetsGeometry.all(2)),
-                  // Text(
-                  //   'Rp  ${widget.menudata.price.toString().numberFormat()}',
-                  //   textScaler: TextScaler.linear(1.1),
-                  // )
-                ],
-              ),
+                ),
+                // Padding(padding: EdgeInsetsGeometry.all(2)),
+                // Text(
+                //   'Rp  ${widget.menudata.price.toString().numberFormat()}',
+                //   textScaler: TextScaler.linear(1.1),
+                // )
+              ],
             ),
           ),
           MatrixTransition(

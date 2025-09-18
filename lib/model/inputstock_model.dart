@@ -10,6 +10,8 @@ class InputstockModel extends Equatable {
   final String title;
   final String tempatbeli;
   final Timestamp tanggalbeli;
+
+  ///Count as in gram/litre
   final int count;
   final int price;
   final String units;

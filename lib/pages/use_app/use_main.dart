@@ -9,6 +9,7 @@ import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/notif/notif_cubit.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/component/menu_card.dart';
 import 'package:order_makan/component/screen_lock.dart';
 import 'package:order_makan/pages/admin_panel/pengeluaran/pengeluaranpage.dart';
@@ -43,246 +44,165 @@ class _UseMainState extends State<UseMain> {
     });
   }
 
+  bool groupmenu = true;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: UseDrawer(),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // floatingActionButton: FloatingActionButton(
-      //   heroTag: 'tag',
-      //   onPressed: () {
-      //     Navigator.push(
-      //         context,
-      //         PageRouteBuilder(
-      //             barrierDismissible: true,
-      //             opaque: false,
-      //             fullscreenDialog: true,
-      //             pageBuilder: (BuildContext context, a1, a2) {
-      //               return CustomOrderDialog(a1: a1);
-      //             }));
-      //   },
-      //   child: Column(
-      //     children: [Icon(Icons.add), Text("Custom")],
-      //   ),
-      // ),
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(padding: EdgeInsets.all(2)),
-            FutureBuilder(
-              future: SharedPreferences.getInstance(),
-              builder: (context, snapshot) {
-                var a = snapshot.data?.getString('globalSetting') ?? '{}';
-                var b = jsonDecode(a);
-                return Text('Koffie Coffeeshop');
-              },
-            ),
-            BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
-              builder: (context, state) {
-                return Text(
-                  '${DateTime.now().formatLengkap()} ${(state as KaryawanAuthenticated).user.namaKaryawan}',
-                  style: TextStyle(fontSize: 10),
-                );
-              },
-            )
-          ],
-        ),
-        actions: [
-          DigitalClock(),
-          const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
-          BlocBuilder<NotifCubit, NotifState>(
-            builder: (context, state) {
-              return ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor:
-                          state.notif.isEmpty ? Colors.grey : Colors.red),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const NotifCenter(),
-                        ));
-                  },
-                  child: Text('!'));
-            },
-          ),
-          const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
-          BlocBuilder<AntrianBloc, AntrianState>(
-            builder: (context, state) {
-              return ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: state.antrianStruks.isEmpty
-                          ? Colors.grey
-                          : Colors.red),
-                  onPressed: state.antrianStruks.isEmpty
-                      ? null
-                      : () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AntrianPage(),
-                              ));
-                        },
-                  child: Text('Antrian Order (${state.antrianStruks.length})'));
-            },
-          ),
-          const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(border: Border(top: BorderSide())),
-        child: BlocListener<MenuBloc, MenuState>(
-          listenWhen: (previous, current) => current.msg != null,
-          listener: (context, state) {
-            if (state.msg != null) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.msg.toString())));
-              BlocProvider.of<MenuBloc>(context).add(ClearMsg());
-            }
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => AntrianPage(),
-            //     ));
-          },
-          child: PageView(
-              scrollBehavior: ScrollBehavior()
-                  .copyWith(physics: NeverScrollableScrollPhysics()),
-              allowImplicitScrolling: false,
-              controller: pageController,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        print('here');
+        pageController.animateToPage(0,
+            duration: Durations.medium4, curve: Curves.easeInOut);
+      },
+      child: BlocListener<UseStrukBloc, UseStrukState>(
+        listenWhen: (p, c) => c.error == StrukError.success(),
+        listener: (context, state) {
+          print('here');
+          if (mounted) {
+            pageController.jumpToPage(0);
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AntrianPage(
+                    fromcheckout: true,
+                  ),
+                ));
+            // Navigator.(context);
+          }
+        },
+        child: Scaffold(
+          drawer: UseDrawer(),
+          appBar: AppBar(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                const Padding(padding: EdgeInsets.all(2)),
+                FutureBuilder(
+                  future: SharedPreferences.getInstance(),
+                  builder: (context, snapshot) {
+                    var a = snapshot.data?.getString('globalSetting') ?? '{}';
+                    var b = jsonDecode(a);
+                    return Text('Koffie Coffeeshop');
+                  },
+                ),
+                BlocBuilder<KaryawanauthBloc, KaryawanauthState>(
+                  builder: (context, state) {
+                    return Text(
+                      '${DateTime.now().formatLengkap()} ${(state as KaryawanAuthenticated).user.namaKaryawan}',
+                      style: TextStyle(fontSize: 10),
+                    );
+                  },
+                )
+              ],
+            ),
+            actions: [
+              DigitalClock(),
+              const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
+              BlocBuilder<NotifCubit, NotifState>(
+                builder: (context, state) {
+                  return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor:
+                              state.notif.isEmpty ? Colors.grey : Colors.red),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const NotifCenter(),
+                            ));
+                      },
+                      child: Text('!'));
+                },
+              ),
+              const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
+              BlocBuilder<AntrianBloc, AntrianState>(
+                builder: (context, state) {
+                  return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: state.antrianStruks.isEmpty
+                              ? Colors.grey
+                              : Colors.red),
+                      onPressed: state.antrianStruks.isEmpty
+                          ? null
+                          : () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AntrianPage(),
+                                  ));
+                            },
+                      child: Text(
+                          'Antrian Order (${state.antrianStruks.length})'));
+                },
+              ),
+              const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
+            ],
+          ),
+          body: Container(
+            decoration: BoxDecoration(border: Border(top: BorderSide())),
+            child: BlocListener<MenuBloc, MenuState>(
+              listenWhen: (previous, current) => current.msg != null,
+              listener: (context, state) {
+                if (state.msg != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(state.msg.toString())));
+                  BlocProvider.of<MenuBloc>(context).add(ClearMsg());
+                }
+              },
+              child: PageView(
+                  scrollBehavior: ScrollBehavior()
+                      .copyWith(physics: NeverScrollableScrollPhysics()),
+                  allowImplicitScrolling: false,
+                  controller: pageController,
                   children: [
-                    Expanded(
-                      flex: 7,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Row(
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Expanded(child: TopTab()),
-                            ],
-                          ),
-                          // const Padding(padding: EdgeInsets.all(2)),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border(top: BorderSide())),
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
                                 children: [
-                                  BlocBuilder<MenuBloc, MenuState>(
-                                    builder: (context, state) {
-                                      return Expanded(
-                                        child: AnimatedSwitcher(
-                                          switchInCurve: Curves.easeInOut,
-                                          switchOutCurve: Curves.easeInOut,
-                                          duration: Durations.medium2,
-                                          transitionBuilder:
-                                              (child, animation) =>
-                                                  FadeTransition(
-                                            opacity: animation,
-                                            child: SlideTransition(
-                                                position: Tween<Offset>(
-                                                        begin: Offset(0, 0.1),
-                                                        end: Offset(0, 0))
-                                                    .animate(animation),
-                                                child: child),
-                                          ),
-                                          child: GridView.count(
-                                            key: UniqueKey(),
-                                            childAspectRatio: 0.98,
-                                            crossAxisCount: 4,
-                                            children: [
-                                              for (var i = 0;
-                                                  i < state.datas.length;
-                                                  i++)
-                                                MenuCard(
-                                                  onTap: () {
-                                                    showDialog(
-                                                      context: context,
-                                                      builder: (context) =>
-                                                          Dialog(
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(18.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Text(state
-                                                                  .datas[i]
-                                                                  .title),
-                                                              Text(state
-                                                                      .datas[i]
-                                                                      .description ??
-                                                                  ''),
-                                                              Divider(),
-                                                              Text('Bahan'),
-                                                              for (var e in state
-                                                                  .datas[i]
-                                                                  .ingredientItems)
-                                                                Text(
-                                                                    "~${e.title} ${e.count}${e.satuan}"),
-                                                              Divider(),
-                                                              Text('submenu'),
-                                                              for (var f in state
-                                                                  .datas[i]
-                                                                  .submenues)
-                                                                Text(f.title
-                                                                    .toString()),
-                                                              Row(
-                                                                children: [
-                                                                  ElevatedButton(
-                                                                      onPressed:
-                                                                          () {},
-                                                                      child: Text(
-                                                                          'Batal')),
-                                                                  ElevatedButton(
-                                                                      onPressed:
-                                                                          () {},
-                                                                      child: Text(
-                                                                          'Ok'))
-                                                                ],
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  menudata: state.datas[i],
-                                                )
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                  Expanded(child: TopTab()),
+                                  IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          groupmenu = !groupmenu;
+                                        });
+                                      },
+                                      icon: Icon(Icons.folder_copy))
                                 ],
                               ),
-                            ),
+                              // const Padding(padding: EdgeInsets.all(2)),
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      border: Border(top: BorderSide())),
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: MenuList(
+                                    newview: groupmenu,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        StrukPanel(
+                          pageController: pageController,
+                        )
+                      ],
                     ),
-                    StrukPanel(
+                    CheckoutDialog(
                       pageController: pageController,
                     )
-                  ],
-                ),
-                CheckoutDialog(
-                  pageController: pageController,
-                )
-              ]),
+                  ]),
+            ),
+          ),
         ),
       ),
     );
@@ -403,6 +323,208 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class MenuList extends StatelessWidget {
+  final bool newview;
+  const MenuList({super.key, this.newview = true});
+
+  Widget newviewWidget(BuildContext context, MenuState state) {
+    Map<String, List<MenuItems>> groupbyletter = {};
+
+    for (var e in state.datas) {
+      groupbyletter[e.title[0]] = (groupbyletter[e.title[0]] ?? []) + [e];
+    }
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (String ez in groupbyletter.keys)
+          Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                      child: Container(
+                          padding: EdgeInsets.only(left: 4),
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.center,
+                                  colors: [
+                                Colors.green.shade900,
+                                Colors.transparent
+                              ])),
+                          child:
+                              Text(ez, style: TextStyle(color: Colors.white)))),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Wrap(
+                      children: [
+                        for (var i = 0; i < groupbyletter[ez]!.length; i++)
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            width: MediaQuery.sizeOf(context).width / 6.1,
+                            height: MediaQuery.sizeOf(context).height / 3,
+                            child: MenuCard(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => Dialog(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(18.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(state.datas[i].title),
+                                          Text(
+                                              state.datas[i].description ?? ''),
+                                          Divider(),
+                                          Text('Bahan'),
+                                          for (var e
+                                              in state.datas[i].ingredientItems)
+                                            Text(
+                                                "~${e.title} ${e.count}${e.satuan}"),
+                                          Divider(),
+                                          Text('submenu'),
+                                          for (var f
+                                              in state.datas[i].submenues)
+                                            Text(f.title.toString()),
+                                          Row(
+                                            children: [
+                                              ElevatedButton(
+                                                  onPressed: () {},
+                                                  child: Text('Batal')),
+                                              ElevatedButton(
+                                                  onPressed: () {},
+                                                  child: Text('Ok'))
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              menudata: groupbyletter[ez]![i],
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MenuBloc, MenuState>(
+      builder: (context, state) {
+        return AnimatedSwitcher(
+          switchInCurve: Curves.easeInOut,
+          switchOutCurve: Curves.easeInOut,
+          duration: Durations.medium4,
+          transitionBuilder: (child, animation) => FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+                position:
+                    Tween<Offset>(begin: Offset(-0.25, 0), end: Offset(0, 0))
+                        .animate(animation),
+                child: child),
+          ),
+          child: Container(
+            key: Key(state.datas.toString()),
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              key: Key(state.datas.toString()),
+              child: newview
+                  ? newviewWidget(context, state)
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Wrap(
+                                alignment: WrapAlignment.start,
+                                runAlignment: WrapAlignment.start,
+                                crossAxisAlignment: WrapCrossAlignment.start,
+                                children: [
+                                  for (var i = 0; i < state.datas.length; i++)
+                                    SizedBox(
+                                      // alignment: Alignment.centerLeft,
+                                      width: MediaQuery.sizeOf(context).width /
+                                          6.1,
+                                      height:
+                                          MediaQuery.sizeOf(context).height / 3,
+                                      child: MenuCard(
+                                        onTap: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) => Dialog(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(18.0),
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(state.datas[i].title),
+                                                    Text(state.datas[i]
+                                                            .description ??
+                                                        ''),
+                                                    Divider(),
+                                                    Text('Bahan'),
+                                                    for (var e in state.datas[i]
+                                                        .ingredientItems)
+                                                      Text(
+                                                          "~${e.title} ${e.count}${e.satuan}"),
+                                                    Divider(),
+                                                    Text('submenu'),
+                                                    for (var f in state
+                                                        .datas[i].submenues)
+                                                      Text(f.title.toString()),
+                                                    Row(
+                                                      children: [
+                                                        ElevatedButton(
+                                                            onPressed: () {},
+                                                            child:
+                                                                Text('Batal')),
+                                                        ElevatedButton(
+                                                            onPressed: () {},
+                                                            child: Text('Ok'))
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        menudata: state.datas[i],
+                                      ),
+                                    )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

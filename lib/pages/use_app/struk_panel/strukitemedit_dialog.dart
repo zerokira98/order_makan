@@ -20,6 +20,7 @@ class _StrukitemeditDialogState extends State<StrukitemeditDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: Padding(
         padding: const EdgeInsets.all(18.0),
         child: Column(
@@ -27,6 +28,10 @@ class _StrukitemeditDialogState extends State<StrukitemeditDialog> {
           children: [
             Text(
               widget.strukItem.title,
+              textScaler: TextScaler.linear(1.15),
+            ),
+            Text(
+              'Submenu',
               textScaler: TextScaler.linear(1.15),
             ),
             Padding(padding: EdgeInsetsGeometry.all(4)),
@@ -71,19 +76,49 @@ class _StrukitemeditDialogState extends State<StrukitemeditDialog> {
                                     widget.strukItem));
                           }
                         },
-                        child: Card(
+                        child: AnimatedContainer(
+                          duration: Durations.short4,
+                          transform: Matrix4.identity()
+                            ..translate(0.0, added ? 2.0 : 0.0),
                           margin: EdgeInsets.all(8),
-                          borderOnForeground: added,
-                          surfaceTintColor: added ? Colors.grey.shade800 : null,
-                          elevation: added ? 1 : 4,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black45),
+                              borderRadius: BorderRadius.circular(12),
+                              color: added
+                                  ? Colors.green.shade800
+                                  : Theme.of(context).scaffoldBackgroundColor,
+                              boxShadow: [
+                                BoxShadow(
+                                    // blurRadius: added ? 0 : 1,
+                                    spreadRadius: added ? 0 : 1,
+                                    color: Colors.black54,
+                                    offset: added ? Offset(0, 0) : Offset(2, 2))
+                              ]),
+                          // borderOnForeground: added,
+                          // elevation: added ? 1 : 4,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
                               children: [
-                                Text(submenutitle),
-                                Text(widget
-                                    .menuItems.submenues[index].adjustHarga
-                                    .numberFormat(currency: true)),
+                                Text(
+                                  submenutitle,
+                                  style: added
+                                      ? Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(color: Colors.white)
+                                      : Theme.of(context).textTheme.titleSmall,
+                                ),
+                                Text(
+                                  widget.menuItems.submenues[index].adjustHarga
+                                      .numberFormat(currency: true),
+                                  style: added
+                                      ? Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(color: Colors.white)
+                                      : Theme.of(context).textTheme.titleSmall,
+                                ),
                               ],
                             ),
                           ),

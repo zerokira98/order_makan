@@ -14,7 +14,6 @@ import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
 import 'package:order_makan/firebase_options.dart';
-import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
 import 'package:order_makan/pages/admin_panel/inputbelibahan/cubit/inputbeliform_cubit.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
 import 'package:order_makan/pages/firstrun_setup.dart';
@@ -39,6 +38,8 @@ void main() async {
   // var db2 = await SembastDB.init2();
   var firebase = FirebaseAuth.instanceFor(app: fireApp);
   var firestore = FirebaseFirestore.instanceFor(app: fireApp);
+
+  firestore.settings = const Settings(persistenceEnabled: true);
   runApp(MultiRepositoryProvider(
     providers: [
       RepositoryProvider(
@@ -141,6 +142,7 @@ class MyApp extends StatelessWidget {
         ],
         title: 'Flutter Demo',
         themeMode: ThemeMode.light,
+        // routes: {'/': (context) => MyApp()},
         darkTheme: ThemeData.dark(useMaterial3: true),
         theme: ThemeData(
           scaffoldBackgroundColor: backgroundcolor,

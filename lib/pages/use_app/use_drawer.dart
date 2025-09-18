@@ -10,7 +10,7 @@ class UseDrawer extends StatelessWidget {
       child: SafeArea(
           child: Column(
         children: [
-          Container(
+          SizedBox(
             height: 180,
             child: Stack(
               children: [
@@ -87,7 +87,7 @@ class UseDrawer extends StatelessWidget {
                     },
                   );
                 },
-                title: const Text('Admin Panel')),
+                title: const Text('Admin Page')),
           ListTile(
             title: const Text('LogOut'),
             onTap: () {

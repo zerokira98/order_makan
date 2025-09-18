@@ -17,10 +17,10 @@ class StrukPanel extends StatelessWidget {
           opacity: 1,
           child: Card.outlined(
             elevation: 8,
-            margin: const EdgeInsets.only(top: 10.0),
+            margin: const EdgeInsets.only(top: 4.0),
             child: Column(children: [
               Padding(
-                padding: EdgeInsets.all(12.0),
+                padding: EdgeInsets.all(8.0),
                 child: Row(
                   children: [
                     Expanded(
@@ -29,7 +29,7 @@ class StrukPanel extends StatelessWidget {
                           Text(
                             'Order Summary',
                             textAlign: TextAlign.center,
-                            textScaler: TextScaler.linear(1.3),
+                            textScaler: TextScaler.linear(1.25),
                           ),
                           // Icon(Icons.shopping_cart)
                         ],
@@ -75,10 +75,10 @@ class StrukPanel extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(padding: EdgeInsets.all(4)),
+              Padding(padding: EdgeInsets.all(2)),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(4.0),
+                  padding: const EdgeInsets.all(2.0),
                   child: BlocBuilder<UseStrukBloc, UseStrukState>(
                     buildWhen: (previous, current) =>
                         previous.orderItems.length != current.orderItems.length,
@@ -122,7 +122,7 @@ class StrukPanel extends StatelessWidget {
                           decoration: BoxDecoration(
                             border: Border.symmetric(
                                 vertical: BorderSide(
-                                    width: 8,
+                                    width: 4,
                                     color: Color.lerp(
                                             Theme.of(context).primaryColor,
                                             Colors.black,
@@ -134,13 +134,13 @@ class StrukPanel extends StatelessWidget {
                           ),
                           margin: const EdgeInsets.only(bottom: 10.0),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 4.0),
+                              horizontal: 4.0, vertical: 4.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 'Total: Rp${getTotal().numberFormat()} ',
-                                textScaler: TextScaler.linear(1.2),
+                                textScaler: TextScaler.linear(1.15),
                                 style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white),

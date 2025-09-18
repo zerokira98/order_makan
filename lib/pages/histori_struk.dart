@@ -178,13 +178,6 @@ class _HistoriStrukState extends State<HistoriStruk> {
                   ),
                 ],
               ),
-              // ElevatedButton(
-              //     onPressed: () async {
-              //       // var after =
-              //       //     await RepositoryProvider.of<StrukRepository>(context)
-              //       //         .readAllStruk();
-              //     },
-              //     child: const Text('press me!')),
             ],
           ),
         ),
@@ -266,32 +259,21 @@ class DisplayStruk extends StatelessWidget {
                       ),
                     ],
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(top: 12.0),
-                  //   child: Row(
-                  //     children: [
-                  //       Expanded(
-                  //           child: Text(
-                  //         'Nomor antrian : ${data.nomorAntrian == 0 ? 'Tanpa Antrian' : data.nomorAntrian}',
-                  //         textAlign: TextAlign.end,
-                  //       )),
-                  //     ],
-                  //   ),
-                  // ),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
+                    padding: const EdgeInsets.only(bottom: 0.0, right: 12),
                     child: Row(
                       children: [
                         Expanded(
                             child: Text(
-                          'Pembayaran : ${data.tipePembayaran}',
+                          'Pembayaran : ${data.tipePembayaran.name.firstUpcase}',
                           textAlign: TextAlign.end,
                         )),
                       ],
                     ),
                   ),
+
                   Padding(
-                    padding: const EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.only(right: 12.0),
                     child: Row(
                       children: [
                         Expanded(
@@ -312,7 +294,43 @@ class DisplayStruk extends StatelessWidget {
                         )),
                       ],
                     ),
-                  ), // BlocBuilder<AntrianBloc, AntrianState>(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, right: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          'Dibayar : ${data.dibayar?.numberFormatCurrency}',
+                          textAlign: TextAlign.end,
+                        )),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          'Kembalian : ${((data.dibayar ?? 0) - data.orderItems.fold(
+                                0,
+                                (previousValue, element) =>
+                                    previousValue +
+                                    (element.count * element.price) +
+                                    element.submenues.fold(
+                                      0,
+                                      (prevValue, ele) =>
+                                          prevValue +
+                                          (ele.adjustHarga * element.count),
+                                    ),
+                              )).numberFormatCurrency}',
+                          textAlign: TextAlign.end,
+                        )),
+                      ],
+                    ),
+                  ),
+                  // BlocBuilder<AntrianBloc, AntrianState>(
                   //   builder: (context, state) {
                   //     return Text(state.antrianStruks.toString());
                   //   },
@@ -348,7 +366,7 @@ class DisplayStruk extends StatelessWidget {
                       ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               visualDensity: VisualDensity.compact,
-                              backgroundColor: Colors.blue.shade900),
+                              backgroundColor: Colors.blue.shade600),
                           onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -404,37 +422,20 @@ class DisplayStruk extends StatelessWidget {
                                     foregroundColor:
                                         WidgetStatePropertyAll(Colors.white),
                                   ),
+                                  // onPressed: () {
+                                  //   if (controller.isOpen) {
+                                  //     controller.close();
+                                  //   } else {
+                                  //     controller.open();
+                                  //   }
+                                  // },
                                   onPressed: () {
-                                    if (controller.isOpen) {
-                                      controller.close();
-                                    } else {
-                                      controller.open();
-                                    }
-                                  },
-                                  onLongPress: () {
                                     BlocProvider.of<AntrianBloc>(context)
                                         .add(Delete(data, reason: ''));
                                     Navigator.pop(context);
                                   },
                                   child: Text('Batalkan Pesanan.')),
                         ),
-
-                        // GestureDetector(
-                        //   onLongPressStart: (details) => debugPrint(details),
-                        //   child:
-                        // ),
-                        // PrintWidget(
-                        //   theData: data,
-                        // ),
-                        // ElevatedButton.icon(
-                        //   style: ButtonStyle(
-                        //     backgroundColor: WidgetStatePropertyAll(Colors.blue),
-                        //     foregroundColor: WidgetStatePropertyAll(Colors.white),
-                        //   ),
-                        //   onPressed: () {},
-                        //   label: Text('Print'),
-                        //   icon: Icon(Icons.print_outlined),
-                        // ),
                         ElevatedButton(
                             style: ButtonStyle(
                               backgroundColor:
@@ -504,11 +505,11 @@ class StrukPrint {
         ));
 
     bytes += generator.emptyLines(1);
-    bytes += generator.text('Id: ${data.strukId}',
-        styles: const PosStyles(
-          align: PosAlign.left,
-          fontType: PosFontType.fontB,
-        ));
+    // bytes += generator.text('Id: ${data.strukId}',
+    //     styles: const PosStyles(
+    //       align: PosAlign.left,
+    //       fontType: PosFontType.fontB,
+    //     ));
     bytes += generator.text('Karyawan: ${datakaryawan['name']}',
         styles: const PosStyles(
           align: PosAlign.left,
@@ -572,6 +573,13 @@ class StrukPrint {
         ]);
       }
     }
+    bytes += generator.text(
+        'Pembayaran : ${data.tipePembayaran.name.firstUpcase}',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            fontType: PosFontType.fontA,
+            width: PosTextSize.size1,
+            height: PosTextSize.size1));
     bytes += generator.emptyLines(1);
     bytes += generator.text(
         'Total : ${data.orderItems.fold(
@@ -580,11 +588,26 @@ class StrukPrint {
                   previousValue +
                   (element.count * element.price) +
                   element.submenues.fold(
-                    0,
-                    (prevValue, ele) =>
-                        prevValue + (ele.adjustHarga * element.count),
-                  ),
-            ).numberFormatCurrency}',
+                      0,
+                      (prevValue, ele) =>
+                          prevValue + (ele.adjustHarga * element.count)),
+            ).numberFormat()}',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            fontType: PosFontType.fontA,
+            width: PosTextSize.size1,
+            height: PosTextSize.size1));
+    bytes += generator.text('Bayar : ${data.dibayar?.numberFormat()}',
+        styles: const PosStyles(
+            align: PosAlign.right,
+            fontType: PosFontType.fontA,
+            width: PosTextSize.size1,
+            height: PosTextSize.size1));
+    bytes += generator.text(
+        'Kembali : ${((data.dibayar ?? 0) - data.orderItems.fold(0, (previousValue, element) => previousValue + (element.count * element.price) + element.submenues.fold(
+              0,
+              (prevValue, ele) => prevValue + (ele.adjustHarga * element.count),
+            ))).numberFormat()}',
         styles: const PosStyles(
             align: PosAlign.right,
             fontType: PosFontType.fontA,
@@ -638,11 +661,13 @@ class _StrukDataTableState extends State<StrukDataTable> {
   Widget build(BuildContext context) {
     return DataTable(
       sortAscending: sort,
+      horizontalMargin: 12.0,
+      columnSpacing: 18.0,
       dataRowMaxHeight: double.infinity,
       sortColumnIndex: 0,
       columns: <DataColumn>[
         DataColumn(
-          columnWidth: FlexColumnWidth(1),
+          columnWidth: FlexColumnWidth(2),
           onSort: (columnIndex, ascending) {
             setState(() {
               sort = !sort;

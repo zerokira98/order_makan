@@ -13,6 +13,7 @@ class UseStrukState extends Equatable {
   final String karyawanId;
   final int nomorAntrian;
   final TipePembayaran tipePembayaran;
+  final int? dibayar;
 
   final String? strukId;
   final DateTime ordertime;
@@ -23,6 +24,7 @@ class UseStrukState extends Equatable {
   final String? deleteReason;
 
   UseStrukState({
+    this.dibayar,
     this.nomorAntrian = 0,
     this.tipePembayaran = TipePembayaran.tunai,
     required this.karyawanId,
@@ -45,6 +47,7 @@ class UseStrukState extends Equatable {
       );
   UseStrukState copywith(
           {List<StrukItem>? orderItems,
+          int? dibayar,
           bool? isFinished,
           String? karyawanId,
           String? deleteReason,
@@ -57,6 +60,7 @@ class UseStrukState extends Equatable {
           DateTime? ordertime}) =>
       UseStrukState(
         total: total ?? this.total,
+        dibayar: dibayar ?? this.dibayar,
         waktuTunggu: waktuTunggu ?? this.waktuTunggu,
         deleteReason: deleteReason ?? this.deleteReason,
         tipePembayaran: tipePembayaran ?? this.tipePembayaran,
@@ -85,6 +89,7 @@ class UseStrukState extends Equatable {
         nomorAntrian,
         tipePembayaran,
         strukId,
+        dibayar,
         ordertime,
         orderItems,
         error,
@@ -101,16 +106,21 @@ class Diskon {
 }
 
 @JsonSerializable()
-class StrukError {
-  int code;
-  String msg;
-  StrukError(this.code, this.msg);
+class StrukError extends Equatable {
+  final int code;
+  final String msg;
+  const StrukError(this.code, this.msg);
   static StrukError empty() => StrukError(0, '');
+  static StrukError success() => StrukError(100, 'send to db success');
+
   static StrukError existed(StrukItem items) => StrukError(1, items.title);
   factory StrukError.fromJson(Map<String, dynamic> json) =>
       _$StrukErrorFromJson(json);
 
   Map<String, dynamic> toJson() => _$StrukErrorToJson(this);
+
+  @override
+  List<Object?> get props => [code, msg];
 }
 
 UseStrukState _$StrukStateFromFirestore(
@@ -119,6 +129,7 @@ UseStrukState _$StrukStateFromFirestore(
   if (data == null) throw Exception();
   return UseStrukState(
     deleteReason: data['reason'],
+    dibayar: data['dibayar'],
     waktuTunggu: data['waktu_tunggu'],
     total: data['total_harga'],
     karyawanId: data['karyawanId'] as String,
@@ -139,6 +150,7 @@ UseStrukState _$StrukStateFromFirestore(
 
 Map<String, dynamic> _$StrukStateToFirestore(UseStrukState instance) =>
     <String, dynamic>{
+      'dibayar': instance.dibayar,
       'custom_order': null,
       'karyawanId': instance.karyawanId,
       'nomorAntrian': instance.nomorAntrian,

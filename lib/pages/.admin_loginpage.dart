@@ -23,7 +23,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Panel Login Page'),
+        title: const Text('Admin Page Login Page'),
       ),
       body: SingleChildScrollView(
         child: Container(

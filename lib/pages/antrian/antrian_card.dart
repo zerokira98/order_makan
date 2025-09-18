@@ -51,8 +51,8 @@ class _AntrianCardState extends State<AntrianCard> {
                     Flexible(
                       flex: 2,
                       child: Text(
-                        'Struk #${widget.e.strukId}\nAntrian : ${widget.e.nomorAntrian}',
-                        textScaler: TextScaler.linear(1.2),
+                        'Antrian : ${widget.e.nomorAntrian}',
+                        textScaler: TextScaler.linear(1.5),
                         textAlign: TextAlign.left,
                       ),
                     ),

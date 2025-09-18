@@ -51,12 +51,14 @@ class PengeluaranInputForm extends StatelessWidget {
                 children: [
                   Expanded(
                       child: TypeAheadField(
+                    hideOnEmpty: true,
                     // focusNode: FocusScope.of(context),
                     suggestionsCallback: (search) async {
                       var a =
                           await RepositoryProvider.of<KasRepository>(context)
                               .getPengeluaranAll();
-                      List<String> b = a.docs
+                      List<String> b = [];
+                      b = a.docs
                           .map((e) => (e.data()['title'] as String)
                                   .toLowerCase()
                                   .contains(search.toLowerCase())

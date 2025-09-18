@@ -1,8 +1,10 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:flutter/foundation.dart';
+import 'package:file_saver/file_saver.dart';
+import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:order_makan/model/inputstock_model.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/bloc/rangkuman_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
@@ -12,14 +14,50 @@ class ExcelProcessor {
     final Workbook workbook = Workbook();
 //Accessing worksheet via index.
     final sheet = workbook.worksheets[0];
+
+    sheet.name = 'Penjualan';
     for (var i = 0; i < state.struks.length; i++) {
-      sheet.getRangeByIndex(i + 1, 1).setDateTime(state.struks[i].ordertime);
-      sheet
-          .getRangeByIndex(i + 1, 2)
-          .setText(state.struks[i].tipePembayaran.name);
+      sheet.getRangeByIndex(i + 1, 1)
+        ..setDateTime(state.struks[i].ordertime)
+        ..numberFormat = 'NNN, D MMMM YYYY';
+      sheet.getRangeByIndex(i + 1, 2).setText(
+          state.struks[i].orderItems.map((e) => e.title).toList().toString());
       sheet
           .getRangeByIndex(i + 1, 3)
-          .setNumber(state.struks[i].total?.toDouble());
+          .setText(state.struks[i].tipePembayaran.name);
+      sheet.getRangeByIndex(i + 1, 4)
+        ..setNumber(state.struks[i].total?.toDouble())
+        ..numberFormat = '#,##0';
+    }
+    sheet.getRangeByIndex(1, 5).setText('Total : ');
+    sheet.getRangeByIndex(1, 6)
+      ..setNumber(state.struks
+          .fold(
+            0,
+            (previousValue, element) => previousValue + (element.total ?? 0),
+          )
+          .toDouble())
+      ..numberFormat = '#,##0';
+    sheet.autoFitColumn(1);
+    sheet.autoFitColumn(2);
+    sheet.autoFitColumn(3);
+
+    ///Pengeluaran sheet
+    final sheet2 = workbook.worksheets.add();
+    sheet2.name = 'Pengeluaran';
+    List<InputstockModel> listpengeluaranbahan =
+        state.pengeluaranInputBahan as List<InputstockModel>;
+    for (var i = 0; i < listpengeluaranbahan.length; i++) {
+      sheet2
+          .getRangeByIndex(i + 1, 1)
+          .setDateTime(listpengeluaranbahan[i].tanggalbeli.toDate());
+      sheet2.getRangeByIndex(i + 1, 2).setText(listpengeluaranbahan[i].title);
+      sheet2
+          .getRangeByIndex(i + 1, 3)
+          .setNumber(listpengeluaranbahan[i].count.toDouble());
+      sheet2
+          .getRangeByIndex(i + 1, 4)
+          .setNumber(listpengeluaranbahan[i].price.toDouble());
     }
 
 //Add Text.
@@ -29,22 +67,37 @@ class ExcelProcessor {
 // //Add DateTime
 //     sheet.getRangeByName('A5').setDateTime(DateTime(2020, 12, 12, 1, 10, 20));
     // Save the document.
-    List<int> bytes = workbook.saveAsStream();
     // var file = File('AddingTextNumberDateTime.xlsx').writeAsBytes(bytes);
 //Dispose the workbook.
-    Directory docDir = await getApplicationDocumentsDirectory();
-    File theFile =
-        await File('${docDir.path}/Backup_${DateTime.now().day}.xlsx')
-            .create(recursive: true);
-    await theFile.writeAsBytes(bytes);
-    print(await theFile.readAsBytes());
-    final params = SaveFileDialogParams(sourceFilePath: theFile.path);
-    final filePath = await FlutterFileDialog.saveFile(params: params);
+    if (kIsWeb) {
+      // final params = SaveFileDialogParams(sourceFilePath: theFile.path);
+      // final filePath = await FlutterFileDialog.saveFile(params: params);
+      FileSaver.instance.saveFile(
+          name: '/Backup_${DateFormat.MMMM().format(DateTime.now())}.xlsx',
+          bytes: Uint8List.fromList(workbook.saveAsStream()));
+      workbook.dispose();
+      return;
+    }
+    print('here');
+    List<int> bytes = workbook.saveAsStream();
+    // Directory docDir = await getApplicationDocumentsDirectory();
+    // File theFile =
+    //     await File('${docDir.path}/Backup_${DateTime.now().day}.xlsx')
+    //         .create(recursive: true);
+    // await theFile.writeAsBytes(bytes);
+    var filePath = await FileSaver.instance.saveAs(
+        fileExtension: 'xlsx',
+        mimeType: MimeType.microsoftExcel,
+        name: 'Backup_${DateFormat.MMMM().format(DateTime.now())}.xlsx',
+        bytes: Uint8List.fromList(bytes));
+    print(filePath);
+    // print(await theFile.readAsBytes());
+    // final params = SaveFileDialogParams(sourceFilePath: theFile.path);
+    // final filePath = await FlutterFileDialog.saveFile(params: params);
     if (filePath != null) {
-      var x = await OpenFilex.open(theFile.path);
+      var x = await OpenFilex.open(filePath);
       debugPrint(x.message);
     }
     workbook.dispose();
-    print('here');
   }
 }

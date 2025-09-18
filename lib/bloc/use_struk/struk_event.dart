@@ -5,7 +5,8 @@ abstract class UseStrukEvent {}
 
 class InitiateStruk extends UseStrukEvent {
   final String karyawanId;
-  InitiateStruk({required this.karyawanId});
+  final bool? success;
+  InitiateStruk({required this.karyawanId, this.success});
 }
 
 class AddSubmenu extends UseStrukEvent {
@@ -44,6 +45,11 @@ class ChangePembayaran extends UseStrukEvent {
 class ChangeAntrian extends UseStrukEvent {
   final int antrian;
   ChangeAntrian({required this.antrian});
+}
+
+class ChangeDibayar extends UseStrukEvent {
+  final int dibayar;
+  ChangeDibayar({required this.dibayar});
 }
 
 class DecreaseCount extends UseStrukEvent {

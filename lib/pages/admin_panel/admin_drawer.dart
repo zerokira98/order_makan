@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'package:order_makan/pages/histori_struk.dart';
 import 'package:order_makan/repo/firestore_kas.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminDrawer extends StatelessWidget {
   const AdminDrawer({super.key});

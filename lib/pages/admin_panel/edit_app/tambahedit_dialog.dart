@@ -1,13 +1,9 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:order_makan/bloc/menu/menu_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart' as t;
-import 'package:order_makan/fileservice.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/ingredient_model.dart';
 import 'package:order_makan/model/menuitems_model.dart';
@@ -15,8 +11,6 @@ import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart
 import 'package:order_makan/pages/admin_panel/edit_app/imagepicker_widget.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/submenu.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 class TambahmenuDialog extends StatefulWidget {
   final bool editmode;
@@ -35,6 +29,8 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
   late TextEditingController hargaC;
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
   List<String> category = [];
+  var telo = CurrencyTextInputFormatter.simpleCurrency(
+      decimalDigits: 0, locale: 'id_ID');
   @override
   void initState() {
     if (widget.editmode) {
@@ -122,40 +118,36 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                             SnackBar(content: Text('There\'s invalid data')));
                       }
                       if (formkey.currentState?.validate() ?? false) {
-                        int? hargaInt = int.tryParse(hargaC.text);
-                        if (namaMenuC.text.length > 3 && hargaInt != null) {
-                          var ingredients = state.ingredients;
-                          if (ingredients.any(
-                            (element) => element.id == null,
-                          )) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text(
-                                    'Nama bahanbaku jangan di-edit setelah memilih')));
-                            throw Exception('Nama bahanbaku jangan diedit');
-                          }
-                          var menuitem = MenuItems(
-                            submenues: state.submenu,
-                            ingredientItems: ingredients,
-                            title: namaMenuC.text,
-                            description: deskripsi.text,
-                            imgDir: imgdir,
-                            price: hargaInt,
-                            categories: category,
-                          );
+                        int? hargaInt = telo.getUnformattedValue().round();
+                        var ingredients = state.ingredients;
+                        if (ingredients.any(
+                          (element) => element.id == null,
+                        )) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                  'Nama bahanbaku jangan di-edit setelah memilih')));
+                          throw Exception('Nama bahanbaku jangan diedit');
+                        }
+                        var menuitem = MenuItems(
+                          submenues: state.submenu,
+                          ingredientItems: ingredients,
+                          title: namaMenuC.text,
+                          description: deskripsi.text,
+                          imgDir: imgdir,
+                          price: hargaInt,
+                          categories: category,
+                        );
 
-                          if (widget.editmode) {
-                            BlocProvider.of<MenuBloc>(context).add(EditMenu(
-                                menuitem.copywith(id: widget.menudata!.id)));
-                            BlocProvider.of<t.TopbarBloc>(context)
-                                .add(t.Init());
-                            Navigator.pop(context);
-                          } else {
-                            BlocProvider.of<MenuBloc>(context)
-                                .add(AddMenu(menuitem));
-                            BlocProvider.of<t.TopbarBloc>(context)
-                                .add(t.Init());
-                            Navigator.pop(context);
-                          }
+                        if (widget.editmode) {
+                          BlocProvider.of<MenuBloc>(context).add(EditMenu(
+                              menuitem.copywith(id: widget.menudata!.id)));
+                          BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
+                          Navigator.pop(context);
+                        } else {
+                          BlocProvider.of<MenuBloc>(context)
+                              .add(AddMenu(menuitem));
+                          BlocProvider.of<t.TopbarBloc>(context).add(t.Init());
+                          Navigator.pop(context);
                         }
                       }
                     },
@@ -224,13 +216,18 @@ class _TambahmenuDialogState extends State<TambahmenuDialog> {
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,
                                     controller: hargaC,
-                                    validator: numberValidator,
+                                    inputFormatters: [telo],
+                                    validator: (value) => numberValidator(telo
+                                        .getUnformattedValue()
+                                        .round()
+                                        .toString()),
                                     keyboardType: TextInputType.number,
                                     decoration: const InputDecoration(
                                         label: Text('Harga')),
                                   )),
                               const Padding(padding: EdgeInsets.all(4)),
                               ImagepickerWidget(imgdir,
+                                  menuname: widget.menudata?.title ?? '',
                                   imgdirUpdater: imgdirUpdater),
 
                               // Text('imgField: img'),

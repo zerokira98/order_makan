@@ -38,6 +38,17 @@ class _AntrianPageState extends State<AntrianPage> {
   }
 
   @override
+  void dispose() {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -69,7 +80,16 @@ class _AntrianPageState extends State<AntrianPage> {
           builder: (context, state) {
             if (state.antrianStruks.isEmpty) {
               return Center(
-                child: Text('Empty'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Empty'),
+                    IconButton(
+                        onPressed: () => BlocProvider.of<AntrianBloc>(context)
+                            .add(InitiateAntrian()),
+                        icon: Icon(Icons.refresh))
+                  ],
+                ),
               );
             }
             if (state.isloading) {

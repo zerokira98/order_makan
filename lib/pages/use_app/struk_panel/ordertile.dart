@@ -66,12 +66,12 @@ class _OrderTileState extends State<OrderTile>
             animation: ac,
             builder: (context, child) => Transform.translate(
               offset: Offset(
+                math.sin((ac.value * math.pi / 2)) * 4.0,
                 0.0,
-                math.sin((ac.value * math.pi / 2)) * 8.0,
               ),
               child: AnimatedOpacity(
                 curve: Curves.easeInOut,
-                duration: Duration(milliseconds: 750),
+                duration: Duration(milliseconds: 450),
                 opacity: opacity,
                 child: GestureDetector(
                   onTap: () async {
@@ -95,98 +95,125 @@ class _OrderTileState extends State<OrderTile>
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide()),
-                      color: Colors.green.withValues(alpha: ca.value),
+                      border: Border(bottom: BorderSide(color: Colors.black45)),
+                      color: Colors.green.withValues(alpha: ca.value / 3),
                     ),
-                    padding: EdgeInsets.only(bottom: 2.0),
+                    padding: EdgeInsets.only(bottom: 2.0, top: 2.0),
                     margin: const EdgeInsets.symmetric(
-                        vertical: 2.0, horizontal: 4.0),
+                        vertical: 1.0, horizontal: 4.0),
                     child: DefaultTextStyle.merge(
                       style: TextStyle(fontSize: 16),
                       child: Column(
                         children: [
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('${widget.index + 1}. '),
                               Expanded(
-                                child: Text(state.orderItems[widget.index].title
-                                    .firstUpcase),
+                                child: Text(
+                                  state.orderItems[widget.index].title
+                                      .firstUpcase,
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ),
-                              GestureDetector(
-                                  onTap: () {
-                                    BlocProvider.of<UseStrukBloc>(context).add(
-                                        DecreaseCount(
-                                            item: state
-                                                .orderItems[widget.index]));
-                                    // if (count < 1) return;
-                                  },
-                                  child: const Icon(Icons.remove)),
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 2.0),
-                                child: InkWell(
-                                    onTap: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            final FocusNode focusNode =
-                                                FocusNode();
-                                            focusNode.requestFocus();
-                                            return Dialog(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(18.0),
-                                                child: SizedBox(
-                                                  width: 100,
-                                                  child: TextFormField(
-                                                    // controller: tct,
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 2),
+                                decoration: BoxDecoration(
+                                    border: Border.all(),
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                        onTap: () {
+                                          BlocProvider.of<UseStrukBloc>(context)
+                                              .add(DecreaseCount(
+                                                  item: state.orderItems[
+                                                      widget.index]));
+                                          // if (count < 1) return;
+                                        },
+                                        child: Icon(state
+                                                    .orderItems[widget.index]
+                                                    .count ==
+                                                1
+                                            ? Icons.delete_outline
+                                            : Icons.remove)),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 2.0),
+                                      child: InkWell(
+                                          onTap: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  final FocusNode focusNode =
+                                                      FocusNode();
+                                                  focusNode.requestFocus();
+                                                  return Dialog(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              18.0),
+                                                      child: SizedBox(
+                                                        width: 100,
+                                                        child: TextFormField(
+                                                          // controller: tct,
 
-                                                    validator: numberValidator,
-                                                    initialValue: state
-                                                        .orderItems[
-                                                            widget.index]
-                                                        .count
-                                                        .toString(),
+                                                          validator:
+                                                              numberValidator,
+                                                          initialValue: state
+                                                              .orderItems[
+                                                                  widget.index]
+                                                              .count
+                                                              .toString(),
 
-                                                    onFieldSubmitted: (value) {
-                                                      debugPrint(value);
-                                                      BlocProvider.of<
-                                                                  UseStrukBloc>(
-                                                              context)
-                                                          .add(ChangeCount(
-                                                              item: state
-                                                                      .orderItems[
-                                                                  widget.index],
-                                                              count: int.parse(
-                                                                  value)));
-                                                      Navigator.pop(context);
-                                                    },
-                                                    focusNode: focusNode,
-                                                    keyboardType:
-                                                        TextInputType.number,
-                                                    decoration: InputDecoration(
-                                                        label: Text(
-                                                            'Jumlah item')),
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          });
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                          '${state.orderItems[widget.index].count}'),
-                                    )),
+                                                          onFieldSubmitted:
+                                                              (value) {
+                                                            debugPrint(value);
+                                                            BlocProvider.of<
+                                                                        UseStrukBloc>(
+                                                                    context)
+                                                                .add(ChangeCount(
+                                                                    item: state
+                                                                            .orderItems[
+                                                                        widget
+                                                                            .index],
+                                                                    count: int
+                                                                        .parse(
+                                                                            value)));
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          focusNode: focusNode,
+                                                          keyboardType:
+                                                              TextInputType
+                                                                  .number,
+                                                          decoration:
+                                                              InputDecoration(
+                                                                  label: Text(
+                                                                      'Jumlah item')),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                });
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                                '${state.orderItems[widget.index].count}'),
+                                          )),
+                                    ),
+                                    GestureDetector(
+                                        onTap: () {
+                                          BlocProvider.of<UseStrukBloc>(context)
+                                              .add(IncreaseCount(
+                                                  item: state.orderItems[
+                                                      widget.index]));
+                                        },
+                                        child: const Icon(Icons.add)),
+                                  ],
+                                ),
                               ),
-                              GestureDetector(
-                                  onTap: () {
-                                    BlocProvider.of<UseStrukBloc>(context).add(
-                                        IncreaseCount(
-                                            item: state
-                                                .orderItems[widget.index]));
-                                  },
-                                  child: const Icon(Icons.add)),
                             ],
                           ),
                           Row(

@@ -231,7 +231,11 @@ class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
                                         ),
                                       ),
                                     );
-                                  }),
+                                  }).then(
+                                (value) {
+                                  setState(() {});
+                                },
+                              ),
                               subtitle: Row(
                                 // mainAxisAlignment:
                                 //     MainAxisAlignment.spaceBetween,

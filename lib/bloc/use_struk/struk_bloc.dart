@@ -20,8 +20,12 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       : super(UseStrukState.initial(karyawanId: auth.currentUser.id)) {
     on<InitiateStruk>((event, emit) {
       ///get karyawan id...
-
-      emit(UseStrukState.initial(karyawanId: event.karyawanId));
+      if (event.success ?? false) {
+        emit(UseStrukState.initial(karyawanId: event.karyawanId)
+            .copywith(error: StrukError.success()));
+      } else {
+        emit(UseStrukState.initial(karyawanId: event.karyawanId));
+      }
     });
     on<AddSubmenu>((event, emit) {
       var cursubmenues = state.orderItems
@@ -111,6 +115,10 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       // await repo.sendtoAntrian(state);
       emit(state.copywith(tipePembayaran: event.tipe));
     });
+    on<ChangeDibayar>((event, emit) async {
+      // await repo.sendtoAntrian(state);
+      emit(state.copywith(dibayar: event.dibayar));
+    });
     on<ChangeAntrian>((event, emit) async {
       // await repo.sendtoAntrian(state);
       emit(state.copywith(nomorAntrian: event.antrian));
@@ -129,12 +137,13 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       //     .then(
       //       (value) => value.length,
       //     );
-      try {
-        await repo.sendtoAntrian(state.copywith(
-            nomorAntrian: (await repo.getTodaysAntrianCount()) + 1));
-        await repo.increaseTodaysAntrianCount();
-        add(InitiateStruk(karyawanId: state.karyawanId));
-      } catch (e) {}
+      repo.increaseTodaysAntrianCount().then(
+        (antriancount) {
+          repo.sendtoAntrian(state.copywith(nomorAntrian: antriancount + 1));
+
+          add(InitiateStruk(karyawanId: state.karyawanId, success: true));
+        },
+      );
     });
 
     _userSubscription = auth.user.listen((event) {

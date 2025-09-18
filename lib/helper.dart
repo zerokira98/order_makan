@@ -96,6 +96,7 @@ extension DateParsingNullable on DateTime? {
     }
   }
 
+  ///yMMMd
   String formatBasic() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat.yMMMd('ID_id');
