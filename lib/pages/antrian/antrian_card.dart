@@ -74,9 +74,10 @@ class _AntrianCardState extends State<AntrianCard> {
                               child: Column(
                                 children: [
                                   Text('${ew.title} x${ew.count}'),
-                                  Text('${ew.submenues.map(
-                                        (e) => e.title,
-                                      ).toList()}'),
+                                  Text(
+                                      '${ew.submenues.isEmpty ? '' : ew.submenues.map(
+                                            (e) => e.title,
+                                          ).toList()}'),
                                 ],
                               ),
                             ),

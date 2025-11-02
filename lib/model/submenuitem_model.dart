@@ -6,11 +6,11 @@ import 'package:equatable/equatable.dart';
 import 'package:order_makan/model/ingredient_model.dart';
 
 class SubMenuItem extends Equatable {
-  String title;
-  int? cardId;
-  List<IngredientItem> adjustIngredient;
-  int adjustHarga;
-  SubMenuItem({
+  final String title;
+  final int? cardId;
+  final List<IngredientItem> adjustIngredient;
+  final int adjustHarga;
+  const SubMenuItem({
     required this.title,
     required this.cardId,
     required this.adjustIngredient,

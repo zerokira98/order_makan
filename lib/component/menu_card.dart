@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/tambahedit_dialog.dart';
@@ -11,6 +12,7 @@ import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
 import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/model/strukitem_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MenuCard extends StatefulWidget {
   final Function() onTap;
@@ -137,20 +139,30 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
                                 alignment: Alignment.centerLeft,
                                 padding: EdgeInsets.symmetric(horizontal: 8),
                                 height: 36,
-                                child: Text(
-                                  widget.menudata.title
-                                      .split(' ')
-                                      .map((word) => word.firstUpcase)
-                                      .join(' '),
-                                  textScaler: TextScaler.linear(1.1),
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      wordSpacing: 0.0,
-                                      letterSpacing: 0.0,
-                                      height: 1.0),
-                                  textAlign: TextAlign.left,
-                                ),
+                                child: FutureBuilder(
+                                    future:
+                                        SharedPreferences.getInstance().then(
+                                      (value) => value.getBool('capitalize'),
+                                    ),
+                                    builder: (context, asyncSnapshot) {
+                                      return Text(
+                                        widget.menudata.title
+                                            .split(' ')
+                                            .map((word) =>
+                                                (asyncSnapshot.data ?? false)
+                                                    ? word.toUpperCase()
+                                                    : word.firstUpcase)
+                                            .join(' '),
+                                        textScaler: TextScaler.linear(1.1),
+                                        style: GoogleFonts.notoSans(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w500,
+                                            wordSpacing: 0.0,
+                                            letterSpacing: 0.0,
+                                            height: 1.0),
+                                        textAlign: TextAlign.left,
+                                      );
+                                    }),
                               ),
                             ),
                           ],
@@ -242,13 +254,15 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
             key: _keyRed,
             animation: ca,
             onTransform: (animationValue) => Matrix4.identity()
-              ..translate(
+              ..translateByDouble(
                   ((width * 0.75 - (posminwidth ?? 0)) * animationValue),
                   ((height / 3 - (posminheight ?? 0)) *
-                      (math.sin(ac.value * math.pi * 1).abs()))
+                      (math.sin(ac.value * math.pi * 1).abs())),
+                  0,
+                  0
                   // ((animationValue + 0.1) * 100) / (animationValue + 0.1),
                   )
-              ..scale(1 - (animationValue), 1 - (animationValue)),
+              ..scaleAdjoint(1 - (animationValue)),
             child: FadeTransition(
               opacity: ca,
               // opacity: ca.drive(Tween(begin: 1.0, end: 1.0)),

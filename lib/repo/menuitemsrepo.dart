@@ -181,7 +181,7 @@ class MenuItemRepository implements _MenuItemRepo {
       {required DateTime start, required DateTime end}) {
     return inputstocksRef
         .where('tanggalbeli', isGreaterThanOrEqualTo: start)
-        .where('tanggalbeli', isLessThanOrEqualTo: end)
+        .where('tanggalbeli', isLessThan: end)
         .get();
   }
 

@@ -7,13 +7,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image/image.dart' as i;
 import 'package:month_year_picker/month_year_picker.dart';
-// import 'package:flutter_thermal_printer/flutter_thermal_printer.dart';
-// import 'package:flutter_thermal_printer/utils/printer.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/pages/antrian/print_widget.dart';
+import 'package:order_makan/pages/historipenjualan/historipenjualan_harian.dart';
+import 'package:order_makan/repo/globalsettingrepo.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
@@ -197,7 +197,11 @@ class DisplayStruk extends StatelessWidget {
     return BlocListener<AntrianBloc, AntrianState>(
       listenWhen: (previous, current) => previous.msg != current.msg,
       listener: (context, state) {
-        Navigator.pop(context);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HistoriPenjualanHarian(),
+            ));
       },
       child: Padding(
         padding: EdgeInsetsGeometry.symmetric(horizontal: width / 6),
@@ -228,7 +232,7 @@ class DisplayStruk extends StatelessWidget {
                     ),
                   ),
                   Text('Nomor Antrian : ${data.nomorAntrian}'),
-                  Text('Id : ${data.strukId}'),
+                  // Text('Id : ${data.strukId}'),
                   FutureBuilder(
                     future: RepositoryProvider.of<KaryawanAuthRepo>(context)
                         .getAllKaryawan(data.karyawanId),
@@ -237,7 +241,7 @@ class DisplayStruk extends StatelessWidget {
                         return CircularProgressIndicator();
                       }
                       return snapshot.hasData
-                          ? Text(snapshot.data['name'])
+                          ? Text(snapshot.data?.singleOrNull?['name'] ?? '')
                           : Text('Id : ${data.karyawanId}');
                     },
                   ),
@@ -273,7 +277,7 @@ class DisplayStruk extends StatelessWidget {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.only(right: 12.0),
+                    padding: const EdgeInsets.only(top: 8, right: 12.0),
                     child: Row(
                       children: [
                         Expanded(
@@ -296,7 +300,7 @@ class DisplayStruk extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10.0, right: 12),
+                    padding: const EdgeInsets.only(right: 12),
                     child: Row(
                       children: [
                         Expanded(
@@ -337,6 +341,7 @@ class DisplayStruk extends StatelessWidget {
                   // ),
                   // Expanded(child: Container()),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       ElevatedButton.icon(
@@ -375,6 +380,7 @@ class DisplayStruk extends StatelessWidget {
                           child: Icon(Icons.settings)),
                     ],
                   ),
+                  Padding(padding: EdgeInsetsGeometry.all(2)),
                   if (viewonly == false)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -469,6 +475,8 @@ class StrukPrint {
     // Using default profile
     final profile = await CapabilityProfile.load();
     final ByteData imgdata = await rootBundle.load('assets/qr/qr.jpeg');
+    var passwifi =
+        await RepositoryProvider.of<GlobalSettingRepo>(context).getWifiPass();
     final Uint8List bytesImg = imgdata.buffer.asUint8List();
     final image = i.decodeImage(bytesImg);
     final generator = Generator(PaperSize.mm58, profile);
@@ -510,11 +518,12 @@ class StrukPrint {
     //       align: PosAlign.left,
     //       fontType: PosFontType.fontB,
     //     ));
-    bytes += generator.text('Karyawan: ${datakaryawan['name']}',
-        styles: const PosStyles(
-          align: PosAlign.left,
-          fontType: PosFontType.fontB,
-        ));
+    bytes +=
+        generator.text('Karyawan: ${datakaryawan.singleOrNull?['name'] ?? ''}',
+            styles: const PosStyles(
+              align: PosAlign.left,
+              fontType: PosFontType.fontB,
+            ));
     bytes += generator.row([
       PosColumn(
         text: data.ordertime.formatLengkap(),
@@ -615,6 +624,10 @@ class StrukPrint {
             height: PosTextSize.size1));
     bytes += generator.emptyLines(2);
     bytes += generator.text('Terimakasi',
+        styles: const PosStyles(
+          align: PosAlign.center,
+        ));
+    bytes += generator.text(passwifi.isEmpty ? '' : 'pass : $passwifi',
         styles: const PosStyles(
           align: PosAlign.center,
         ));

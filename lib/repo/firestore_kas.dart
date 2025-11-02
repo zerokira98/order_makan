@@ -47,11 +47,11 @@ class KasRepository {
     return pengeluaran.get();
   }
 
-  Future<QuerySnapshot<Object?>> getPengeluaran(
+  Future<QuerySnapshot<Map<dynamic, dynamic>>> getPengeluaran(
       {required DateTime start, required DateTime end}) {
     return pengeluaran
         .where('date', isGreaterThanOrEqualTo: start)
-        .where('date', isLessThanOrEqualTo: end)
+        .where('date', isLessThan: end)
         .get();
   }
 }

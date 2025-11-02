@@ -52,7 +52,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
               elevation: 3.2,
               //initialValue: _options[1],
               onCanceled: () {
-                print('You have not chossed anything');
+                debugPrint('You have not chossed anything');
               },
               tooltip: 'Menu',
               onSelected: (Object select) async {
@@ -264,7 +264,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       platformVersion = await PrintBluetoothThermal.platformVersion;
-      //print("patformversion: $platformVersion");
+      //debugPrint("patformversion: $platformVersion");
       porcentbatery = await PrintBluetoothThermal.batteryLevel;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
@@ -276,7 +276,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
     if (!mounted) return;
 
     final bool result = await PrintBluetoothThermal.bluetoothEnabled;
-    print("bluetooth enabled: $result");
+    debugPrint("bluetooth enabled: $result");
     if (result) {
       _msj = "Bluetooth enabled, please search and connect";
     } else {
@@ -326,7 +326,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
     });
     final bool result =
         await PrintBluetoothThermal.connect(macPrinterAddress: mac);
-    print("state conected $result");
+    debugPrint("state conected $result");
     if (result) connected = true;
     setState(() {
       _progress = false;
@@ -338,7 +338,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
     setState(() {
       connected = false;
     });
-    print("status disconnect $status");
+    debugPrint("status disconnect $status");
   }
 
   Future<void> printTest() async {
@@ -348,7 +348,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
     }*/
 
     bool conexionStatus = await PrintBluetoothThermal.connectionStatus;
-    //print("connection status: $conexionStatus");
+    //debugPrint("connection status: $conexionStatus");
     if (conexionStatus) {
       bool result = false;
       // if (Platform.isWindows) {
@@ -358,9 +358,9 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
       List<int> ticket = await testTicket();
       result = await PrintBluetoothThermal.writeBytes(ticket);
       // }
-      print("print test result:  $result");
+      debugPrint("print test result:  $result");
     } else {
-      print("print test conexionStatus: $conexionStatus");
+      debugPrint("print test conexionStatus: $conexionStatus");
       setState(() {
         disconnect();
       });
@@ -383,7 +383,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
           printText: PrintTextSize(size: 3, text: "$text size 3"));
     } else {
       //desconectado
-      print("desconectado bluetooth $conexionStatus");
+      debugPrint("desconectado bluetooth $conexionStatus");
     }
   }
 
@@ -524,7 +524,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
       String text = "${_txtText.text}\n";
       bool result = await PrintBluetoothThermal.writeString(
           printText: PrintTextSize(size: int.parse(_selectSize), text: text));
-      print("status print result: $result");
+      debugPrint("status print result: $result");
       setState(() {
         _msj = "printed status: $result";
       });
@@ -533,7 +533,7 @@ class _PrintWidgetSettingState extends State<PrintWidgetSetting> {
       setState(() {
         _msj = "no connected device";
       });
-      print("no conectado");
+      debugPrint("no conectado");
     }
   }
 }

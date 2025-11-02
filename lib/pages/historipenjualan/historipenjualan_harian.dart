@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/histori_struk.dart';
 import 'package:order_makan/repo/firestore_kas.dart';
@@ -10,19 +11,38 @@ class HistoriPenjualanHarian extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var now = DateTime.now();
+    var filtertoday = StrukFilter(
+        start: DateTime(now.year, now.month, now.day),
+        end: DateTime(now.year, now.month, now.day + 1));
     return Scaffold(
       appBar: AppBar(
         title: Text('Histori Penjualan Hari ini'),
       ),
       body: FutureBuilder(
-        future: RepositoryProvider.of<StrukRepository>(context)
-            .readStrukwithFilter(StrukFilter(
-                start: DateTime(now.year, now.month, now.day),
-                end: DateTime(now.year, now.month, now.day + 1))),
+        future: (
+          RepositoryProvider.of<StrukRepository>(context).readStrukwithFilter(
+            filtertoday,
+          ),
+          RepositoryProvider.of<KasRepository>(context)
+              .getPengeluaran(start: filtertoday.start!, end: filtertoday.end!),
+          RepositoryProvider.of<KasRepository>(context).getUangLaciHarian()
+        ).wait,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            // debugPrint(snapshot.data.toString());
-            var data = snapshot.data;
+            ///datas
+            List<UseStrukState> datastruks = snapshot.data!.$1;
+            int uanglaci = ((snapshot.data?.$3.data()?['uang'] as int?) ?? 0);
+            int pengeluaran = snapshot.data!.$2.docs.fold(
+              0,
+              (previousValue, element) =>
+                  previousValue + (element.data()['cost'] as int),
+            );
+            int totalpendapatan = datastruks.fold(
+              0,
+              (previousValue, element) => previousValue + (element.total!),
+            );
+
+            ///widget
             return RefreshIndicator(
               onRefresh: () {
                 return Future.delayed(Durations.medium1);
@@ -36,67 +56,38 @@ class HistoriPenjualanHarian extends StatelessWidget {
                           showDialog(
                               context: context,
                               builder: (context) => DisplayStruk(
-                                    data: data[index],
+                                    data: datastruks[index],
                                     viewonly: true,
                                   ));
-                          // Dialog.fullscreen(
-                          //       child: Scaffold(
-                          //         appBar: AppBar(
-                          //           title: Text('Details'),
-                          //         ),
-                          //         body: Center(
-                          //           child: SingleChildScrollView(
-                          //               child: StrukDataTable(
-                          //                   data: data[index])),
-                          //         ),
-                          //       ),
-                          //     ));
                         },
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
                                 child: Text(
-                                    "Nomor Antrian: ${data[index].nomorAntrian}")),
-                            Text(data[index].ordertime.formatLengkap()),
-                            Text(data[index].ordertime.clockOnly()),
+                                    "Nomor Antrian: ${datastruks[index].nomorAntrian}")),
+                            Text(datastruks[index]
+                                    .total
+                                    ?.numberFormat(currency: true) ??
+                                '')
                           ],
                         ),
                         subtitle: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(data[index].orderItems.map(
-                              (e) {
-                                return "${e.title}${e.submenues.isEmpty ? '' : '*'} ${e.count}x";
-                              },
-                            ).toString()),
-                            Text(data[index]
-                                    .total
-                                    // .orderItems
-                                    // .fold(
-                                    //   0,
-                                    //   (previousValue, element) =>
-                                    //       previousValue +
-                                    //       (element.price * element.count),
-                                    // )
-                                    ?.numberFormat(currency: true) ??
-                                '')
+                            Expanded(
+                              child: Text(datastruks[index].orderItems.map(
+                                (e) {
+                                  return "${e.title}${e.submenues.isEmpty ? '' : '*'} ${e.count}x";
+                                },
+                              ).toString()),
+                            ),
+                            Text(datastruks[index].ordertime.formatLengkap()),
+                            Text(datastruks[index].ordertime.clockOnly()),
                           ],
                         ),
                       ),
-                      itemCount: data!.length,
-                      // children: [
-                      //   Text('total : ${snapshot.data!.fold(
-                      //     0,
-                      //     (previousValue, element) =>
-                      //         previousValue +
-                      //         (element.orderItems.fold(
-                      //           0,
-                      //           (previousValue1, element1) =>
-                      //               previousValue1 + (element1.count * element1.price),
-                      //         )),
-                      //   )}')
-                      // ],
+                      itemCount: datastruks.length,
                     ),
                   ),
                   Row(
@@ -108,40 +99,23 @@ class HistoriPenjualanHarian extends StatelessWidget {
                           child: Column(
                             children: [
                               Text(
-                                'Total: ${data.fold(
-                                      0,
-                                      (previousValue, element) =>
-                                          previousValue + (element.total!),
-                                    ).numberFormat(currency: true)}',
+                                'Total pendapatan: ${totalpendapatan.numberFormat(currency: true)}',
                                 textAlign: TextAlign.center,
                               ),
-                              FutureBuilder(
-                                  future: RepositoryProvider.of<KasRepository>(
-                                          context)
-                                      .getUangLaciHarian(),
-                                  builder: (context, asyncSnapshot) {
-                                    if (asyncSnapshot.hasData) {
-                                      return Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                              'Uang laci awal: ${(asyncSnapshot.data?.data()?['uang'] as int?)?.numberFormat(currency: true)}'),
-                                          Padding(
-                                              padding:
-                                                  EdgeInsetsGeometry.symmetric(
-                                                      horizontal: 18)),
-                                          Text('Uang laci akhir: ${(((asyncSnapshot.data?.data()?['uang'] as int?) ?? 0) + data.fold(
-                                                0,
-                                                (previousValue, element) =>
-                                                    previousValue +
-                                                    (element.total!),
-                                              )).numberFormat(currency: true)}'),
-                                        ],
-                                      );
-                                    }
-                                    return CircularProgressIndicator();
-                                  }),
+                              Text(
+                                  'Pengeluaran: ${pengeluaran.numberFormatCurrency}'),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      'Uang laci awal: ${uanglaci.numberFormat(currency: true)}'),
+                                  Padding(
+                                      padding: EdgeInsetsGeometry.symmetric(
+                                          horizontal: 18)),
+                                  Text(
+                                      'Uang laci akhir: ${(uanglaci + totalpendapatan - pengeluaran).numberFormat(currency: true)} '),
+                                ],
+                              ),
                             ],
                           ),
                         ),

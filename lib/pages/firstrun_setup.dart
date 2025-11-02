@@ -1,7 +1,6 @@
 // set admin credential
 // set 1 karyawan credential(?)
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -185,8 +184,11 @@ class _SetupPageState extends State<SetupPage> {
                               await store
                                   .collection('users')
                                   .doc(value.user?.uid)
-                                  .set(
-                                      {"name": username.text, "role": "admin"});
+                                  .set({
+                                "name": username.text,
+                                "role": "admin",
+                                "id": value.user?.uid
+                              });
                               List firstcat = ['meals', 'snacks', 'drinks'];
                               var menurepo =
                                   RepositoryProvider.of<MenuItemRepository>(

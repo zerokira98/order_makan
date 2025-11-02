@@ -42,10 +42,10 @@ class ChangePembayaran extends UseStrukEvent {
   ChangePembayaran({required this.tipe});
 }
 
-class ChangeAntrian extends UseStrukEvent {
-  final int antrian;
-  ChangeAntrian({required this.antrian});
-}
+// class ChangeAntrian extends UseStrukEvent {
+//   final int antrian;
+//   ChangeAntrian({required this.antrian});
+// }
 
 class ChangeDibayar extends UseStrukEvent {
   final int dibayar;

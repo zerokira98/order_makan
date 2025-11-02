@@ -1,22 +1,27 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:order_makan/model/inputstock_model.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/bloc/rangkuman_bloc.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 class ExcelProcessor {
-  Future<void> printExcel(RangkumanState state) async {
+  static Future<void> printExcel(
+      RangkumanState state, BuildContext context) async {
     final Workbook workbook = Workbook();
 //Accessing worksheet via index.
     final sheet = workbook.worksheets[0];
-
+    var karyawans =
+        await RepositoryProvider.of<KaryawanAuthRepo>(context).getAllKaryawan();
     sheet.name = 'Penjualan';
+    debugPrint(karyawans.toString());
     for (var i = 0; i < state.struks.length; i++) {
+      var simpledate = state.struks[i].ordertime.day;
+
       sheet.getRangeByIndex(i + 1, 1)
         ..setDateTime(state.struks[i].ordertime)
         ..numberFormat = 'NNN, D MMMM YYYY';
@@ -25,12 +30,16 @@ class ExcelProcessor {
       sheet
           .getRangeByIndex(i + 1, 3)
           .setText(state.struks[i].tipePembayaran.name);
-      sheet.getRangeByIndex(i + 1, 4)
+      sheet.getRangeByIndex(i + 1, 4).setText(karyawans.singleWhere(
+            (element) => element?['id'] == state.struks[i].karyawanId,
+            orElse: () => {'name': state.struks[i].karyawanId},
+          )?['name']);
+      sheet.getRangeByIndex(i + 1, 5)
         ..setNumber(state.struks[i].total?.toDouble())
         ..numberFormat = '#,##0';
     }
-    sheet.getRangeByIndex(1, 5).setText('Total : ');
-    sheet.getRangeByIndex(1, 6)
+    sheet.getRangeByIndex(1, 8).setText('Total : ');
+    sheet.getRangeByIndex(1, 9)
       ..setNumber(state.struks
           .fold(
             0,
@@ -78,7 +87,7 @@ class ExcelProcessor {
       workbook.dispose();
       return;
     }
-    print('here');
+    debugPrint('here');
     List<int> bytes = workbook.saveAsStream();
     // Directory docDir = await getApplicationDocumentsDirectory();
     // File theFile =
@@ -88,9 +97,9 @@ class ExcelProcessor {
     var filePath = await FileSaver.instance.saveAs(
         fileExtension: 'xlsx',
         mimeType: MimeType.microsoftExcel,
-        name: 'Backup_${DateFormat.MMMM().format(DateTime.now())}.xlsx',
+        name: 'Backup_${DateFormat.MMMM().format(DateTime.now())}',
         bytes: Uint8List.fromList(bytes));
-    print(filePath);
+    debugPrint(filePath);
     // print(await theFile.readAsBytes());
     // final params = SaveFileDialogParams(sourceFilePath: theFile.path);
     // final filePath = await FlutterFileDialog.saveFile(params: params);

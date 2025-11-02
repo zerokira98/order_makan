@@ -2,19 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screen_lock/flutter_screen_lock.dart';
 
-class KeyLock extends StatelessWidget {
+class KeyLock extends StatefulWidget {
   final String tendigits;
   final String title;
   final bool showCancel;
-  KeyLock(
+  const KeyLock(
       {super.key,
       required this.tendigits,
       required this.title,
       this.showCancel = true});
 
+  @override
+  State<KeyLock> createState() => _KeyLockState();
+}
+
+class _KeyLockState extends State<KeyLock> {
   final InputController ic = InputController();
 
-  final FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode(
+    onKeyEvent: (node, event) {
+      debugPrint('here focus');
+      return KeyEventResult.handled;
+    },
+  );
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +38,9 @@ class KeyLock extends StatelessWidget {
       focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: (key) {
+        debugPrint('keytpress');
         if (key is! KeyDownEvent) return;
-        if (key.logicalKey == LogicalKeyboardKey.goBack && showCancel) {
+        if (key.logicalKey == LogicalKeyboardKey.goBack && widget.showCancel) {
           return Navigator.of(context).pop(false);
         }
         if (key.logicalKey == LogicalKeyboardKey.backspace) {
@@ -34,12 +51,12 @@ class KeyLock extends StatelessWidget {
         }
       },
       child: ScreenLock(
-        title: Text(title),
-        correctString: tendigits,
-        cancelButton: !showCancel ? SizedBox() : null,
+        title: Text(widget.title),
+        correctString: widget.tendigits,
+        cancelButton: !widget.showCancel ? SizedBox() : null,
         inputController: ic,
         onCancelled:
-            !showCancel ? null : () => Navigator.of(context).pop(false),
+            !widget.showCancel ? null : () => Navigator.of(context).pop(false),
         onUnlocked: () => Navigator.of(context).pop(true),
       ),
     );

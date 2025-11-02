@@ -137,12 +137,14 @@ extension DateParsing on DateTime {
     return tanggalFormat.format(this);
   }
 
+  ///10 Okt 2025
   String formatBasic() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat.yMMMd('ID_id');
     return tanggalFormat.format(this);
   }
 
+  ///Oktober 2025
   String formatMonthYear() {
     initializeDateFormatting();
     DateFormat tanggalFormat = DateFormat.yMMMM('ID_id');

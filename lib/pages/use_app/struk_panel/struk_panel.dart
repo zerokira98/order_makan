@@ -71,7 +71,7 @@ class StrukPanel extends StatelessWidget {
                             ),
                           );
                         },
-                        icon: Icon(Icons.delete))
+                        icon: Icon(Icons.clear_all))
                   ],
                 ),
               ),

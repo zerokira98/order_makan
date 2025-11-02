@@ -1,8 +1,8 @@
-
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/helper.dart';
+import 'package:order_makan/pages/admin_panel/app_settings/app_settings.dart';
 import 'package:order_makan/pages/admin_panel/inputbelibahan/input_bahanbaku.dart';
 import 'package:order_makan/pages/admin_panel/karyawan_manage/karyawanmanage_main.dart';
 import 'package:order_makan/pages/admin_panel/pengeluaran/pengeluaranpage.dart';
@@ -10,11 +10,26 @@ import 'package:order_makan/pages/admin_panel/rangkum/bloc/rangkuman_bloc.dart';
 import 'package:order_makan/pages/admin_panel/rangkum/rangkuman_periodik/rangkuman_periodik.dart';
 import 'package:order_makan/pages/histori_struk.dart';
 import 'package:order_makan/repo/firestore_kas.dart';
+import 'package:order_makan/repo/globalsettingrepo.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
 
-class AdminDrawer extends StatelessWidget {
+class AdminDrawer extends StatefulWidget {
   const AdminDrawer({super.key});
+
+  @override
+  State<AdminDrawer> createState() => _AdminDrawerState();
+}
+
+class _AdminDrawerState extends State<AdminDrawer> {
+  final FocusNode lacifocusNode = FocusNode();
+  final FocusNode wififocusNode = FocusNode();
+  @override
+  void dispose() {
+    lacifocusNode.dispose();
+    wififocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +122,10 @@ class AdminDrawer extends StatelessWidget {
                 },
                 title: const Text('Rangkuman Bulanan')),
             Divider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Etc'),
+            ),
             ListTile(
                 onTap: () async {
                   var datatext =
@@ -118,12 +137,11 @@ class AdminDrawer extends StatelessWidget {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        final FocusNode focusNode = FocusNode();
                         var tct = TextEditingController(
                             text: datatext?['uang'].toString() ?? '');
                         var telo = CurrencyTextInputFormatter.simpleCurrency(
                             decimalDigits: 0, locale: 'id_ID');
-                        focusNode.requestFocus();
+                        lacifocusNode.requestFocus();
                         return Dialog(
                           child: Padding(
                             padding: const EdgeInsets.all(18.0),
@@ -149,7 +167,7 @@ class AdminDrawer extends StatelessWidget {
                                       //             int.parse(value)));
                                       // Navigator.pop(context);
                                     },
-                                    focusNode: focusNode,
+                                    focusNode: lacifocusNode,
                                     keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
                                         label: Text('Uang Laci')),
@@ -157,7 +175,6 @@ class AdminDrawer extends StatelessWidget {
                                 ),
                                 ElevatedButton(
                                     onPressed: () {
-                                      print(telo.getDouble());
                                       if (telo.getDouble() != 0) {
                                         RepositoryProvider.of<KasRepository>(
                                                 context)
@@ -174,84 +191,70 @@ class AdminDrawer extends StatelessWidget {
                           ),
                         );
                       });
-                  // setState(() {
-                  //   selectedIndex = 0;
-                  // });
-                  // Navigator.pop(context);
                 },
                 title: Text('Set Uang Laci Hari ini')),
-            // ListTile(
-            //     onTap: () async {
-            //       var datatext = await SharedPreferences.getInstance().then(
-            //         (value) {
-            //           try {
-            //             var a = value.getString('globalSetting') ?? '{}';
-            //             print(a);
-            //             var b = jsonDecode(a);
-            //             return '${b['namaresto']}';
-            //           } catch (e) {
-            //             return '';
-            //           }
-            //         },
-            //       );
-            //       showDialog(
-            //           context: context,
-            //           builder: (context) {
-            //             final FocusNode focusNode = FocusNode();
-            //             var tct =
-            //                 TextEditingController(text: datatext.toString());
-            //             focusNode.requestFocus();
-            //             return Dialog(
-            //               child: Padding(
-            //                 padding: const EdgeInsets.all(18.0),
-            //                 child: Row(
-            //                   mainAxisSize: MainAxisSize.min,
-            //                   children: [
-            //                     SizedBox(
-            //                       width: 120,
-            //                       child: TextFormField(
-            //                         controller: tct,
-            //                         validator: usernameValidator,
-            //                         onFieldSubmitted: (value) {
-            //                           debugPrint(value);
-            //                         },
-            //                         focusNode: focusNode,
-            //                         keyboardType: TextInputType.name,
-            //                         decoration: InputDecoration(
-            //                             label: Text('Nama resto')),
-            //                       ),
-            //                     ),
-            //                     ElevatedButton(
-            //                         onPressed: () async {
-            //                           var sp =
-            //                               await SharedPreferences.getInstance();
-            //                           await sp
-            //                               .setString(
-            //                                   'globalSetting',
-            //                                   jsonEncode(
-            //                                       {'namaresto': tct.text}))
-            //                               .then(
-            //                             (value) {
-            //                               if (value) {
-            //                                 Navigator.pop(context);
-            //                               } else {
-            //                                 debugPrint('error');
-            //                               }
-            //                             },
-            //                           );
-            //                         },
-            //                         child: Text('set'))
-            //                   ],
-            //                 ),
-            //               ),
-            //             );
-            //           });
-            //       // setState(() {
-            //       //   selectedIndex = 0;
-            //       // });
-            //       // Navigator.pop(context);
-            //     },
-            //     title: Text('Ganti Nama Resto/Kafe')),
+            ListTile(
+                onTap: () {
+                  RepositoryProvider.of<GlobalSettingRepo>(context)
+                      .getWifiPass()
+                      .then((datatext) {
+                    if (context.mounted) {
+                      return showDialog(
+                          context: context,
+                          builder: (context) {
+                            var tct = TextEditingController(text: datatext);
+                            wififocusNode.requestFocus();
+                            return Dialog(
+                              child: Padding(
+                                padding: const EdgeInsets.all(18.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: 100,
+                                      child: TextFormField(
+                                        controller: tct,
+                                        autovalidateMode:
+                                            AutovalidateMode.always,
+                                        // validator: (value) => numberValidator(
+                                        //     telo.getUnformattedValue().toString()),
+                                        // inputFormatters: [telo],
+                                        onFieldSubmitted: (value) {
+                                          RepositoryProvider.of<
+                                                  GlobalSettingRepo>(context)
+                                              .setWifiPass(tct.text)
+                                              .then(
+                                                (value) =>
+                                                    Navigator.pop(context),
+                                              );
+                                        },
+                                        focusNode: wififocusNode,
+
+                                        // keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                            label: Text('password wifi')),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          RepositoryProvider.of<
+                                                  GlobalSettingRepo>(context)
+                                              .setWifiPass(tct.text)
+                                              .then(
+                                                (value) =>
+                                                    Navigator.pop(context),
+                                              );
+                                        },
+                                        child: Text('set'))
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+                    }
+                  });
+                },
+                title: Text('Set password wifi')),
             ListTile(
                 onTap: () {
                   Navigator.push(
@@ -261,6 +264,16 @@ class AdminDrawer extends StatelessWidget {
                       ));
                 },
                 title: const Text('Manage Karyawan')),
+            ListTile(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AppSettings(),
+                      ));
+                },
+                trailing: Icon(Icons.settings),
+                title: const Text('App Settings')),
           ],
           // children: List.generate(
           //     a.length,

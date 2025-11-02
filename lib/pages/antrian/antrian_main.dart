@@ -25,6 +25,7 @@ class _AntrianPageState extends State<AntrianPage> {
   void initState() {
     if (widget.fromcheckout) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
+        BlocProvider.of<AntrianBloc>(context).add(InitiateAntrian());
         RepositoryProvider.of<StrukRepository>(context).getAntrian().then(
           (value) {
             showDialog(
@@ -34,6 +35,9 @@ class _AntrianPageState extends State<AntrianPage> {
         );
       });
     }
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      BlocProvider.of<AntrianBloc>(context).add(InitiateAntrian());
+    });
     super.initState();
   }
 
@@ -105,6 +109,35 @@ class _AntrianPageState extends State<AntrianPage> {
                 crossAxisCount: 1,
                 children: state.antrianStruks.map((e) {
                   return InkWell(
+                      onLongPress: () {
+                        debugPrint('longpress');
+                        showDialog(
+                            context: context,
+                            builder: (context) =>
+                                BlocListener<AntrianBloc, AntrianState>(
+                                  listener: (context, state) {
+                                    if (state.msg != null) {
+                                      if (mounted) {
+                                        Navigator.pop(context);
+                                      }
+                                    }
+                                  },
+                                  child: AlertDialog(
+                                    title: Text('Selesaikan Pesanan?'),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () {
+                                            if (e.strukId != null) {
+                                              BlocProvider.of<AntrianBloc>(
+                                                      context)
+                                                  .add(OrderFinish(e.strukId!));
+                                            }
+                                          },
+                                          child: Text('Selesaikan'))
+                                    ],
+                                  ),
+                                ));
+                      },
                       onTap: () {
                         showDialog(
                           context: context,

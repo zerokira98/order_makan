@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/widgets.dart';
+import 'package:order_makan/bloc/topbarbloc/topbar_bloc.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/model/menuitems_model.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
@@ -11,7 +12,13 @@ part 'menu_state.dart';
 
 class MenuBloc extends Bloc<MenuEvent, MenuState> {
   MenuItemRepository repo;
-  MenuBloc(this.repo) : super(const MenuState(datas: [])) {
+  TopbarBloc topbarbloc;
+  MenuBloc(this.repo, this.topbarbloc) : super(const MenuState(datas: [])) {
+    topbarbloc.stream.listen(
+      (event) {
+        add(ChangeTopbarCat(catName: event.selected));
+      },
+    );
     on<Init>((event, emit) async {
       Map<String, List<MenuItems>> groupbyletter = {};
       await repo.getAllMenus().then(
@@ -20,7 +27,7 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
             groupbyletter[e.title[0]] = (groupbyletter[e.title[0]] ?? []) + [e];
           }
           groupbyletter.forEach(
-            (key, value) => print(key + value.toString()),
+            (key, value) => debugPrint(key + value.toString()),
           );
 
           emit(MenuState(datas: a).copywith(msg: () => event.msg));
@@ -67,6 +74,23 @@ class MenuBloc extends Bloc<MenuEvent, MenuState> {
         var c = await repo.getMenusByCategory(a);
         emit(MenuState(datas: c));
       }
+    });
+    on<SearchQuery>((event, emit) async {
+      var a = event.query;
+      var cat = topbarbloc.state.selected;
+      List<MenuItems> data;
+      if (cat == '[ALL]') {
+        data = await repo.getAllMenus();
+      } else {
+        data = await repo.getMenusByCategory(cat);
+      }
+      emit(MenuState(
+          datas: data
+              .map(
+                (e) => e.title.toLowerCase().contains(a) ? e : null,
+              )
+              .nonNulls
+              .toList()));
     });
 
     ///useless, no need to bloc?

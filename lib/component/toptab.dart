@@ -22,10 +22,7 @@ class _TopTabState extends State<TopTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        BlocBuilder<TopbarBloc, TopbarState>(
-            // future: RepositoryProvider.of<MenuItemRepository>(context)
-            //     .getCategories(),
-            builder: (context, state) {
+        BlocBuilder<TopbarBloc, TopbarState>(builder: (context, state) {
           if (state.categories.isEmpty) {
             return widget.edit ? AddCategoryButton() : const Text('EMPTY');
           }

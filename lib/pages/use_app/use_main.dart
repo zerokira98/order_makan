@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -45,19 +44,35 @@ class _UseMainState extends State<UseMain> {
   }
 
   bool groupmenu = true;
+  TextEditingController searchControl = TextEditingController();
+
+  var searchNode = FocusNode(
+    debugLabel: 'search node',
+    onKeyEvent: (node, event) {
+      debugPrint('search node');
+      return KeyEventResult.handled;
+    },
+  );
+
+  @override
+  void dispose() {
+    searchNode.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        print('here');
+        debugPrint('here');
         pageController.animateToPage(0,
             duration: Durations.medium4, curve: Curves.easeInOut);
       },
       child: BlocListener<UseStrukBloc, UseStrukState>(
         listenWhen: (p, c) => c.error == StrukError.success(),
         listener: (context, state) {
-          print('here');
+          debugPrint('here');
           if (mounted) {
             pageController.jumpToPage(0);
             Navigator.push(
@@ -80,8 +95,8 @@ class _UseMainState extends State<UseMain> {
                 FutureBuilder(
                   future: SharedPreferences.getInstance(),
                   builder: (context, snapshot) {
-                    var a = snapshot.data?.getString('globalSetting') ?? '{}';
-                    var b = jsonDecode(a);
+                    // var a = snapshot.data?.getString('globalSetting') ?? '{}';
+                    // var b = jsonDecode(a);
                     return Text('Koffie Coffeeshop');
                   },
                 ),
@@ -100,6 +115,9 @@ class _UseMainState extends State<UseMain> {
               const Padding(padding: EdgeInsets.symmetric(horizontal: 24)),
               BlocBuilder<NotifCubit, NotifState>(
                 builder: (context, state) {
+                  if (state.notif.isEmpty) {
+                    return SizedBox();
+                  }
                   return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
@@ -168,7 +186,41 @@ class _UseMainState extends State<UseMain> {
                             children: [
                               Row(
                                 children: [
-                                  Expanded(child: TopTab()),
+                                  Expanded(flex: 4, child: TopTab()),
+                                  Flexible(
+                                      flex: 1,
+                                      child: TextFormField(
+                                        // canRequestFocus: false,
+                                        focusNode: searchNode,
+                                        onTapOutside: (event) {
+                                          FocusScope.of(context).unfocus();
+                                          searchNode.unfocus();
+                                        },
+                                        onChanged: (value) {
+                                          BlocProvider.of<MenuBloc>(context)
+                                              .add(SearchQuery(query: value));
+                                        },
+                                        controller: searchControl,
+                                        decoration: InputDecoration(
+                                            // border: inputborder(),
+                                            isDense: true,
+                                            isCollapsed: true,
+                                            contentPadding: EdgeInsets.all(0.0),
+                                            suffix: IconButton(
+                                                onPressed: () {
+                                                  BlocProvider.of<MenuBloc>(
+                                                          context)
+                                                      .add(SearchQuery(
+                                                          query: ''));
+
+                                                  FocusScope.of(context)
+                                                      .unfocus();
+                                                  searchNode.unfocus();
+                                                  searchControl.clear();
+                                                },
+                                                icon: Icon(Icons.clear)),
+                                            label: Text('Search')),
+                                      )),
                                   IconButton(
                                       onPressed: () {
                                         setState(() {
@@ -185,7 +237,7 @@ class _UseMainState extends State<UseMain> {
                                       border: Border(top: BorderSide())),
                                   padding: const EdgeInsets.all(8.0),
                                   child: MenuList(
-                                    newview: groupmenu,
+                                    newview: !groupmenu,
                                   ),
                                 ),
                               ),
@@ -234,6 +286,7 @@ class _CustomOrderDialogState extends State<CustomOrderDialog> {
             ElevatedButton(
               onPressed: () {
                 //var menuitems? check null
+
                 if (selected == null) {
                   debugPrint('clicked null selected');
                   RepositoryProvider.of<MenuItemRepository>(context)
@@ -374,42 +427,9 @@ class MenuList extends StatelessWidget {
                             child: MenuCard(
                               onTap: () {
                                 showDialog(
-                                  context: context,
-                                  builder: (context) => Dialog(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(18.0),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(state.datas[i].title),
-                                          Text(
-                                              state.datas[i].description ?? ''),
-                                          Divider(),
-                                          Text('Bahan'),
-                                          for (var e
-                                              in state.datas[i].ingredientItems)
-                                            Text(
-                                                "~${e.title} ${e.count}${e.satuan}"),
-                                          Divider(),
-                                          Text('submenu'),
-                                          for (var f
-                                              in state.datas[i].submenues)
-                                            Text(f.title.toString()),
-                                          Row(
-                                            children: [
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text('Batal')),
-                                              ElevatedButton(
-                                                  onPressed: () {},
-                                                  child: Text('Ok'))
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
+                                    context: context,
+                                    builder: (context) => ontapPreviewDialog(
+                                        groupbyletter[ez]![i]));
                               },
                               menudata: groupbyletter[ez]![i],
                             ),
@@ -422,6 +442,61 @@ class MenuList extends StatelessWidget {
             ],
           ),
       ],
+    );
+  }
+
+  Widget ontapPreviewDialog(MenuItems data) {
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            data.imgDir.contains('assets') || data.imgDir.isEmpty
+                ? Image.asset(
+                    data.imgDir.isEmpty ? 'assets/sate.jpg' : data.imgDir,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                  )
+                : Image(
+                    image: CachedNetworkImageProvider(data.imgDir),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) {
+                        return child;
+                      }
+                      return CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null);
+                    },
+                    height: 280,
+                    fit: BoxFit.cover,
+                  ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(data.title),
+                Text(data.description ?? ''),
+                Divider(),
+                Text('Bahan'),
+                for (var e in data.ingredientItems)
+                  Text("~${e.title} ${e.count}${e.satuan}"),
+                Divider(),
+                Text('submenu'),
+                for (var f in data.submenues) Text(f.title.toString()),
+                Row(
+                  children: [
+                    ElevatedButton(onPressed: () {}, child: Text('Batal')),
+                    ElevatedButton(onPressed: () {}, child: Text('Ok'))
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -470,46 +545,10 @@ class MenuList extends StatelessWidget {
                                       child: MenuCard(
                                         onTap: () {
                                           showDialog(
-                                            context: context,
-                                            builder: (context) => Dialog(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(18.0),
-                                                child: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  children: [
-                                                    Text(state.datas[i].title),
-                                                    Text(state.datas[i]
-                                                            .description ??
-                                                        ''),
-                                                    Divider(),
-                                                    Text('Bahan'),
-                                                    for (var e in state.datas[i]
-                                                        .ingredientItems)
-                                                      Text(
-                                                          "~${e.title} ${e.count}${e.satuan}"),
-                                                    Divider(),
-                                                    Text('submenu'),
-                                                    for (var f in state
-                                                        .datas[i].submenues)
-                                                      Text(f.title.toString()),
-                                                    Row(
-                                                      children: [
-                                                        ElevatedButton(
-                                                            onPressed: () {},
-                                                            child:
-                                                                Text('Batal')),
-                                                        ElevatedButton(
-                                                            onPressed: () {},
-                                                            child: Text('Ok'))
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          );
+                                              context: context,
+                                              builder: (context) =>
+                                                  ontapPreviewDialog(
+                                                      state.datas[i]));
                                         },
                                         menudata: state.datas[i],
                                       ),

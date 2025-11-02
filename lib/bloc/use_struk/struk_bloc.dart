@@ -119,10 +119,10 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       // await repo.sendtoAntrian(state);
       emit(state.copywith(dibayar: event.dibayar));
     });
-    on<ChangeAntrian>((event, emit) async {
-      // await repo.sendtoAntrian(state);
-      emit(state.copywith(nomorAntrian: event.antrian));
-    });
+    // on<ChangeAntrian>((event, emit) async {
+    //   // await repo.sendtoAntrian(state);
+    //   emit(state.copywith(nomorAntrian: event.antrian));
+    // });
     on<DateUpdate>((event, emit) async {
       // await repo.sendtoAntrian(state);
       emit(state.copywith(ordertime: DateTime.now()));
@@ -139,7 +139,7 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       //     );
       repo.increaseTodaysAntrianCount().then(
         (antriancount) {
-          repo.sendtoAntrian(state.copywith(nomorAntrian: antriancount + 1));
+          repo.sendtoAntrian(state.copywith(nomorAntrian: antriancount));
 
           add(InitiateStruk(karyawanId: state.karyawanId, success: true));
         },

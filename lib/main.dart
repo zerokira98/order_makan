@@ -16,10 +16,12 @@ import 'package:order_makan/bloc/menu/menu_bloc.dart' as m;
 import 'package:order_makan/firebase_options.dart';
 import 'package:order_makan/pages/admin_panel/inputbelibahan/cubit/inputbeliform_cubit.dart';
 import 'package:order_makan/pages/admin_panel/edit_app/cubit/menuedit_cubit.dart';
+import 'package:order_makan/pages/admin_panel/pengeluaran/cubit/pengeluaran_cubit.dart';
 import 'package:order_makan/pages/firstrun_setup.dart';
 import 'package:order_makan/pages/karyawan_loginpage.dart';
 import 'package:order_makan/pages/karyawan_signup.dart';
 import 'package:order_makan/repo/firestore_kas.dart';
+import 'package:order_makan/repo/globalsettingrepo.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:order_makan/repo/strukrepo.dart';
@@ -59,12 +61,20 @@ void main() async {
         create: (context) => MenuItemRepository(firestore),
       ),
       RepositoryProvider(
+        create: (context) => GlobalSettingRepo(firestore),
+      ),
+      RepositoryProvider(
         create: (context) => StrukRepository(
             firestore, RepositoryProvider.of<MenuItemRepository>(context)),
       ),
     ],
     child: MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) =>
+              PengeluaranCubit(RepositoryProvider.of<KasRepository>(context)),
+          child: Container(),
+        ),
         BlocProvider(
           create: (context) =>
               NotifCubit(RepositoryProvider.of<MenuItemRepository>(context)),
@@ -100,8 +110,9 @@ void main() async {
         ),
         BlocProvider(
             create: (context) => m.MenuBloc(
-                  RepositoryProvider.of<MenuItemRepository>(context),
-                )..add(m.Init())),
+                RepositoryProvider.of<MenuItemRepository>(context),
+                BlocProvider.of<TopbarBloc>(context))
+              ..add(m.Init())),
       ],
       child: MyApp(),
     ),
@@ -125,14 +136,6 @@ class MyApp extends StatelessWidget {
             }
           },
         ),
-        BlocListener<TopbarBloc, TopbarState>(
-          listenWhen: (p, c) =>
-              p.selected != c.selected && c.selected.isNotEmpty,
-          listener: (context, state) {
-            BlocProvider.of<m.MenuBloc>(context)
-                .add(m.ChangeTopbarCat(catName: state.selected));
-          },
-        )
       ],
       child: MaterialApp(
         // routes: {'/adminpanel': (context) => AdminPanel()},

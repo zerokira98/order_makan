@@ -28,7 +28,7 @@ class RangkumanPeriodik extends StatelessWidget {
             builder: (context, state) {
               return ElevatedButton(
                   onPressed: () {
-                    ExcelProcessor().printExcel(state);
+                    ExcelProcessor.printExcel(state, context);
                   },
                   child: Text('Rangkum Excel'));
             },

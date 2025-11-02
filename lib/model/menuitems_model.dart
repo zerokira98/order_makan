@@ -7,8 +7,6 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:order_makan/model/ingredient_model.dart';
 import 'package:order_makan/model/submenuitem_model.dart';
 
-part 'menuitems_model.g.dart';
-
 @JsonSerializable(explicitToJson: true)
 class MenuItems {
   final String title;
@@ -71,17 +69,9 @@ class MenuItems {
         categories: categories ?? this.categories,
         count: count ?? this.count,
       );
-  // factory MenuItems.fromJson(Map<String, dynamic> json) =>
-  //     _$MenuItemsFromJson(json);
+
   factory MenuItems.fromFirestore(DocumentSnapshot<Map> data) =>
       _$MenuItemsFromFirestore(data);
-
-  // Map<String, dynamic> toJson() => _$MenuItemsToJson(this);
-
-  // @override
-  // String toString() {
-  //   return title;
-  // }
 
   Map<String, dynamic> toFirestore() => _$MenuItemsToFirestore(this);
 

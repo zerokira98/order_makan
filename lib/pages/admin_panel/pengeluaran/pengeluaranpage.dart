@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:order_makan/helper.dart';
+import 'package:order_makan/pages/admin_panel/pengeluaran/cubit/pengeluaran_cubit.dart';
 import 'package:order_makan/pages/admin_panel/pengeluaran/historipengeluaran/historipengeluaran_main.dart';
 import 'package:order_makan/repo/firestore_kas.dart';
 import 'package:order_makan/repo/karyawan_authrepo.dart';
@@ -153,6 +154,7 @@ class PengeluaranInputForm extends StatelessWidget {
                           titlec.text = '';
                           date.text = '';
                           cost.text = '';
+                          BlocProvider.of<PengeluaranCubit>(context).initiate();
                         },
                       );
                     }

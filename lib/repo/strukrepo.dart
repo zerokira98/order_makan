@@ -50,12 +50,12 @@ class StrukRepository extends _StrukRepo {
         .doc((date ?? DateTime.now()).formatBasic());
     return antriancountref.get(GetOptions(source: Source.cache)).then(
       (value) {
-        print('telo');
+        debugPrint('telo');
         return (value.data()?['count'] as int?) ?? 0;
       },
     ).onError(
       (error, stackTrace) {
-        print('telo error');
+        debugPrint('telo error');
         throw error!;
       },
     );
@@ -76,8 +76,6 @@ class StrukRepository extends _StrukRepo {
     return antriancountref.get().then(
           (value) => value.data()!['count'] as int,
         );
-    // var sp = await SharedPreferences.getInstance();
-    // return sp.setInt(thedate.formatBasic(), await getTodaysAntrianCount() + 1);
   }
 
   Stream<int> getStrukStreamCount() {

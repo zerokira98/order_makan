@@ -30,3 +30,8 @@ class ChangeTopbarCat extends MenuEvent {
   final String catName;
   ChangeTopbarCat({required this.catName});
 }
+
+class SearchQuery extends MenuEvent {
+  final String query;
+  SearchQuery({required this.query});
+}

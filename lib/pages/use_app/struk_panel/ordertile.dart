@@ -29,6 +29,8 @@ class _OrderTileState extends State<OrderTile>
   Tween<double> ani = Tween(begin: 0.0, end: 1.0);
   double opacity = 0.0;
   late Animation ca;
+
+  final FocusNode countfocusNode = FocusNode();
   @override
   void initState() {
     ac = AnimationController(
@@ -47,6 +49,7 @@ class _OrderTileState extends State<OrderTile>
   @override
   void dispose() {
     ac.dispose();
+    countfocusNode.dispose();
     super.dispose();
   }
 
@@ -145,9 +148,7 @@ class _OrderTileState extends State<OrderTile>
                                             showDialog(
                                                 context: context,
                                                 builder: (context) {
-                                                  final FocusNode focusNode =
-                                                      FocusNode();
-                                                  focusNode.requestFocus();
+                                                  countfocusNode.requestFocus();
                                                   return Dialog(
                                                     child: Padding(
                                                       padding:
@@ -183,7 +184,8 @@ class _OrderTileState extends State<OrderTile>
                                                             Navigator.pop(
                                                                 context);
                                                           },
-                                                          focusNode: focusNode,
+                                                          focusNode:
+                                                              countfocusNode,
                                                           keyboardType:
                                                               TextInputType
                                                                   .number,

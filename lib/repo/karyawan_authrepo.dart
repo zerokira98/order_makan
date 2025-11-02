@@ -33,9 +33,18 @@ class KaryawanAuthRepo {
     );
   }
 
-  Future getAllKaryawan(String karyawanId) {
+  Future<List<Map<String, dynamic>?>> getAllKaryawan([String? karyawanId]) {
+    if (karyawanId == null) {
+      return firestore.collection('users').get().then(
+            (value) => value.docs
+                .map(
+                  (e) => e.data(),
+                )
+                .toList(),
+          );
+    }
     return firestore.collection('users').doc(karyawanId).get().then(
-          (value) => value.data(),
+          (value) => [value.data()],
         );
   }
 
@@ -52,10 +61,11 @@ class KaryawanAuthRepo {
       )
           .then(
         (value) {
-          return firestore
-              .collection('users')
-              .doc(value.user?.uid)
-              .set({"name": displayName ?? '', "role": role ?? "karyawan"});
+          return firestore.collection('users').doc(value.user?.uid).set({
+            "name": displayName ?? '',
+            "role": role ?? "karyawan",
+            "id": value.user?.uid
+          });
         },
       );
     } on auth.FirebaseAuthException catch (e) {

@@ -26,7 +26,7 @@ class _KaryawanLoginPageState extends State<KaryawanLoginPage> {
       ),
       body: BlocListener<KaryawanauthBloc, KaryawanauthState>(
         listener: (context, state) {
-          print(state);
+          debugPrint(state.toString());
           if (state is KaryawanUnAuth) {
             if (state.errorMsg != null) {
               ScaffoldMessenger.of(context)

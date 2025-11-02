@@ -1,5 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class FileService {
@@ -36,7 +37,9 @@ class FileService {
   Future menuimageDownload(String ref) async {
     try {
       return await FirebaseStorage.instance.ref(ref).getData();
-    } catch (e) {}
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   static Future<String> getDownloadUrl(String path) async {

@@ -79,7 +79,7 @@ class _StrukitemeditDialogState extends State<StrukitemeditDialog> {
                         child: AnimatedContainer(
                           duration: Durations.short4,
                           transform: Matrix4.identity()
-                            ..translate(0.0, added ? 2.0 : 0.0),
+                            ..translateByDouble(0.0, added ? 2.0 : 0.0, 1, 1),
                           margin: EdgeInsets.all(8),
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black45),
