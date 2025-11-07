@@ -13,14 +13,18 @@ part 'inputbeliform_state.dart';
 class InputbeliformCubit extends Cubit<InputbeliformState> {
   MenuItemRepository repo;
   InputbeliformCubit(this.repo) : super(InputbeliformState.initial());
-  Future<void> initiate() async {
-    emit(InputbeliformState.initial());
-    await Future.delayed(Durations.extralong1);
-    emit(InputbeliformState.initial());
+  Future<void> initiate({bool? success}) async {
+    // emit(InputbeliformState.initial());
+    // await Future.delayed(Durations.extralong1);
+    emit(InputbeliformState.initial().copyWith(isSuccess: success ?? false));
   }
 
   void changeData(InputbeliformState data) async {
     emit(data);
+  }
+
+  void clrSuccess() {
+    emit(state.copyWith(isSuccess: false));
   }
 
   void sendtoDB() async {
@@ -50,6 +54,6 @@ class InputbeliformCubit extends Cubit<InputbeliformState> {
         asIngredient: state.ingredientItem.copyWith(
           id: () => ingredientId,
         )));
-    initiate();
+    initiate(success: true);
   }
 }

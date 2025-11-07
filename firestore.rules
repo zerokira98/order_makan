@@ -50,6 +50,13 @@ service cloud.firestore {
     allow read : if true;
       allow  write: if isSignedIn()&& get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role=="admin" ;
     }
+    match /globalsettings/{document=**} { 
+    allow read : if true;
+      allow  write: if isSignedIn() ;
+    }match /antriancount_perdate/{document=**} { 
+    allow read : if true;
+      allow  write: if isSignedIn() ;
+    }
   }
 
 function isSignedIn(){

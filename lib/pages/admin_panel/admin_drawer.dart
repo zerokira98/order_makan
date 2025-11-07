@@ -1,6 +1,7 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:order_makan/bloc/bahanbaku/bahanbaku_cubit.dart';
 import 'package:order_makan/helper.dart';
 import 'package:order_makan/pages/admin_panel/app_settings/app_settings.dart';
 import 'package:order_makan/pages/admin_panel/inputbelibahan/input_bahanbaku.dart';
@@ -35,6 +36,13 @@ class _AdminDrawerState extends State<AdminDrawer> {
   Widget build(BuildContext context) {
     var now = DateTime.now();
     return Drawer(
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.brown.shade100),
+        borderRadius: BorderRadius.only(
+            topRight: Radius.circular(20), bottomRight: Radius.circular(20)),
+      ),
+      backgroundColor: Color.alphaBlend(
+          Colors.white30, Theme.of(context).scaffoldBackgroundColor),
       child: Center(
         child: ListView(
           shrinkWrap: true,
@@ -58,6 +66,7 @@ class _AdminDrawerState extends State<AdminDrawer> {
                 title: const Text('Catat Pengeluaran Umum')),
             ListTile(
                 onTap: () {
+                  BlocProvider.of<BahanbakuCubit>(context).initiate();
                   Navigator.push(
                       context,
                       MaterialPageRoute(

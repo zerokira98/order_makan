@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import 'package:order_makan/model/ingredient_model.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
 
 part 'notif_state.dart';

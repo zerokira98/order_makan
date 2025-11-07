@@ -138,12 +138,14 @@ class StrukPanel extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Total: Rp${getTotal().numberFormat()} ',
-                                textScaler: TextScaler.linear(1.15),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white),
+                              Flexible(
+                                child: Text(
+                                  'Total: Rp${getTotal().numberFormat()} ',
+                                  textScaler: TextScaler.linear(1.15),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white),
+                                ),
                               ),
                               ElevatedButton.icon(
                                   style: ElevatedButton.styleFrom(
@@ -159,15 +161,6 @@ class StrukPanel extends StatelessWidget {
                                               2,
                                           duration: Durations.medium4,
                                           curve: Curves.easeInOut);
-                                      // showDialog(
-                                      //   // useSafeArea: false,
-                                      //   context: context,
-                                      //   builder: (c) => BlocProvider.value(
-                                      //     value: BlocProvider.of<UseStrukBloc>(
-                                      //         context),
-                                      //     child: const CheckoutDialog(),
-                                      //   ),
-                                      // );
                                     }
                                   },
                                   icon: Icon(Icons.navigate_next),

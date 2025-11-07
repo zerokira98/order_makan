@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 import 'package:order_makan/bloc/antrian/antrian_bloc.dart';
+import 'package:order_makan/bloc/bahanbaku/bahanbaku_cubit.dart';
 import 'package:order_makan/bloc/karyawanauth/karyawanauth_bloc.dart';
 import 'package:order_makan/bloc/notif/notif_cubit.dart';
 import 'package:order_makan/bloc/use_struk/struk_bloc.dart';
@@ -70,6 +71,11 @@ void main() async {
     ],
     child: MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => BahanbakuCubit(
+              RepositoryProvider.of<MenuItemRepository>(context)),
+          child: Container(),
+        ),
         BlocProvider(
           create: (context) =>
               PengeluaranCubit(RepositoryProvider.of<KasRepository>(context)),

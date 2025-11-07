@@ -1,7 +1,7 @@
 part of 'menu_bloc.dart';
 
 @immutable
-class MenuState {
+class MenuState extends Equatable {
   final List<MenuItems> datas;
 
   final Map? msg;
@@ -11,4 +11,7 @@ class MenuState {
     return MenuState(
         datas: datas ?? this.datas, msg: msg != null ? msg() : this.msg);
   }
+
+  @override
+  List<Object?> get props => [datas, msg];
 }

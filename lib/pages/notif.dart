@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_makan/bloc/notif/notif_cubit.dart';
-import 'package:order_makan/model/ingredient_model.dart';
 
 class NotifCenter extends StatelessWidget {
   const NotifCenter({super.key});

@@ -5,22 +5,25 @@ part of 'pengeluaran_cubit.dart';
 class PengeluaranState extends Equatable {
   final List<QueryDocumentSnapshot<Map<dynamic, dynamic>>> datas;
   final StrukFilter filter;
-  const PengeluaranState({required this.datas, required this.filter});
+  final bool isLoading;
+  const PengeluaranState(
+      {required this.datas, required this.filter, this.isLoading = false});
 
   static PengeluaranState get empty =>
       PengeluaranState(datas: [], filter: StrukFilter());
 
   @override
-  List<Object> get props => [datas, filter];
+  List<Object> get props => [datas, filter, isLoading];
 
   PengeluaranState copyWith({
     List<QueryDocumentSnapshot<Map<dynamic, dynamic>>>? datas,
     StrukFilter? filter,
+    bool? isLoading,
   }) {
     return PengeluaranState(
-      datas: datas ?? this.datas,
-      filter: filter ?? this.filter,
-    );
+        datas: datas ?? this.datas,
+        filter: filter ?? this.filter,
+        isLoading: isLoading ?? this.isLoading);
   }
 
   @override

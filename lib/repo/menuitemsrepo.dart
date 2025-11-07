@@ -159,24 +159,29 @@ class MenuItemRepository implements _MenuItemRepo {
         );
   }
 
+  ///stock bahanbaku
   Future<QuerySnapshot<IngredientItem>> getStocks() {
     return ingredientRef.get();
   }
 
+  ///stock bahanbaku
   Future<void> updateIngredientsStockCount(String id, int count) {
     return ingredientRef.doc(id).update({'count': FieldValue.increment(count)});
   }
 
+  ///stock bahanbaku
   Future<DocumentReference<InputstockModel>> addInputstocks(
       InputstockModel data) async {
     await updateIngredientsStockCount(data.asIngredient.id!, data.count);
     return inputstocksRef.add(data);
   }
 
+  ///pembelian bahanbaku
   Future<QuerySnapshot<InputstockModel>> getInputstocks() {
     return inputstocksRef.get();
   }
 
+  ///pembelian bahanbaku
   Future<QuerySnapshot<InputstockModel>> getInputstocksWithFilter(
       {required DateTime start, required DateTime end}) {
     return inputstocksRef

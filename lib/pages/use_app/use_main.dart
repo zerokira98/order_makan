@@ -517,7 +517,7 @@ class MenuList extends StatelessWidget {
                 child: child),
           ),
           child: Container(
-            key: Key(state.datas.toString()),
+            key: Key(state.hashCode.toString()),
             alignment: Alignment.topCenter,
             child: SingleChildScrollView(
               key: Key(state.datas.toString()),

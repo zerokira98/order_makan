@@ -9,6 +9,7 @@ class InputbeliformState extends Equatable {
   final String tempatbeli;
   final int count;
   final int harga;
+  final bool isSuccess;
   const InputbeliformState({
     required this.ingredientItem,
     required this.tanggalbeli,
@@ -16,6 +17,7 @@ class InputbeliformState extends Equatable {
     required this.tempatbeli,
     required this.count,
     required this.harga,
+    this.isSuccess = false,
   });
   static InputbeliformState initial() => InputbeliformState(
       tanggalbeli: DateTime(
@@ -34,25 +36,26 @@ class InputbeliformState extends Equatable {
       tempatbeli,
       count,
       harga,
+      isSuccess
     ];
   }
 
-  InputbeliformState copyWith({
-    IngredientItem? ingredientItem,
-    DateTime? tanggalbeli,
-    String? nama,
-    String? tempatbeli,
-    int? count,
-    int? harga,
-  }) {
+  InputbeliformState copyWith(
+      {IngredientItem? ingredientItem,
+      DateTime? tanggalbeli,
+      String? nama,
+      String? tempatbeli,
+      int? count,
+      int? harga,
+      bool? isSuccess}) {
     return InputbeliformState(
-      ingredientItem: ingredientItem ?? this.ingredientItem,
-      tanggalbeli: tanggalbeli ?? this.tanggalbeli,
-      nama: nama ?? this.nama,
-      tempatbeli: tempatbeli ?? this.tempatbeli,
-      count: count ?? this.count,
-      harga: harga ?? this.harga,
-    );
+        ingredientItem: ingredientItem ?? this.ingredientItem,
+        tanggalbeli: tanggalbeli ?? this.tanggalbeli,
+        nama: nama ?? this.nama,
+        tempatbeli: tempatbeli ?? this.tempatbeli,
+        count: count ?? this.count,
+        harga: harga ?? this.harga,
+        isSuccess: isSuccess ?? this.isSuccess);
   }
 
   Map<String, dynamic> toMap() {

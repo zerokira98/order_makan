@@ -63,6 +63,7 @@ class KaryawanAuthRepo {
         (value) {
           return firestore.collection('users').doc(value.user?.uid).set({
             "name": displayName ?? '',
+            "email": value.user?.email ?? '',
             "role": role ?? "karyawan",
             "id": value.user?.uid
           });

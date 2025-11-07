@@ -50,20 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyALOYfvaQer0z45koQXjT-T5Pr2pO6kmJI',
-    appId: '1:27883078232:web:97b890cc300f735f3d002d',
-    messagingSenderId: '27883078232',
-    projectId: 'groom-dev-33492',
-    authDomain: 'groom-dev-33492.firebaseapp.com',
-    storageBucket: 'groom-dev-33492.firebasestorage.app',
+    apiKey: 'AIzaSyCO5drCGT8L72uPX62VOAPRpQwlC3HUXu4',
+    appId: '1:55819968623:web:87141407ea04e2222e2d9a',
+    messagingSenderId: '55819968623',
+    projectId: 'get-order-a0bd7',
+    authDomain: 'get-order-a0bd7.firebaseapp.com',
+    storageBucket: 'get-order-a0bd7.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD9CmCM5pAjHiJexIbZw0DPSc0ZynMbYjk',
-    appId: '1:27883078232:android:0fc6e28ca218e99e3d002d',
-    messagingSenderId: '27883078232',
-    projectId: 'groom-dev-33492',
-    storageBucket: 'groom-dev-33492.firebasestorage.app',
+    apiKey: 'AIzaSyCLHxtWoG8wMZH7WWizmeOOm2tyF5XsLTw',
+    appId: '1:55819968623:android:1db722870fd2803d2e2d9a',
+    messagingSenderId: '55819968623',
+    projectId: 'get-order-a0bd7',
+    storageBucket: 'get-order-a0bd7.firebasestorage.app',
   );
-
 }

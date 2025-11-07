@@ -49,8 +49,8 @@ class _HistoriPengeluaranMainState extends State<HistoriPengeluaranMain> {
                       },
                     );
                   },
-                  child: Text(
-                      DateFormat.MMMM('id_ID').format(state.filter.start!)));
+                  child: Text(DateFormat.MMMM('id_ID')
+                      .format(state.filter.start ?? DateTime.now())));
             },
           ),
           IconButton(
@@ -62,6 +62,9 @@ class _HistoriPengeluaranMainState extends State<HistoriPengeluaranMain> {
       ),
       body: BlocBuilder<PengeluaranCubit, PengeluaranState>(
         builder: (context, state) {
+          if (state.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
           if (state.datas.isEmpty) {
             return Center(
               child: Text('empty'),

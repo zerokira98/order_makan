@@ -5,10 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
+import 'package:order_makan/bloc/bahanbaku/bahanbaku_cubit.dart';
 import 'package:order_makan/helper.dart';
+import 'package:order_makan/model/ingredient_model.dart';
 import 'package:order_makan/model/inputstock_model.dart';
 import 'package:order_makan/pages/admin_panel/inputbelibahan/cubit/inputbeliform_cubit.dart';
 import 'package:order_makan/repo/menuitemsrepo.dart';
+import 'package:order_makan/repo/strukrepo.dart';
 
 class InputBeliBahanbaku extends StatefulWidget {
   const InputBeliBahanbaku({super.key});
@@ -17,21 +20,25 @@ class InputBeliBahanbaku extends StatefulWidget {
   State<InputBeliBahanbaku> createState() => _InputBeliBahanbakuState();
 }
 
+enum DateFilter { month, year }
+
 class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
-  late Future<QuerySnapshot<InputstockModel>> thefuture;
-  var date = DateTime.now();
+  var filter = DateFilter.month;
+  // late Future<QuerySnapshot<InputstockModel>> thefuture;
+  // var date = DateTime.now();
   @override
   void initState() {
-    thefuture = futuremet();
+    // thefuture = futuremet();
+
     super.initState();
   }
 
-  Future<QuerySnapshot<InputstockModel>> futuremet() {
-    return RepositoryProvider.of<MenuItemRepository>(context)
-        .getInputstocksWithFilter(
-            start: DateTime(date.year, date.month),
-            end: DateTime(date.year, date.month + 1));
-  }
+  // Future<QuerySnapshot<InputstockModel>> futuremet() {
+  //   return RepositoryProvider.of<MenuItemRepository>(context)
+  //       .getInputstocksWithFilter(
+  //           start: DateTime(date.year, date.month),
+  //           end: DateTime(date.year, date.month + 1));
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -47,218 +54,294 @@ class _InputBeliBahanbakuState extends State<InputBeliBahanbaku> {
           actions: [
             IconButton.outlined(
                 onPressed: () {
-                  setState(() {});
+                  BlocProvider.of<InputbeliformCubit>(context).initiate();
+                  BlocProvider.of<BahanbakuCubit>(context).initiate();
+                  // setState(() {});
                 },
                 icon: Icon(Icons.refresh))
           ],
         ),
-        body: Row(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text('List Pembelian Bahanbaku'),
-                        Expanded(child: SizedBox()),
-                        ElevatedButton(
-                            onPressed: () {
-                              showMonthYearPicker(
+        body: BlocBuilder<BahanbakuCubit, BahanbakuState>(
+          builder: (context, state) {
+            return Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            Text('List Pembelian Bahanbaku'),
+                            Expanded(child: SizedBox()),
+                            IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    filter = DateFilter
+                                        .values[(filter.index + 1) % 2];
+                                  });
+                                },
+                                icon: Icon(Icons.swap_horiz)),
+                            ElevatedButton(
+                                onPressed: () {
+                                  if (filter == DateFilter.month) {
+                                    showMonthYearPicker(
+                                            context: context,
+                                            initialDate: state.filter.start ??
+                                                DateTime.now(),
+                                            firstDate: DateTime(2023),
+                                            lastDate: DateTime.now())
+                                        .then(
+                                      (value) {
+                                        if (value != null) {
+                                          BlocProvider.of<BahanbakuCubit>(
+                                                  context)
+                                              .changeDate(StrukFilter(
+                                                  start: DateTime(
+                                                      value.year, value.month),
+                                                  end: DateTime(value.year,
+                                                      value.month + 1)));
+                                        }
+                                      },
+                                    );
+                                  } else {
+                                    showDialog(
                                       context: context,
-                                      initialDate: date,
-                                      firstDate: DateTime(2023),
-                                      lastDate: DateTime.now())
-                                  .then(
-                                (value) {
-                                  if (value != null) {
-                                    setState(() {
-                                      date = value;
-                                      thefuture = futuremet();
-                                    });
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text("Select Year"),
+                                          content: SizedBox(
+                                            // Need to use container to add size constraint.
+                                            width: 300,
+                                            height: 300,
+                                            child: YearPicker(
+                                              firstDate: DateTime(
+                                                  DateTime.now().year - 100),
+                                              lastDate:
+                                                  DateTime(DateTime.now().year),
+                                              selectedDate:
+                                                  state.filter.start ??
+                                                      DateTime.now(),
+                                              onChanged: (DateTime value) {
+                                                BlocProvider.of<BahanbakuCubit>(
+                                                        context)
+                                                    .changeDate(StrukFilter(
+                                                        start: DateTime(
+                                                          value.year,
+                                                        ),
+                                                        end: DateTime(
+                                                            value.year + 1)));
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
                                   }
                                 },
-                              );
-                            },
-                            child: Text(DateFormat.MMMM('id_ID').format(date))),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: FutureBuilder(
-                      future: thefuture,
-                      builder: (context, snapshot) {
-                        debugPrint(snapshot.data?.docs.toString());
-                        if (snapshot.data == null ||
-                            (snapshot.data?.docs.isEmpty ?? false)) {
-                          return Center(
-                            child: Text('Empty'),
-                          );
-                        }
-                        return ListView.builder(
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            var thedata = snapshot.data!.docs[index].data();
-                            return ListTile(
-                              title: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(thedata.title.toString()),
-                                  Text(thedata.asIngredient.title.toString()),
-                                ],
-                              ),
-                              subtitle: Row(
-                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(thedata.price
-                                        .numberFormat(currency: true)),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      thedata.tanggalbeli
-                                          .toDate()
-                                          .formatBasic(),
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      thedata.count.numberFormat() +
-                                          thedata.asIngredient.satuan,
-                                      textAlign: TextAlign.end,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            VerticalDivider(),
-            Expanded(
-              flex: 1,
-              child: Column(
-                children: [
-                  Text('List Stock Bahanbaku'),
-                  Expanded(
-                    child: FutureBuilder(
-                      future: RepositoryProvider.of<MenuItemRepository>(context)
-                          .getIngredients(),
-                      builder: (context, snapshot) {
-                        debugPrint(snapshot.data.toString());
-                        if (snapshot.data == null ||
-                            (snapshot.data?.isEmpty ?? false)) {
-                          return Center(
-                            child: Text('Empty'),
-                          );
-                        }
-                        return ListView.builder(
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
-                            var thedata = snapshot.data![index];
-                            return ListTile(
-                              title: Text(thedata.title.toString().firstUpcase),
-                              onTap: () => showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    TextEditingController alert =
-                                        TextEditingController(
-                                            text: thedata.alert?.toString() ??
-                                                '0');
-                                    TextEditingController satuandialog =
-                                        TextEditingController(
-                                            text: thedata.satuan);
-                                    return Dialog(
-                                      insetPadding: EdgeInsets.all(24),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(18.0),
-                                        child: SizedBox(
-                                          width: 300,
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: TextFormField(
-                                                  controller: alert,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  validator: numberValidator,
-                                                  decoration: InputDecoration(
-                                                      label: Text(
-                                                          'Alert when less than')),
-                                                ),
-                                              ),
-                                              Expanded(
-                                                child: TextFormField(
-                                                  validator: numberValidator,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  controller: satuandialog,
-                                                  decoration: InputDecoration(
-                                                      label: Text('Satuan')),
-                                                ),
-                                              ),
-                                              IconButton(
-                                                  onPressed: () {
-                                                    RepositoryProvider.of<
-                                                                MenuItemRepository>(
-                                                            context)
-                                                        .editIngredientsSatuan(
-                                                            thedata.copyWith(
-                                                          satuan:
-                                                              satuandialog.text,
-                                                          alert: () =>
-                                                              int.parse(
-                                                                  alert.text),
-                                                        ))
-                                                        .then(
-                                                          (value) =>
-                                                              Navigator.pop(
-                                                                  context),
-                                                        );
-                                                  },
-                                                  icon: Icon(Icons.save))
-                                            ],
+                                child: state.isLoading
+                                    ? CircularProgressIndicator.adaptive()
+                                    : Text((filter == DateFilter.month)
+                                        ? DateFormat.MMMM('id_ID').format(
+                                            state.filter.start ??
+                                                DateTime.now())
+                                        : DateFormat.y('id_ID').format(
+                                            state.filter.start ??
+                                                DateTime.now()))),
+                          ],
+                        ),
+                      ),
+                      state.isLoading
+                          ? Expanded(
+                              child: Center(
+                              child: CircularProgressIndicator(),
+                            ))
+                          : Expanded(
+                              child: ListView.builder(
+                                  itemCount: state.pembelian.length,
+                                  itemBuilder: (context, index) {
+                                    var thedata = state.pembelian[index].data();
+                                    return ListTile(
+                                      title: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(thedata.title.toString()),
+                                          Text(thedata.asIngredient.title
+                                              .toString()),
+                                        ],
+                                      ),
+                                      subtitle: Row(
+                                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(thedata.price
+                                                .numberFormat(currency: true)),
                                           ),
-                                        ),
+                                          Expanded(
+                                            child: Text(
+                                              thedata.tanggalbeli
+                                                  .toDate()
+                                                  .formatBasic(),
+                                              textAlign: TextAlign.end,
+                                            ),
+                                          ),
+                                          Expanded(
+                                            child: Text(
+                                              thedata.count.numberFormat() +
+                                                  state.stockBarang
+                                                      .map(
+                                                        (e) => e.data(),
+                                                      )
+                                                      .singleWhere(
+                                                          (e1) => e1.title
+                                                              .toLowerCase()
+                                                              .contains(thedata
+                                                                  .asIngredient
+                                                                  .title),
+                                                          orElse: () => thedata
+                                                              .asIngredient)
+                                                      .satuan,
+                                              //data might wrong,use from bahanbaku !! thedata.asIngredient.satuan,
+                                              textAlign: TextAlign.end,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     );
-                                  }).then(
-                                (value) {
-                                  setState(() {});
-                                },
-                              ),
-                              subtitle: Row(
-                                // mainAxisAlignment:
-                                //     MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                      'Stock: ${thedata.count.numberFormat()}'),
-                                  Text(thedata.satuan),
-                                  Expanded(child: SizedBox()),
-                                  Text('Alert:${thedata.alert}'),
-                                ],
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    ),
+                                  }),
+                            ),
+                    ],
                   ),
-                  InputBahanbakuField(
-                      BlocProvider.of<InputbeliformCubit>(context).state),
-                ],
-              ),
-            ),
-          ],
+                ),
+                VerticalDivider(),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      Text('List Stock Bahanbaku'),
+                      state.isLoading
+                          ? Expanded(
+                              child: Center(
+                              child: CircularProgressIndicator(),
+                            ))
+                          : Expanded(
+                              child: ListView.builder(
+                              itemCount: state.stockBarang.length,
+                              itemBuilder: (context, index) {
+                                var thedata = state.stockBarang[index].data();
+                                return ListTile(
+                                  title: Text(
+                                      thedata.title.toString().firstUpcase),
+                                  onTap: () => showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        TextEditingController alert =
+                                            TextEditingController(
+                                                text:
+                                                    thedata.alert?.toString() ??
+                                                        '0');
+                                        TextEditingController satuandialog =
+                                            TextEditingController(
+                                                text: thedata.satuan);
+                                        return Dialog(
+                                          insetPadding: EdgeInsets.all(24),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(18.0),
+                                            child: SizedBox(
+                                              width: 300,
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: TextFormField(
+                                                      controller: alert,
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      validator:
+                                                          numberValidator,
+                                                      decoration: InputDecoration(
+                                                          label: Text(
+                                                              'Alert when less than')),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: TextFormField(
+                                                      validator:
+                                                          numberValidator,
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      controller: satuandialog,
+                                                      decoration:
+                                                          InputDecoration(
+                                                              label: Text(
+                                                                  'Satuan')),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                      onPressed: () {
+                                                        RepositoryProvider.of<
+                                                                    MenuItemRepository>(
+                                                                context)
+                                                            .editIngredientsSatuan(
+                                                                thedata
+                                                                    .copyWith(
+                                                              satuan:
+                                                                  satuandialog
+                                                                      .text,
+                                                              alert: () => int
+                                                                  .parse(alert
+                                                                      .text),
+                                                            ))
+                                                            .then(
+                                                              (value) =>
+                                                                  Navigator.pop(
+                                                                      context),
+                                                            );
+                                                      },
+                                                      icon: Icon(Icons.save))
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).then(
+                                    (value) {
+                                      setState(() {});
+                                    },
+                                  ),
+                                  subtitle: Row(
+                                    // mainAxisAlignment:
+                                    //     MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                          'Stock: ${thedata.count.numberFormat()}'),
+                                      Text(thedata.satuan),
+                                      Expanded(child: SizedBox()),
+                                      Text('Alert:${thedata.alert}'),
+                                    ],
+                                  ),
+                                );
+                              },
+                            )),
+                      BlocListener<InputbeliformCubit, InputbeliformState>(
+                        listener: (context, state) {
+                          if (state.isSuccess) {
+                            BlocProvider.of<InputbeliformCubit>(context)
+                                .clrSuccess();
+                            BlocProvider.of<BahanbakuCubit>(context).initiate();
+                          }
+                        },
+                        child: InputBahanbakuField(
+                            BlocProvider.of<InputbeliformCubit>(context).state),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -348,6 +431,7 @@ class InputBahanbakuField extends StatelessWidget {
                                     thecubit.changeData(thecubit.state.copyWith(
                                         ingredientItem: ingreitem.copyWith(
                                             title: value.trim(),
+                                            satuan: '',
                                             id: () => null)));
                                   },
                                   decoration: InputDecoration(
@@ -416,6 +500,7 @@ class InputBahanbakuField extends StatelessWidget {
                       Expanded(
                         child: TextFormField(
                           controller: nama,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           onChanged: (value) {
                             thecubit.changeData(
                                 thecubit.state.copyWith(nama: value));
@@ -490,7 +575,28 @@ class InputBahanbakuField extends StatelessWidget {
                         var isValid =
                             _formKey.currentState?.validate() ?? false;
                         if (isValid) {
-                          thecubit.sendtoDB();
+                          if (thecubit.state.ingredientItem.id == null) {
+                            showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Alert'),
+                                content: Text(
+                                    'Bahan baku baru akan ditambahkan, lanjutkan?'),
+                                actions: [
+                                  ElevatedButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      child: Text('Ok'))
+                                ],
+                              ),
+                            ).then(
+                              (value) {
+                                if (value ?? false) {
+                                  thecubit.sendtoDB();
+                                }
+                              },
+                            );
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text('Invalid data exist')));

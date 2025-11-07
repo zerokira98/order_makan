@@ -19,6 +19,7 @@ class EditMain extends StatelessWidget {
       body: Row(
         children: [
           Expanded(flex: 3, child: AdminDrawer()),
+          Padding(padding: EdgeInsetsGeometry.all(2)),
           Expanded(
             flex: 7,
             child: Column(
@@ -41,6 +42,7 @@ class EditMain extends StatelessWidget {
                     children: <Widget>[
                       for (var i = 0; i < state.datas.length; i++)
                         MenuCard(
+                          key: Key(state.datas[i].hashCode.toString()),
                           onTap: () {},
                           editmode: true,
                           menudata: state.datas[i],

@@ -230,12 +230,12 @@ class _MenuCardState extends State<MenuCard> with TickerProviderStateMixin {
                                 bottomRight: Radius.circular(8)),
                             color: Colors.black45,
                           ),
-                          padding: EdgeInsets.all(8),
+                          padding: EdgeInsets.all(4),
                           child: Text(
-                            'Rp  ${widget.menudata.price.toString().numberFormat()}',
+                            'Rp ${widget.menudata.price.toString().numberFormat()}',
                             textAlign: TextAlign.end,
                             style: TextStyle(color: Colors.white),
-                            textScaler: TextScaler.linear(1.1),
+                            textScaler: TextScaler.linear(1.15),
                           ),
                         ),
                       )
