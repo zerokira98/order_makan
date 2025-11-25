@@ -73,6 +73,10 @@ dependencies:
   rename_app: ^1.6.5
   cached_network_image: ^3.4.1
   google_fonts: ^6.3.2
+  firebase_messaging: ^16.0.4
+  flutter_local_notifications: ^19.5.0
+  android_id: ^0.4.0
+  http: ^1.5.0
 
 dev_dependencies:
   flutter_test:

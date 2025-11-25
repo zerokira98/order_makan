@@ -1,10 +1,13 @@
 import 'dart:async';
 
+import 'package:android_id/android_id.dart';
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:order_makan/repo/karyawan_authrepo.dart';
-import 'package:order_makan/repo/user_model.dart' show User;
+
+import '../../repo/repo.dart';
 
 part 'karyawanauth_event.dart';
 part 'karyawanauth_state.dart';
@@ -35,7 +38,7 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
     on<SignIn>((event, emit) async {
       try {
         await auth.logInWithEmailAndPassword(
-            email: event.email, password: event.password);
+            email: event.email.trim(), password: event.password);
       } on Exception catch (e) {
         emit(KaryawanUnAuth(errorMsg: e.toString()));
         // debugPrint('error $e');
@@ -45,12 +48,24 @@ class KaryawanauthBloc extends Bloc<KaryawanauthEvent, KaryawanauthState> {
     });
     on<SignUp>((event, emit) async {
       await auth.signUp(
-          email: event.email,
+          email: event.email.trim(),
           password: event.password,
           displayName: event.username);
     });
     on<SignOut>((event, emit) async {
-      await auth.logOut();
+      auth.logOut().then(
+        (value) {
+          if (!kIsWasm) {
+            FirebaseMessaging.instance.getToken().then((token) async {
+              debugPrint("tken:$token");
+              var androidId = await const AndroidId().getId();
+              DeviceRepo(
+                firestore: FirebaseFirestore.instance,
+              ).updateToken((androidId ?? 'unknownid'), token!, false);
+            });
+          }
+        },
+      );
     });
     _userSubscription = auth.user.listen((event) {
       add(UserChanged(event));

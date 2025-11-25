@@ -338,7 +338,7 @@ class _CheckoutDialogState extends State<CheckoutDialog> {
                                             try {
                                               BlocProvider.of<UseStrukBloc>(
                                                       context)
-                                                  .add(SendtoDb());
+                                                  .add(SendtoAntrianDB());
                                             } catch (e) {
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(SnackBar(

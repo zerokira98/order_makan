@@ -43,7 +43,7 @@ class _AntrianPageState extends State<AntrianPage> {
 
   @override
   void dispose() {
-    ScaffoldMessenger.of(context).clearSnackBars();
+    // ScaffoldMessenger.of(context).clearSnackBars();
     super.dispose();
   }
 
@@ -68,7 +68,7 @@ class _AntrianPageState extends State<AntrianPage> {
         listenWhen: (previous, current) => current.msg != previous.msg,
         listener: (context, state) {
           if (mounted) {
-            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
             if (state.msg != null) {
               ScaffoldMessenger.of(context)
                   .showSnackBar(SnackBar(

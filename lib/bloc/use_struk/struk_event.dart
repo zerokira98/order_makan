@@ -62,7 +62,7 @@ class ClearErrMsg extends UseStrukEvent {
   ClearErrMsg();
 }
 
-class SendtoDb extends UseStrukEvent {}
+class SendtoAntrianDB extends UseStrukEvent {}
 
 class DateUpdate extends UseStrukEvent {}
 

@@ -1,14 +1,11 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-
 import 'package:meta/meta.dart';
 import 'package:order_makan/bloc/use_struk/struk_state.dart';
 import 'package:order_makan/model/strukitem_model.dart';
 import 'package:order_makan/model/submenuitem_model.dart';
-import 'package:order_makan/repo/karyawan_authrepo.dart';
-import 'package:order_makan/repo/strukrepo.dart';
-import 'package:order_makan/repo/user_model.dart';
+import 'package:order_makan/repo/repo.dart';
 
 part 'struk_event.dart';
 
@@ -127,7 +124,7 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       // await repo.sendtoAntrian(state);
       emit(state.copywith(ordertime: DateTime.now()));
     });
-    on<SendtoDb>((event, emit) async {
+    on<SendtoAntrianDB>((event, emit) async {
       // var now = DateTime.now();
       // var todayscount = await repo
       //     .readStrukwithFilter(StrukFilter(
@@ -139,7 +136,11 @@ class UseStrukBloc extends Bloc<UseStrukEvent, UseStrukState> {
       //     );
       repo.increaseTodaysAntrianCount().then(
         (antriancount) {
-          repo.sendtoAntrian(state.copywith(nomorAntrian: antriancount));
+          repo.sendtoAntrian(state.copywith(nomorAntrian: antriancount)).then(
+            (value) {
+              BackendApi.sendNotifOrderCreated(value.id);
+            },
+          );
 
           add(InitiateStruk(karyawanId: state.karyawanId, success: true));
         },

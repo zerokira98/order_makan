@@ -3,6 +3,12 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:order_makan/repo/user_model.dart' show User;
 
+// String baseApiUrl = 'http://10.0.2.2:3001/ordermakan'; //android emulator
+// String baseApiUrl = 'http://127.0.0.1:3001/ordermakan';//localhost
+String baseApiUrl =
+    'https://nodemid--get-order-a0bd7.asia-southeast1.hosted.app/ordermakan'; //firebase app hosting
+String apiKey = "SaT1JjsUHiRxt3pxQXhP";
+
 String? validateEmail(String? value) {
   const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
       r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
@@ -32,6 +38,12 @@ String? usernameValidator(String? value) {
   if (value.length < 3) return "too short";
   return null;
 }
+// String? usernameValidator(String? value) {
+//   if (value == null) return "not initialized";
+//   if (value.isEmpty) return "cant empty";
+//   if (value.length < 3) return "too short";
+//   return null;
+// }
 
 NumberFormat numfor = NumberFormat("###,###", 'ID_id');
 

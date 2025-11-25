@@ -1,9 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:month_year_picker/month_year_picker.dart';
@@ -21,27 +24,38 @@ import 'package:order_makan/pages/admin_panel/pengeluaran/cubit/pengeluaran_cubi
 import 'package:order_makan/pages/firstrun_setup.dart';
 import 'package:order_makan/pages/karyawan_loginpage.dart';
 import 'package:order_makan/pages/karyawan_signup.dart';
-import 'package:order_makan/repo/firestore_kas.dart';
-import 'package:order_makan/repo/globalsettingrepo.dart';
-import 'package:order_makan/repo/karyawan_authrepo.dart';
-import 'package:order_makan/repo/menuitemsrepo.dart';
-import 'package:order_makan/repo/strukrepo.dart';
+import 'repo/repo.dart';
 import 'package:order_makan/pages/use_app/use_main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb) {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
+    InitializationSettings initializationSettings =
+        const InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (details) {},
+    );
+  }
 
   initializeDateFormatting('id_ID', null);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   var fireApp = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // var db = await SembastDB.init();
-  // var db2 = await SembastDB.init2();
   var firebase = FirebaseAuth.instanceFor(app: fireApp);
   var firestore = FirebaseFirestore.instanceFor(app: fireApp);
-
+  FirebaseMessaging.onBackgroundMessage(_messageHandler);
+  FirebaseMessaging.onMessage.listen(
+    (element) {
+      _messageHandler(element);
+    },
+  );
   firestore.settings = const Settings(persistenceEnabled: true);
   runApp(MultiRepositoryProvider(
     providers: [
@@ -197,4 +211,29 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
+}
+
+@pragma('vm:entry-point')
+Future<void> _messageHandler(RemoteMessage message) async {
+  debugPrint('message:$message');
+  var flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  const AndroidNotificationDetails androidNotificationDetails =
+      AndroidNotificationDetails(
+    'your channel id',
+    'your channel name',
+    channelDescription: 'your channel description',
+    importance: Importance.max,
+    priority: Priority.high,
+    ticker: 'ticker',
+  );
+  const NotificationDetails notificationDetails = NotificationDetails(
+    android: androidNotificationDetails,
+  );
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    message.notification?.title ?? 'no-title',
+    message.notification?.body ?? 'no body',
+    notificationDetails,
+    payload: 'item x',
+  );
 }

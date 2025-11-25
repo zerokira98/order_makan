@@ -31,6 +31,7 @@ class _DateTimerState extends State<DateTimer> {
   @override
   void dispose() {
     timer.cancel();
+
     super.dispose();
   }
 

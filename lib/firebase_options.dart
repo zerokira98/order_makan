@@ -65,4 +65,5 @@ class DefaultFirebaseOptions {
     projectId: 'get-order-a0bd7',
     storageBucket: 'get-order-a0bd7.firebasestorage.app',
   );
+
 }

@@ -98,8 +98,8 @@ class _KaryawanSignupPageState extends State<KaryawanSignupPage> {
                               //   var c = jsonDecode(b);
                               try {
                                 BlocProvider.of<KaryawanauthBloc>(context).add(
-                                    SignUp(email.text, password.text,
-                                        username.text));
+                                    SignUp(email.text.trim(), password.text,
+                                        username.text.trim()));
 
                                 if (widget.firstTime) {
                                   await sharedpref.setInt('firstStart', 2);

@@ -20,7 +20,24 @@ class KaryawanManageMain extends StatelessWidget {
               return ListView.builder(
                 itemCount: snap.data!.docs.length,
                 itemBuilder: (context, index) => ListTile(
-                    title: Text(snap.data!.docs[index].data().toString())),
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: Text('Edit User'),
+                              content: Text('Edit Form'),
+                            ));
+                  },
+                  title: Row(
+                    children: [
+                      Text(snap.data!.docs[index].data()['name'].toString()),
+                      Expanded(child: SizedBox()),
+                      Text(snap.data!.docs[index].data()['email'].toString()),
+                    ],
+                  ),
+                  subtitle:
+                      Text(snap.data!.docs[index].data()['role'].toString()),
+                ),
               );
             }
             return const Column(

@@ -20,7 +20,7 @@ class ExcelProcessor {
     sheet.name = 'Penjualan';
     debugPrint(karyawans.toString());
     for (var i = 0; i < state.struks.length; i++) {
-      var simpledate = state.struks[i].ordertime.day;
+      var simpled = state.struks[i].ordertime.day;
 
       sheet.getRangeByIndex(i + 1, 1)
         ..setDateTime(state.struks[i].ordertime)

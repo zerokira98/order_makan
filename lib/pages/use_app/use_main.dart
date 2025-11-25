@@ -1,4 +1,7 @@
+import 'package:android_id/android_id.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -22,8 +25,9 @@ import 'package:order_makan/pages/admin_panel/adminpanel_main.dart';
 import 'package:order_makan/pages/antrian/antrian_main.dart';
 import 'package:order_makan/pages/historipenjualan/historipenjualan_harian.dart';
 import 'package:order_makan/pages/use_app/checkout.dart';
-import 'package:order_makan/repo/menuitemsrepo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../repo/repo.dart';
 
 part 'use_drawer.dart';
 
@@ -53,6 +57,20 @@ class _UseMainState extends State<UseMain> {
       return KeyEventResult.handled;
     },
   );
+  @override
+  void initState() {
+    if (!kIsWasm) {
+      FirebaseMessaging.instance.getToken().then((token) async {
+        debugPrint("en:$token");
+        var androidId = await const AndroidId().getId();
+        DeviceRepo(
+          firestore: FirebaseFirestore.instance,
+        ).updateToken((androidId ?? 'unknownid'), token!,
+            await RepositoryProvider.of<KaryawanAuthRepo>(context).isAdmin());
+      });
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -107,7 +125,13 @@ class _UseMainState extends State<UseMain> {
                       style: TextStyle(fontSize: 10),
                     );
                   },
-                )
+                ),
+                // ElevatedButton(
+                //     onPressed: () async {
+                //       var a = await BackendApi.testHit();
+                //       print(a.body);
+                //     },
+                //     child: Text('test'))
               ],
             ),
             actions: [
